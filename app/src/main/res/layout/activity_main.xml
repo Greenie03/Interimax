@@ -19,7 +19,9 @@
         android:layout_alignParentBottom="true"
         android:layout_gravity="bottom"
         android:background="@color/transparent"
-        app:itemIconTint="@color/colorIcon"
-        app:menu="@menu/navbar" />
+        app:itemIconTint="@color/icon_selector"
+        style="@style/Widget.MaterialComponents.BottomNavigationView.PrimarySurface"
+        app:menu="@menu/navbar"
+        app:labelVisibilityMode="unlabeled"/>
 
 </RelativeLayout>
