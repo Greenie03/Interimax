@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Interimax</string>
+    <string name="home">home</string>
+    <string name="message">message</string>
+    <string name="bookmark">bookmark</string>
+    <string name="notification">notification</string>
 </resources>
