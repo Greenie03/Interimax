@@ -8,9 +8,9 @@ Afin de faciliter le développement de l'application nous avons choisi de voir l
 parties distinctes selon les différents cas d'usages. Nous nous retrouvons donc avec les trois
 sous-parties suivantes :
 
-**-Partie anonyme**
-**-Partie candidat**
-**-Partie employeur**
+**-Partie anonyme**<br>
+**-Partie candidat**<br>
+**-Partie employeur**<br>
 
 ### PART I - PARTIE ANONYME
 
