@@ -13,6 +13,28 @@
         android:theme="@style/Theme.Interimax"
         tools:targetApi="31">
         <activity
+            android:name=".SplashActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false"
+            android:parentActivityName=".SplashActivity" />
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false"
+            android:parentActivityName=".SplashActivity" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAxdCGPjxgpjepuqfNTf8Ltp2zyZ7A4Z-A" />
+
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
