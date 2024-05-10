@@ -22,3 +22,11 @@ Nous commencerons donc l'implémentation du code par la partie que l'on jugera l
 Le point de départ du développement de cette partie repose dans la réalisation de la Homepage qui sera commune avec le cas d'usage candidat.
 Ici cette Homepage est vue comme une activité contenant une barre de navigation qui permettra de naviguer entre les différents fragments disponible selon si l'utilisateur est connecté ou non. Dans ce cas si seul le fragment permettant de consulter les offres autour de nous sera disponible. Ce dernier nous permettra ultérieurement également d'accéder à l'activité de recherche. Lors de ce premier commit c'est donc la première activité ainsi que sa navbar qui a été réalisé avec ces boutons qui nous serviront à naviguer. 
 
+#### COMMIT 2 - SEARCH ACTIVITY CREATION
+
+Dans ce commit, une deuxième activité a été créée dans le but de pouvoir permettre aux utilisateurs de type anonyme et candidat de rechercher différentes offres d'emploi. Pour ce faire, l'utilisateur peut soit :
+-Entrer les mots-clés de l'offre recherchée dans la barre de recherche
+-Naviguer à travers son historique de recherche afin de reprendre une recherche avec des mots-clés déjà entrrés auparavant
+-cliquer sur l'un des boutons representant les recherches populaires
+Par la suite il pourra également affiner sa recherche en cliquant sur le bouton filtre ce qui ouvrira un fragment avec d'autrees paramètres de recherche pour affiner cette derniere.
+
