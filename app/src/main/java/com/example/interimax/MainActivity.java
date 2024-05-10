@@ -41,28 +41,28 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             case R.id.navigation_home:
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.flFragment, firstFragment)
+                        .replace(R.id.fragment, firstFragment)
                         .commit();
                 return true;
 
             case R.id.navigation_message:
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.flFragment, secondFragment)
+                        .replace(R.id.fragment, secondFragment)
                         .commit();
                 return true;
 
             case R.id.navigation_bookmark:
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.flFragment, thirdFragment)
+                        .replace(R.id.fragment, thirdFragment)
                         .commit();
                 return true;
 
             case R.id.navigation_notifications:
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.flFragment, thirdFragment)
+                        .replace(R.id.fragment, thirdFragment)
                         .commit();
                 return true;
         }*/

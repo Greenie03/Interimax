@@ -4,4 +4,11 @@
     <string name="message">message</string>
     <string name="bookmark">bookmark</string>
     <string name="notification">notification</string>
+    <string name="back_icon_description">Back Icon</string>
+    <string name="search">Recherche</string>
+    <string name="search_hint">Rechercher un job ou une position</string>
+    <string name="filter_icon_description">Filter Icon</string>
+    <string name="recent_search">Recherches récentes</string>
+    <string name="popular">Populaires</string>
+
 </resources>

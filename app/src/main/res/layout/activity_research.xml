@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ResearchActivity">
+
+    <ImageButton
+        android:id="@+id/back_button"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="20dp"
+        android:src="@drawable/cross_icon"
+        android:contentDescription="@string/back_icon_description"
+        android:layout_alignParentStart="true"/>
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/search"
+        android:layout_centerHorizontal="true"
+        android:textStyle="bold"
+        android:textSize="24sp"
+        android:layout_marginTop="20dp"/>
+
+    <LinearLayout
+        android:id="@+id/search_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/title"
+        android:layout_marginTop="64dp"
+        android:gravity="center_vertical">
+        <EditText
+            android:id="@+id/search_input"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="@string/search_hint"
+            android:autofillHints=""
+            android:inputType="text"
+            android:padding="24dp" />
+
+        <ImageButton
+            android:id="@+id/filter_button"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/filter_icon_description"
+            android:src="@drawable/filter_icon" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/recent_search_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/search_layout"
+        android:paddingHorizontal="18dp"
+        android:layout_marginTop="60dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/recent_search"
+            android:textStyle="bold"
+            android:textSize="24sp" />
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/popular_section_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/popular"
+        android:textStyle="bold"
+        android:textSize="24sp"
+        android:layout_below="@id/recent_search_layout"
+        android:layout_marginTop="24dp"/>
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true"
+        android:layout_below="@id/popular_section_title">
+        <LinearLayout
+            android:id="@+id/popular_buttons"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"/>
+    </HorizontalScrollView>
+
+</RelativeLayout>
