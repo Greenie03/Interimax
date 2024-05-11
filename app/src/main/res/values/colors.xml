@@ -5,4 +5,6 @@
     <color name="purple_hard">#390A6E</color>
     <color name="purple_soft">#BB86FC</color>
     <color name="link_color">#2196F3</color>
+    <color name="grey_light">#D3D3D3</color>
+    <color name="grey_hard">#9C9C9C</color>
 </resources>
