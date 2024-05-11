@@ -2,6 +2,7 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
@@ -16,15 +17,16 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:popupTheme="@style/Base.Theme.Interimax" >
+            app:popupTheme="@style/Base.Theme.Interimax">
 
             <!-- Ajouter un ImageView pour le logo à droite -->
             <ImageView
                 android:id="@+id/toolbarLogo"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_gravity="right"
-                android:src="@drawable/logo" />
+                android:layout_gravity="end"
+                android:src="@drawable/logo"
+                android:translationX="150dp" />
 
         </androidx.appcompat.widget.Toolbar>
 
