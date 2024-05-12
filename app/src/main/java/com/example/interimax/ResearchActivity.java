@@ -16,6 +16,11 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.interimax.models.Offer;
+
+import java.util.Set;
+import java.util.stream.Collectors;
+
 public class ResearchActivity extends AppCompatActivity {
     EditText search_input;
 
@@ -31,11 +36,11 @@ public class ResearchActivity extends AppCompatActivity {
         });
         search_input = findViewById(R.id.search_input);
         LinearLayout button_layout = findViewById(R.id.popular_buttons);
-        for(int i = 0; i < 19; i++){
-            String text_button = "Button " + (i+1);
-            Button b = createNewPopularButton(text_button);
+        Set<String> jobTitle = Offer.getAllOffers().stream().map(Offer::getJobTitle).collect(Collectors.toSet());
+        jobTitle.forEach(jt -> {
+            Button b = createNewPopularButton(jt);
             button_layout.addView(b);
-        }
+        });
 
         ImageButton search_button = findViewById(R.id.search_button_id);
         search_button.setOnClickListener(new View.OnClickListener() {
@@ -75,6 +80,7 @@ public class ResearchActivity extends AppCompatActivity {
                 search_input.setText(name);
             }
         });
+
         return b;
     }
 }
