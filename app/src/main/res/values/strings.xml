@@ -10,5 +10,6 @@
     <string name="filter_icon_description">Filter Icon</string>
     <string name="recent_search">Recherches récentes</string>
     <string name="popular">Populaires</string>
+    <string name="search_button">Search Button</string>
 
 </resources>
