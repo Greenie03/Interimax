@@ -42,6 +42,14 @@ public class ResearchActivity extends AppCompatActivity {
             button_layout.addView(b);
         });
 
+        ImageButton back_button =  findViewById(R.id.back_button);
+        back_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
         ImageButton search_button = findViewById(R.id.search_button_id);
         search_button.setOnClickListener(new View.OnClickListener() {
             @Override
