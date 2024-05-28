@@ -3,6 +3,7 @@ package com.example.interimax;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -36,10 +37,15 @@ public class ResearchActivity extends AppCompatActivity {
         });
         search_input = findViewById(R.id.search_input);
         LinearLayout button_layout = findViewById(R.id.popular_buttons);
-        Set<String> jobTitle = Offer.getAllOffers().stream().map(Offer::getJobTitle).collect(Collectors.toSet());
-        jobTitle.forEach(jt -> {
-            Button b = createNewPopularButton(jt);
-            button_layout.addView(b);
+        Offer.getAllOffers().thenAccept(offers -> {
+            runOnUiThread(() -> {
+                Set<String> jobTitle = offers.stream().map(Offer::getJobTitle).collect(Collectors.toSet());
+                jobTitle.forEach(jt -> {
+                    Button b = createNewPopularButton(jt);
+                    button_layout.addView(b);
+                    Log.d("Job", jt);
+                });
+            });
         });
 
         ImageButton back_button =  findViewById(R.id.back_button);
@@ -67,7 +73,8 @@ public class ResearchActivity extends AppCompatActivity {
         filter_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(ResearchActivity.this, "Filter button", Toast.LENGTH_LONG).show();
+                FilterFragment filterFragment = FilterFragment.newInstance();
+                filterFragment.show(getSupportFragmentManager(), "filter_fragment");
             }
         });
     }
@@ -76,10 +83,12 @@ public class ResearchActivity extends AppCompatActivity {
         Button b = new Button(this);
         b.setText(name);
         b.setBackground(getDrawable(R.drawable.popular_button_background));
+        b.setPadding(4,0,4,0);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
+
         lp.setMargins(18,0,18,0);
         b.setLayoutParams(lp);
         b.setOnClickListener(new View.OnClickListener() {

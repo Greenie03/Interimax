@@ -72,7 +72,7 @@
             android:paddingHorizontal="18dp"
             android:contentDescription="@string/filter_icon_description"
             android:src="@drawable/filter_icon"
-            android:background="@drawable/border" />
+            android:background="@drawable/border_grey" />
     </LinearLayout>
 
     <LinearLayout

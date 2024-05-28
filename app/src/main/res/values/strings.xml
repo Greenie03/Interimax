@@ -111,4 +111,9 @@
     <string name="confirm_password">Confirmer le mot de passe</string>
     <string name="register">Créer le compte</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="filters">Filtres</string>
+    <string name="done">Terminé</string>
+    <string name="filter_hint">Employeur</string>
+    <string name="salary">Salaire</string>
+    <string name="salary_section_desc">La moyenne des salaires choisis est</string>
 </resources>

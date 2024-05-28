@@ -1,7 +1,6 @@
 package com.example.interimax;
 
 import static com.example.interimax.models.Offer.getAllOffers;
-import static com.example.interimax.models.Offer.getOffers;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -65,19 +64,18 @@ public class ScrollingHomeFragment extends Fragment implements OnMapReadyCallbac
     }
     private void loadOffersAndMarkOnMap() {
         // Liste d'offres simulée
-        //List<Offer> offers = getAllOffers();
-        List<Offer> offers = getOffers();
+        getAllOffers().thenAccept(offers -> {
+            for (Offer offer : offers) {
+                // Créer un marqueur pour chaque offre
+                MarkerOptions options = new MarkerOptions()
+                        .position(new LatLng(offer.getCoordinate().getLatitude(), offer.getCoordinate().getLongitude()))
+                        .title(offer.getName())
+                        .snippet("Prix: " + offer.getSalary() + "€");
 
-        for (Offer offer : offers) {
-            // Créer un marqueur pour chaque offre
-            MarkerOptions options = new MarkerOptions()
-                    .position(new LatLng(offer.getLatitude(), offer.getLongitude()))
-                    .title(offer.getName())
-                    .snippet("Prix: " + offer.getSalary() + "€");
-
-            // Ajouter le marqueur sur la carte
-            mMap.addMarker(options);
-        }
+                // Ajouter le marqueur sur la carte
+                mMap.addMarker(options);
+            }
+        });
     }
 
 }

@@ -1,7 +1,26 @@
 package com.example.interimax.models;
 
+import android.util.Log;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+
+import com.example.interimax.MainActivity;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 public class Offer {
     private String name;
@@ -10,82 +29,90 @@ public class Offer {
     private String description; // Description du poste
     private Integer period; // Période de l'emploi
     private double salary; // Rémunération
-    private double latitude;
-    private double longitude;
+    private GeoPoint coordinate;
 
     // Liste statique qui contient toutes les offres
     private static List<Offer> allOffers = new ArrayList<>();
+    private static FirebaseFirestore database = FirebaseFirestore.getInstance();
 
     // Constructeur complet
-    public Offer(String name, String employerName, String jobTitle, String description, Integer period, double salary, double latitude, double longitude) {
+    public Offer(String name, String employerName, String jobTitle, String description, Integer period, double salary, GeoPoint coordinate) {
         this.name = name;
         this.employerName = employerName;
         this.jobTitle = jobTitle;
         this.description = description;
         this.period = period;
         this.salary = salary;
-        this.latitude = latitude;
-        this.longitude = longitude;
+        this.coordinate = coordinate;
         addOffer(this); // Ajouter automatiquement l'offre à la liste
+    }
+
+    public Offer(){
+
     }
 
     // Ajoute une offre à la liste
     private static void addOffer(Offer offer) {
-        allOffers.add(offer);
+        database.collection("Job").add(offer);
     }
 
     // Retourne la liste des offres
-    public static List<Offer> getAllOffers() {
-        return allOffers;
-    }
-    public static List<Offer> getOffers() {
+    public static CompletableFuture<List<Offer>> getAllOffers() {
         List<Offer> offers = new ArrayList<>();
-        offers.add(new Offer(
-                "Assistant Administratif - Paris",
-                "Agence Intérim Paris Centre",
-                "Assistant Administratif",
-                "Gestion des appels, traitement de texte, et gestion de dossiers clients.",
-                8, // Durée en heures pour une journée complète
-                12.50, // Salaire horaire
-                48.8566, 2.3522));
+        CompletableFuture<List<Offer>> future = new CompletableFuture<>();
+        database.collection("Job").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()){
+                    for(QueryDocumentSnapshot doc : task.getResult()){
+                        Log.d("document "+doc.getId(), doc.getData().toString());
+                        offers.add(doc.toObject(Offer.class));
+                    }
+                }
+                future.complete(offers);
+            }
+        });
+        return future;
+    }
 
-        offers.add(new Offer(
-                "Ouvrier de Construction - Marseille",
-                "BTP Marseille Sud",
-                "Ouvrier",
-                "Travaux de construction, aide à la maçonnerie et préparation des sites.",
-                24, // Durée en heures pour trois jours
-                13.00, // Salaire horaire
-                43.2965, 5.3698));
-
-        offers.add(new Offer(
-                "Serveur en Restauration - Lyon",
-                "RestoLyon",
-                "Serveur",
-                "Service en salle, accueil des clients et préparation des commandes.",
-                40, // Durée en heures pour cinq jours
-                11.00, // Salaire horaire
-                45.7640, 4.8357));
-
-        offers.add(new Offer(
-                "Aide-Soignant - Toulouse",
-                "Santé Intérim Toulouse",
-                "Aide-Soignant",
-                "Assistance aux patients, soins de base et maintien de l'hygiène.",
-                56, // Durée en heures pour sept jours
-                14.00, // Salaire horaire
-                43.6045, 1.4442));
-
-        offers.add(new Offer(
-                "Préparateur de Commandes - Lille",
-                "Logistique Nord",
-                "Préparateur de Commandes",
-                "Préparation des commandes, gestion des stocks et emballage.",
-                16, // Durée en heures pour deux jours
-                10.50, // Salaire horaire
-                50.6293, 3.0573));
-
-        return offers;
+    public static CompletableFuture<List<Offer>> findOffer(Optional<String> name, Optional<String> employerName, Optional<String> jobTitle, Optional<String> description, Optional<Integer> period, Optional<Double> salary, Optional<GeoPoint> coordinate){
+        CompletableFuture<List<Offer>> future = new CompletableFuture<>();
+        List<Offer> offers = new ArrayList<>();
+        Query query = database.collection("Job");
+        if(name.isPresent()){
+            query.whereEqualTo("name", name.get());
+        }
+        if(employerName.isPresent()){
+            query.whereEqualTo("employerName", employerName.get());
+        }
+        if(jobTitle.isPresent()){
+            query.whereEqualTo("jobTitle", jobTitle.get());
+        }
+        if(description.isPresent()){
+            query.whereEqualTo("description", description.get());
+        }
+        if(period.isPresent()){
+            query.whereEqualTo("period", period.get());
+        }
+        if(salary.isPresent()){
+            query.whereEqualTo("salary", salary.get());
+        }
+        if(coordinate.isPresent()){
+            query.whereEqualTo("coordinate", coordinate.get());
+        }
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()){
+                    for(QueryDocumentSnapshot doc : task.getResult()){
+                        Log.d("document "+doc.getId(), doc.getData().toString());
+                        offers.add(doc.toObject(Offer.class));
+                    }
+                }
+                future.complete(offers);
+            }
+        });
+        return future;
     }
 
 
@@ -120,12 +147,8 @@ public class Offer {
         return employerName;
     }
 
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public double getLongitude() {
-        return longitude;
+    public GeoPoint getCoordinate() {
+        return coordinate;
     }
 
     public String getJobTitle() {

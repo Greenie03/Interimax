@@ -32,8 +32,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             return insets;
         });
 
-        Offer.getOffers();
-
         homeFragment = new HomeFragment();
 
         bottomNavigationView = findViewById(R.id.navbar);
