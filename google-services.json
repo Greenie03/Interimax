@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "685260195689",
+    "project_id": "interimax-d383c",
+    "storage_bucket": "interimax-d383c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:685260195689:android:55f93c04ab89f14a99dff8",
+        "android_client_info": {
+          "package_name": "com.example.interimax"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5Ghny4PaTPHH1WtMJHiIbQjrgyEBxk_U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
