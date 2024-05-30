@@ -86,11 +86,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (itemId == R.id.navigation_message) {
             fragment = new MessagesFragment();
             Log.d("handleNavigationItemSelected", "Messages selected");
-        } /*else if (itemId == R.id.navigation_bookmark) {
-            fragment = new SavedFragment();
+        } else if (itemId == R.id.navigation_bookmark) {
+            fragment = new SavedOffersFragment();
             Log.d("handleNavigationItemSelected", "Saved selected");
-        } else if (itemId == R.id.navigation_menu) {
-            fragment = new OtherFragment();
+        } /*else if (itemId == R.id.navigation_notification) {
+            fragment = new NotificationFragment();
             Log.d("handleNavigationItemSelected", "Other selected");
         }*/
 

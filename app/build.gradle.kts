@@ -7,6 +7,7 @@ android {
     namespace = "com.example.interimax"
     compileSdk = 34
 
+
     defaultConfig {
         applicationId = "com.example.interimax"
         minSdk = 33
@@ -32,6 +33,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        dataBinding = true
     }
 }
 
@@ -52,6 +54,9 @@ dependencies {
     implementation(libs.com.google.gms.google.services.gradle.plugin)
     //implementation(libs.legacy.support.v4)
     implementation(libs.recyclerview)
+    implementation(libs.databinding.runtime)
+    implementation(libs.databinding.common)
+    implementation(libs.databinding.adapters)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
