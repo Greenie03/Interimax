@@ -1,5 +1,10 @@
 package com.example.interimax.models;
 
+import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -11,18 +16,24 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
-public class Offer {
+public class Offer implements Parcelable {
     private String name;
     private String employerName; // Nom de l'employeur
     private String jobTitle; // Métier cible
@@ -30,13 +41,14 @@ public class Offer {
     private Integer period; // Période de l'emploi
     private double salary; // Rémunération
     private GeoPoint coordinate;
+    private String city;
 
     // Liste statique qui contient toutes les offres
     private static List<Offer> allOffers = new ArrayList<>();
     private static FirebaseFirestore database = FirebaseFirestore.getInstance();
 
     // Constructeur complet
-    public Offer(String name, String employerName, String jobTitle, String description, Integer period, double salary, GeoPoint coordinate) {
+    public Offer(String name, String employerName, String jobTitle, String description, Integer period, double salary, GeoPoint coordinate, String city) {
         this.name = name;
         this.employerName = employerName;
         this.jobTitle = jobTitle;
@@ -44,12 +56,25 @@ public class Offer {
         this.period = period;
         this.salary = salary;
         this.coordinate = coordinate;
+        this.city = city;
         addOffer(this); // Ajouter automatiquement l'offre à la liste
     }
 
     public Offer(){
 
     }
+
+    public static final Creator<Offer> CREATOR = new Creator<Offer>() {
+        @Override
+        public Offer createFromParcel(Parcel in) {
+            return new Offer(in);
+        }
+
+        @Override
+        public Offer[] newArray(int size) {
+            return new Offer[size];
+        }
+    };
 
     // Ajoute une offre à la liste
     private static void addOffer(Offer offer) {
@@ -75,30 +100,18 @@ public class Offer {
         return future;
     }
 
-    public static CompletableFuture<List<Offer>> findOffer(Optional<String> name, Optional<String> employerName, Optional<String> jobTitle, Optional<String> description, Optional<Integer> period, Optional<Double> salary, Optional<GeoPoint> coordinate){
+    public static CompletableFuture<List<Offer>> findOffer(Context context, Optional<String> name, Optional<String[]> employers, Optional<Integer> salaryFrom, Optional<Integer> salaryTo, Optional<String[]> locations){
         CompletableFuture<List<Offer>> future = new CompletableFuture<>();
         List<Offer> offers = new ArrayList<>();
         Query query = database.collection("Job");
         if(name.isPresent()){
-            query.whereEqualTo("name", name.get());
+            query = query.whereEqualTo("jobTitle", name.get());
         }
-        if(employerName.isPresent()){
-            query.whereEqualTo("employerName", employerName.get());
+        if(employers.isPresent()){
+            query = query.whereIn("employerName", Arrays.asList(employers.get()));
         }
-        if(jobTitle.isPresent()){
-            query.whereEqualTo("jobTitle", jobTitle.get());
-        }
-        if(description.isPresent()){
-            query.whereEqualTo("description", description.get());
-        }
-        if(period.isPresent()){
-            query.whereEqualTo("period", period.get());
-        }
-        if(salary.isPresent()){
-            query.whereEqualTo("salary", salary.get());
-        }
-        if(coordinate.isPresent()){
-            query.whereEqualTo("coordinate", coordinate.get());
+        if(locations.isPresent()){
+            query = query.whereIn("city", Arrays.asList(locations.get()));
         }
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -106,7 +119,15 @@ public class Offer {
                 if(task.isSuccessful()){
                     for(QueryDocumentSnapshot doc : task.getResult()){
                         Log.d("document "+doc.getId(), doc.getData().toString());
-                        offers.add(doc.toObject(Offer.class));
+                        Offer offer = doc.toObject(Offer.class);
+                        if(salaryFrom.isPresent() &&
+                                salaryTo.isPresent() &&
+                                offer.getSalary() >= salaryFrom.get() &&
+                                offer.getSalary() <= salaryTo.get()){
+                            offers.add(offer);
+                        } else if (!salaryFrom.isPresent() && !salaryTo.isPresent()) {
+                            offers.add(offer);
+                        }
                     }
                 }
                 future.complete(offers);
@@ -114,7 +135,6 @@ public class Offer {
         });
         return future;
     }
-
 
 
     // Supprimer une offre
@@ -165,5 +185,40 @@ public class Offer {
 
     public double getSalary() {
         return salary;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(@NonNull Parcel parcel, int i) {
+        parcel.writeString(this.name);
+        parcel.writeString(this.description);
+        parcel.writeString(this.employerName);
+        parcel.writeString(this.city);
+        parcel.writeString(this.jobTitle);
+        parcel.writeInt(this.period);
+        parcel.writeDouble(this.salary);
+        parcel.writeDouble(this.getCoordinate().getLatitude());
+        parcel.writeDouble(this.getCoordinate().getLongitude());
+    }
+
+    public Offer(Parcel in){
+        this.name = in.readString();
+        this.description = in.readString();
+        this.employerName = in.readString();
+        this.city = in.readString();
+        this.jobTitle = in.readString();
+        this.period = in.readInt();
+        this.salary = in.readDouble();
+        Double lat = in.readDouble();
+        Double lng = in.readDouble();
+        this.coordinate = new GeoPoint(lat,lng);
     }
 }

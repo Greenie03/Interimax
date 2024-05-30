@@ -116,4 +116,15 @@
     <string name="filter_hint">Employeur</string>
     <string name="salary">Salaire</string>
     <string name="salary_section_desc">La moyenne des salaires choisis est</string>
+    <string name="location">Localisation</string>
+    <string name="no_location">Aucune localisation</string>
+    <string name="delete">Supprimer</string>
+    <string name="icon">icon</string>
+    <string name="job_found">Offres trouvées</string>
+    <string name="one_job_found">Offre trouvée</string>
+    <string name="no_job_found">Aucune offres trouvées</string>
+    <string name="back_arrow_desc">back arrow</string>
+    <string name="offer_icon">offer_icon</string>
+    <string name="description_title">Description</string>
+    <string name="candidate">Postuler</string>
 </resources>

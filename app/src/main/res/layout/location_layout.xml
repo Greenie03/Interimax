@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingHorizontal="30dp"
+    android:background="@drawable/rounded">
+    <LinearLayout
+        android:id="@+id/location_input_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:background="@drawable/border_grey"
+        android:gravity="center_vertical">
+        <ImageButton
+            android:id="@+id/add_location_button_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="18dp"
+            android:src="@drawable/search_loop_icon"
+            android:background="@color/transparent"
+            android:contentDescription="@string/search_button" />
+        <EditText
+            android:id="@+id/location_input"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            android:paddingStart="0dp"
+            android:hint="@string/location"
+            android:autofillHints=""
+            android:inputType="text"
+            android:background="@color/transparent"/>
+    </LinearLayout>
+    <TextView
+        android:id="@+id/no_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/location_input_layout"
+        android:paddingVertical="48dp"
+        android:text="@string/no_location"
+        android:textSize="18sp"
+        android:textColor="@color/grey"/>
+    <HorizontalScrollView
+        android:id="@+id/locationScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true"
+        android:layout_below="@id/location_input_layout"
+        android:visibility="invisible">
+        <LinearLayout
+            android:id="@+id/selected_locations"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:paddingVertical="48dp"/>
+    </HorizontalScrollView>
+    <!--<Button
+        android:id="@+id/my_position_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/locationScrollView"
+        android:text="Ma position"
+        android:background="@color/transparent"
+        android:textSize="18sp"
+        android:textColor="@color/colorPrimary"/>-->
+
+</RelativeLayout>
