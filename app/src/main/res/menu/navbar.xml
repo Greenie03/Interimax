@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-        <item
-            android:id="@+id/navigation_home"
-            android:icon="@drawable/home_icon"
-            android:title="@string/home"
-            app:showAsAction="ifRoom" />
-        <item
-            android:id="@+id/navigation_message"
-            android:icon="@drawable/messages_icon"
-            android:title="@string/message"
-            app:showAsAction="ifRoom" />
-        <item
-            android:id="@+id/navigation_bookmark"
-            android:icon="@drawable/bookmark_icon"
-            android:title="@string/bookmark"
-            app:showAsAction="ifRoom" />
-        <item
-            android:id="@+id/navigation_notifications"
-            android:icon="@drawable/notification_icon"
-            android:title="@string/notification"
-            app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/navigation_home"
+        android:icon="@drawable/home_icon"
+        android:title="@string/home"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/navigation_message"
+        android:icon="@drawable/messages_icon"
+        android:title="@string/message"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/navigation_bookmark"
+        android:icon="@drawable/bookmark_icon"
+        android:title="@string/bookmark"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/navigation_menu"
+        android:icon="@drawable/notification_icon"
+        android:title="@string/notification"
+        app:showAsAction="ifRoom" />
 </menu>

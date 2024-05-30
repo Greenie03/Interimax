@@ -1,0 +1,28 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_profile"
+        android:title="Voir Profil"
+        android:titleTextColor="@color/purple_hard" />
+    <item
+        android:id="@+id/nav_personal_info"
+        android:title="Information personnelle" />
+    <item
+        android:id="@+id/nav_applications"
+        android:title="Candidatures" />
+    <item
+        android:id="@+id/nav_offers"
+        android:title="Propositions" />
+    <item
+        android:id="@+id/nav_cvs"
+        android:title="CVs" />
+    <item
+        android:id="@+id/nav_cover_letters"
+        android:title="Lettres de motivation" />
+    <item
+        android:id="@+id/nav_settings"
+        android:title="Réglages" />
+    <item
+        android:id="@+id/nav_logout"
+        android:title="Déconnexion"
+        android:titleTextColor="@color/red" />
+</menu>
