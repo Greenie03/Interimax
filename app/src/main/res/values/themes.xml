@@ -7,4 +7,10 @@
     </style>
 
     <style name="Theme.Interimax" parent="Base.Theme.Interimax" />
+    <style name="Theme.Interimax.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    <style name="Theme.Interimax.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="Theme.Interimax.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

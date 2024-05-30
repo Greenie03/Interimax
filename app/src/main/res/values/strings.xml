@@ -11,7 +11,8 @@
     <string name="recent_search">Recherches récentes</string>
     <string name="popular">Populaires</string>
     <string name="search_button">Search Button</string>
-
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"
 
@@ -127,4 +128,7 @@
     <string name="offer_icon">offer_icon</string>
     <string name="description_title">Description</string>
     <string name="candidate">Postuler</string>
+    <string name="title_activity_messages">MessagesActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="add_message">Nouveau message</string>
 </resources>
