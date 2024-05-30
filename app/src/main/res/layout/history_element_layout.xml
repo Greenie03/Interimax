@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <ImageView
+        android:id="@+id/history_icon_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/icon"
+        android:src="@drawable/history_icon"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"/>
+    <TextView
+        android:id="@+id/history_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/history_icon_id"
+        android:layout_toStartOf="@id/delete_button"
+        android:textColor="@color/grey"
+        android:padding="24dp"
+        android:layout_centerVertical="true"/>
+    <ImageButton
+        android:id="@+id/delete_button"
+        android:src="@drawable/history_cross_icon"
+        android:background="@color/transparent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:contentDescription="@string/delete"
+        android:layout_centerVertical="true"/>
+</RelativeLayout>

@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".FilterFragment"
-    android:padding="30sp">
+    android:padding="30dp">
     <RelativeLayout
         android:id="@+id/header_layout"
         android:layout_width="match_parent"
@@ -64,12 +64,23 @@
             android:inputType="text"
             android:background="@color/transparent"/>
     </LinearLayout>
+    <TextView
+        android:id="@+id/no_employer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/employer_input_layout"
+        android:paddingVertical="48dp"
+        android:background="@drawable/bottom_border"
+        android:text="Aucun employeur sélectionné."
+        android:textSize="18sp"
+        android:textColor="@color/grey"/>
     <HorizontalScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fillViewport="true"
-        android:layout_below="@id/employer_input_layout">
+        android:layout_below="@id/employer_input_layout"
+        android:visibility="invisible">
         <LinearLayout
             android:id="@+id/selected_buttons"
             android:layout_width="wrap_content"
@@ -102,46 +113,91 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="18sp"
-        android:text="$24"
         android:layout_toEndOf="@id/salary_section_desc"
         android:layout_below="@id/salary_section_title"
         android:layout_marginTop="6dp"
         android:layout_marginStart="6dp"/>
-    <RelativeLayout
-        android:id="@+id/salary_result_layout"
+    <LinearLayout
+        android:id="@+id/salary_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginBottom="14dp"
-        android:paddingHorizontal="18dp"
+        android:background="@drawable/bottom_border"
+        android:orientation="vertical"
         android:layout_below="@id/salary_section_desc">
-        <TextView
-            android:id="@+id/salary_from"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:id="@+id/salary_result_layout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_centerInParent="true"
-            android:text="10e"
-            android:textStyle="bold"
-            android:textSize="26sp"
-            android:textColor="@color/black"/>
-        <TextView
-            android:id="@+id/salary_to"
-            android:layout_width="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="14dp"
+            android:paddingHorizontal="18dp">
+            <TextView
+                android:id="@+id/salary_from"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerInParent="true"
+                android:textStyle="bold"
+                android:textSize="26sp"
+                android:textColor="@color/black"/>
+            <TextView
+                android:id="@+id/salary_to"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerInParent="true"
+                android:textStyle="bold"
+                android:textSize="26sp"
+                android:textColor="@color/black"/>
+        </RelativeLayout>
+        <com.google.android.material.slider.RangeSlider
+            android:id="@+id/slider"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerInParent="true"
-            android:text="75e"
-            android:textStyle="bold"
-            android:textSize="26sp"
-            android:textColor="@color/black"/>
-    </RelativeLayout>
-    <com.google.android.material.slider.RangeSlider
-        android:id="@+id/slider"
+            android:valueFrom="5"
+            android:valueTo="75"
+            app:values="@array/initial_range_slider_values"
+            android:layout_below="@id/salary_result_layout"
+            android:layout_marginBottom="48dp"/>
+    </LinearLayout>
+    <RelativeLayout
+        android:id="@+id/location_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:valueFrom="5"
-        android:valueTo="75"
-        app:values="@array/initial_range_slider_values"
-        android:layout_below="@id/salary_result_layout"/>
+        android:layout_below="@id/salary_layout"
+        android:background="@drawable/bottom_border"
+        android:layout_marginBottom="60dp">
+        <TextView
+            android:id="@+id/location_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/location"
+            android:textSize="18sp"
+            android:textColor="@color/grey"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"/>
+        <TextView
+            android:id="@+id/locations"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:paddingHorizontal="48dp"
+            android:paddingVertical="24dp"
+            android:text="@string/no_location"
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/location_tv"
+            android:layout_toStartOf="@id/location_btn"/>
+        <ImageView
+            android:id="@+id/location_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/location"
+            android:src="@drawable/location_edit_icon"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"/>
+
+    </RelativeLayout>
 </RelativeLayout>
