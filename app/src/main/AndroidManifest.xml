@@ -47,11 +47,14 @@
         <activity
             android:name=".LoginActivity"
             android:exported="false"
-            android:parentActivityName=".HomeActivity" />
+            android:parentActivityName=".MainActivity" />
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value=".MainActivity"/>
         <activity
             android:name=".RegisterActivity"
             android:exported="false"
-            android:parentActivityName=".HomeActivity" />
+            android:parentActivityName=".MainActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
