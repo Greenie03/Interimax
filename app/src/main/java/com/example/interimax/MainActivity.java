@@ -89,10 +89,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (itemId == R.id.navigation_bookmark) {
             fragment = new SavedOffersFragment();
             Log.d("handleNavigationItemSelected", "Saved selected");
-        } /*else if (itemId == R.id.navigation_notification) {
-            fragment = new NotificationFragment();
+        } else if (itemId == R.id.navigation_notification) {
+            fragment = new NotificationsFragment();
             Log.d("handleNavigationItemSelected", "Other selected");
-        }*/
+        }
 
         if (fragment != null) {
             loadFragment(fragment);

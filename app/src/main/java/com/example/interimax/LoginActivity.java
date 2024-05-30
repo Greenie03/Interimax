@@ -35,6 +35,7 @@ public class LoginActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
         // Utiliser OnBackPressedDispatcher pour gérer le bouton de retour
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
@@ -54,8 +55,8 @@ public class LoginActivity extends AppCompatActivity {
         TextView textViewAnonyme = findViewById(R.id.tvAnonyme);
         textViewRegister.setOnClickListener(view -> {
             // Démarrer l'activité MainActivity
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(intent);
+            Intent intentLogin = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intentLogin);
         });
     }
     @Override
