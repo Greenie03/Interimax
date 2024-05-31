@@ -34,6 +34,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class Offer implements Parcelable {
+    private String id;
     private String name;
     private String employerName; // Nom de l'employeur
     private String jobTitle; // Métier cible
@@ -48,7 +49,8 @@ public class Offer implements Parcelable {
     private static FirebaseFirestore database = FirebaseFirestore.getInstance();
 
     // Constructeur complet
-    public Offer(String name, String employerName, String jobTitle, String description, Integer period, double salary, GeoPoint coordinate, String city) {
+    public Offer(String id, String name, String employerName, String jobTitle, String description, Integer period, double salary, GeoPoint coordinate, String city) {
+        this.id = id;
         this.name = name;
         this.employerName = employerName;
         this.jobTitle = jobTitle;
@@ -78,7 +80,20 @@ public class Offer implements Parcelable {
 
     // Ajoute une offre à la liste
     private static void addOffer(Offer offer) {
-        database.collection("Job").add(offer);
+        database.collection("Job").add(offer).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentReference> task) {
+                if(task.isSuccessful()){
+                    DocumentReference doc = task.getResult();
+                    offer.setId(doc.getId());
+                }else{
+                    Exception e = task.getException();
+                    if (e != null) {
+                        Log.e("FirestoreError", "Erreur lors de l'exécution de la requête", e);
+                    }
+                }
+            }
+        });
     }
 
     // Retourne la liste des offres
@@ -92,6 +107,11 @@ public class Offer implements Parcelable {
                     for(QueryDocumentSnapshot doc : task.getResult()){
                         Log.d("document "+doc.getId(), doc.getData().toString());
                         offers.add(doc.toObject(Offer.class));
+                    }
+                }else{
+                    Exception e = task.getException();
+                    if (e != null) {
+                        Log.e("FirestoreError", "Erreur lors de l'exécution de la requête", e);
                     }
                 }
                 future.complete(offers);
@@ -124,8 +144,10 @@ public class Offer implements Parcelable {
                                 salaryTo.isPresent() &&
                                 offer.getSalary() >= salaryFrom.get() &&
                                 offer.getSalary() <= salaryTo.get()){
+                            offer.setId(doc.getId());
                             offers.add(offer);
                         } else if (!salaryFrom.isPresent() && !salaryTo.isPresent()) {
+                            offer.setId(doc.getId());
                             offers.add(offer);
                         }
                     }
@@ -142,23 +164,16 @@ public class Offer implements Parcelable {
         return allOffers.remove(offer);
     }
 
-    // Trouver et modifier une offre existante
-    public static boolean updateOffer(String oldName, String newName, String newEmployerName, String newJobTitle, String newDescription, Integer newPeriod, double newSalary) {
-        for (Offer offer : allOffers) {
-            if (offer.getName().equals(oldName)) {
-                offer.name = newName;
-                offer.employerName = newEmployerName;
-                offer.jobTitle = newJobTitle;
-                offer.description = newDescription;
-                offer.period = newPeriod;
-                offer.salary = newSalary;
-                return true;
-            }
-        }
-        return false;
+    public void setId(String id) {
+        this.id = id;
     }
 
     // Getters
+
+    public String getId() {
+        return id;
+    }
+
     public String getName() {
         return name;
     }

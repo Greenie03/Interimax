@@ -106,6 +106,7 @@ public class SearchResultActivity extends AppCompatActivity {
                 adapter.setOnClickListener(new OfferAdapter.OnClickListener() {
                     @Override
                     public void onClick(int position, Offer model) {
+                        //model.updateOffer();
                         Intent offerIntent = new Intent(SearchResultActivity.this, OfferActivity.class);
                         offerIntent.putExtra("offer", model);
                         startActivity(offerIntent);

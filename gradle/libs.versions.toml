@@ -21,6 +21,10 @@ playServices = "12.0.1"
 databindingRuntime = "8.4.1"
 databindingCommon = "8.4.1"
 databindingAdapters = "8.4.1"
+adapters = "8.6.0-alpha04"
+databindingAdaptersVersion = "8.6.0-alpha04"
+databindingRuntimeVersion = "8.6.0-alpha04"
+databindingCommonVersion = "8.6.0-alpha04"
 
 [libraries]
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
@@ -44,6 +48,10 @@ play-services = { group = "com.google.android.gms", name = "play-services", vers
 databinding-runtime = { group = "androidx.databinding", name = "databinding-runtime", version.ref = "databindingRuntime" }
 databinding-common = { group = "androidx.databinding", name = "databinding-common", version.ref = "databindingCommon" }
 databinding-adapters = { group = "androidx.databinding", name = "databinding-adapters", version.ref = "databindingAdapters" }
+adapters = { group = "com.android.databinding", name = "adapters", version.ref = "adapters" }
+androidx-databinding-adapters = { group = "androidx.databinding", name = "databinding-adapters", version.ref = "databindingAdaptersVersion" }
+androidx-databinding-runtime = { group = "androidx.databinding", name = "databinding-runtime", version.ref = "databindingRuntimeVersion" }
+androidx-databinding-common = { group = "androidx.databinding", name = "databinding-common", version.ref = "databindingCommonVersion" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

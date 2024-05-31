@@ -19,7 +19,7 @@
         android:layout_alignParentEnd="true">
         <TextView
             android:id="@+id/name"
-            android:layout_width="200dp"
+            android:layout_width="175dp"
             android:layout_height="wrap_content"
             android:textStyle="bold"
             android:textSize="20sp"
@@ -46,10 +46,12 @@
         android:layout_below="@id/header">
         <TextView
             android:id="@+id/employer_name"
-            android:layout_width="wrap_content"
+            android:layout_width="175dp"
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textColor="@color/grey"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:layout_alignParentStart="true"/>
         <TextView
             android:id="@+id/city"

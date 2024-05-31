@@ -131,4 +131,14 @@
     <string name="title_activity_messages">MessagesActivity</string>
     <string name="action_settings">Settings</string>
     <string name="add_message">Nouveau message</string>
+    <string name="apply">Postuler</string>
+    <string name="choose_a_resume">Choisir un CV</string>
+    <string name="suivre_les_candidatures">Suivre les candidatures</string>
+    <string name="succes">Réussite</string>
+    <string name="success_text">Vous venez de postuler à</string>
+    <string name="find_more_offer">Chercher plus d’offres</string>
+    <string name="upload_icon">upload icon</string>
+    <string name="no_resume_selected">Aucun CV selectionné</string>
+    <string name="motivation_letter">Lettre de motivation</string>
+    <string name="optional">(Optionnelle)</string>
 </resources>

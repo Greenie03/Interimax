@@ -1,9 +1,12 @@
 package com.example.interimax;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,6 +17,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.interimax.models.Offer;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class OfferActivity extends AppCompatActivity {
 
@@ -25,6 +29,8 @@ public class OfferActivity extends AppCompatActivity {
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom);
+            RelativeLayout header = findViewById(R.id.header);
+            header.setPadding(48,48+systemBars.top,48,96);
             return insets;
         });
         if(getIntent().getExtras() != null) {
@@ -56,14 +62,26 @@ public class OfferActivity extends AppCompatActivity {
             saveButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    if(FirebaseAuth.getInstance().getCurrentUser() != null){
 
+                    }else{
+                        Intent intent = new Intent(OfferActivity.this, LoginActivity.class);
+                        startActivity(intent);
+                    }
                 }
             });
 
             candidateButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
+                    if(FirebaseAuth.getInstance().getCurrentUser() != null){
+                        Intent intent = new Intent(OfferActivity.this, CandidateActivity.class);
+                        intent.putExtra("offer",offer);
+                        startActivity(intent);
+                    }else{
+                        Intent intent = new Intent(OfferActivity.this, LoginActivity.class);
+                        startActivity(intent);
+                    }
                 }
             });
         }

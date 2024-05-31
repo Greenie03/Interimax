@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -17,6 +18,12 @@
         android:theme="@style/Theme.Interimax"
         tools:targetApi="31">
         <activity
+            android:name=".DoneActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CandidateActivity"
+            android:exported="false" />
+        <activity
             android:name=".OfferActivity"
             android:exported="false" />
         <activity
@@ -27,11 +34,11 @@
         <activity
             android:name=".SearchResultActivity"
             android:exported="false"
-            android:parentActivityName=".ResearchActivity"/>
+            android:parentActivityName=".ResearchActivity" />
         <activity
             android:name=".ResearchActivity"
             android:exported="false"
-            android:parentActivityName=".MainActivity"/>
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".JobViewActivity"
             android:exported="false" />
@@ -50,11 +57,11 @@
         <activity
             android:name=".LoginActivity"
             android:exported="false"
-            android:parentActivityName=".HomeActivity" />
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".RegisterActivity"
             android:exported="false"
-            android:parentActivityName=".HomeActivity" />
+            android:parentActivityName=".MainActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

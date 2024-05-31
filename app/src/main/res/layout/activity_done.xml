@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".DoneActivity"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:layout_margin="24dp">
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/done"
+        android:src="@drawable/done_image"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/succes"
+        android:textStyle="bold"
+        android:textSize="24sp"
+        android:textColor="@color/black"/>
+    <TextView
+        android:id="@+id/successTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/success_text"
+        android:textColor="@color/grey"/>
+    <Button
+        android:id="@+id/application"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="64dp"
+        android:text="@string/suivre_les_candidatures"
+        android:textColor="@color/white"
+        android:background="@drawable/purple_rounded" />
+    <Button
+        android:id="@+id/other_offer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:text="@string/find_more_offer"
+        android:textColor="@color/colorPrimary"
+        android:background="@drawable/border" />
+</LinearLayout>
