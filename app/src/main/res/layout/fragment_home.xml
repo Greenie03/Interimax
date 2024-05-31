@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomeActivity">
+    tools:context="fragments.HomeFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,12 +20,14 @@
             android:gravity="center_vertical">
 
             <TextView
+                android:id="@+id/nom_user"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Nom d'utilisateur"
                 android:textSize="24sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:text="Anonyme"
+                android:textColor="@color/blackish_blue"/>
 
             <FrameLayout
                 android:layout_width="wrap_content"

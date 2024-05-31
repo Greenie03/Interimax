@@ -12,7 +12,20 @@
           "package_name": "com.example.interimax"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "685260195689-lboqcgo6p53h5qd6ohvdg77kangnc1l4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.interimax",
+            "certificate_hash": "d88e0a72accc4fc3a0771e21d8e6c50170e745f8"
+          }
+        },
+        {
+          "client_id": "685260195689-vlnmd6ipvmgu71vg9810v2m5es99psk8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB5Ghny4PaTPHH1WtMJHiIbQjrgyEBxk_U"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "685260195689-vlnmd6ipvmgu71vg9810v2m5es99psk8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

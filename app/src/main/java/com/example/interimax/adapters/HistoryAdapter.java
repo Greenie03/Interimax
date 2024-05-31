@@ -1,4 +1,4 @@
-package com.example.interimax;
+package com.example.interimax.adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -12,43 +12,49 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.interimax.models.Offer;
+import com.example.interimax.R;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.ViewHolder> {
+public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {
 
-    private List<Offer> itemList;
+    private List<String> itemList;
     private OnClickListener onClickListener;
+    private OnClickListener crossOnClickListener;
 
-    public OfferAdapter(Context context, List<Offer> itemList) {
-        this.itemList = itemList;
+    public HistoryAdapter(Context context, Set<String> itemList) {
+        this.itemList = new ArrayList<>(itemList);
         Collections.reverse(this.itemList);
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.offer_list_element, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.history_element_layout, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
-        Offer item = itemList.get(position);
-        holder.name.setText(item.getName());
-        holder.employerName.setText(item.getEmployerName());
-        String salary = String.valueOf(item.getSalary()) + "/h";
-        holder.salary.setText(salary);
-        holder.city.setText(item.getCity());
+        String item = itemList.get(position);
+        holder.title.setText(item);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(onClickListener != null){
                     onClickListener.onClick(position, item);
+                }
+            }
+        });
+
+        holder.crossButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(crossOnClickListener != null){
+                    crossOnClickListener.onClick(position, item);
                 }
             }
         });
@@ -64,25 +70,24 @@ public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.ViewHolder> 
         this.onClickListener = onClickListener;
     }
 
+    public void setCrossOnClickListener(OnClickListener onClickListener) {
+        this.crossOnClickListener = onClickListener;
+    }
+
     public interface OnClickListener {
-        void onClick(int position, Offer model);
+        void onClick(int position, String model);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        private ImageView icon;
-        private TextView name;
-        private TextView salary;
-        private TextView employerName;
-        private TextView city;
+        public ImageView icon;
+        public TextView title;
+        public ImageButton crossButton;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            icon = itemView.findViewById(R.id.icon);
-            name = itemView.findViewById(R.id.name);
-            salary = itemView.findViewById(R.id.salary);
-            employerName = itemView.findViewById(R.id.employer_name);
-            city = itemView.findViewById(R.id.city);
-
+            icon = itemView.findViewById(R.id.history_icon_id);
+            title = itemView.findViewById(R.id.history_tv);
+            crossButton = itemView.findViewById(R.id.delete_button);
         }
     }
 

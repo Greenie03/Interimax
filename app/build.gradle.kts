@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.databinding.runtime)
     implementation(libs.databinding.common)
     implementation(libs.databinding.adapters)
+    implementation(libs.firebase.storage)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -67,5 +68,10 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-storage")
     implementation("com.google.android.material:material:1.12.0")
+
+    implementation("com.github.bumptech.glide:glide:4.12.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
+    // Import the BoM for the Firebase platform
+    implementation(platform(libs.firebase.bom))
 
 }

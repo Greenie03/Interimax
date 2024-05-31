@@ -11,6 +11,7 @@
     <string name="recent_search">Recherches récentes</string>
     <string name="popular">Populaires</string>
     <string name="search_button">Search Button</string>
+
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="large_text">
@@ -124,6 +125,10 @@
     <string name="job_found">Offres trouvées</string>
     <string name="one_job_found">Offre trouvée</string>
     <string name="no_job_found">Aucune offres trouvées</string>
+    <plurals name="job_found">
+        <item quantity="one">%d job found</item>
+        <item quantity="other">%d jobs found</item>
+    </plurals>
     <string name="back_arrow_desc">back arrow</string>
     <string name="offer_icon">offer_icon</string>
     <string name="description_title">Description</string>
@@ -141,4 +146,6 @@
     <string name="no_resume_selected">Aucun CV selectionné</string>
     <string name="motivation_letter">Lettre de motivation</string>
     <string name="optional">(Optionnelle)</string>
+    <string name="applications_title">Candidatures</string>
+    <string name="applications_count">Candidatures actives:</string>
 </resources>

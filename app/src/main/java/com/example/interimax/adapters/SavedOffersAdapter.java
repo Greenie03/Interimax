@@ -1,6 +1,4 @@
-package com.example.interimax;
-
-import static java.lang.String.*;
+package com.example.interimax.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +7,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.interimax.R;
 import com.example.interimax.models.Offer;
 import com.google.firebase.firestore.GeoPoint;
 
