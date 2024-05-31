@@ -1,5 +1,6 @@
 package com.example.interimax.fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -28,6 +29,8 @@ import androidx.fragment.app.Fragment;
 import com.example.interimax.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -36,11 +39,14 @@ import com.google.firebase.storage.StorageReference;
 import java.util.HashMap;
 import java.util.Map;
 
-
 public class CVFragment extends Fragment {
 
     private static final int PICK_FILE_REQUEST = 1;
     private Uri fileUri;
+    private FirebaseAuth auth;
+    private FirebaseFirestore db;
+    private FirebaseStorage storage;
+
     // Registering for Activity Result
     private final ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -70,6 +76,10 @@ public class CVFragment extends Fragment {
             }
         });
 
+        auth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+        storage = FirebaseStorage.getInstance();
+
         Button buttonChooseCV = view.findViewById(R.id.button_choose_cv);
         Button buttonValidate = view.findViewById(R.id.button_validate);
 
@@ -97,6 +107,7 @@ public class CVFragment extends Fragment {
                 Toast.makeText(getContext(), "Veuillez choisir un fichier", Toast.LENGTH_SHORT).show();
             }
         });
+
         // Gérer le bouton de retour de l'appareil
         requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
             @Override
@@ -110,22 +121,8 @@ public class CVFragment extends Fragment {
             }
         });
         return view;
-
     }
-    /*@Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            // Retourner au menu déroulant
-            if (getActivity() != null) {
-                DrawerLayout drawerLayout = getActivity().findViewById(R.id.drawer_layout);
-                if (drawerLayout != null) {
-                    drawerLayout.openDrawer(GravityCompat.START);
-                }
-            }
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }*/
+
     private void displayFileInfo(Uri fileUri) {
         RelativeLayout fileInfoLayout = getView().findViewById(R.id.file_info_layout);
         ImageView fileIcon = getView().findViewById(R.id.file_icon);
@@ -135,10 +132,7 @@ public class CVFragment extends Fragment {
         // Récupérer les informations du fichier
         Cursor cursor = getContext().getContentResolver().query(fileUri, null, null, null, null);
         if (cursor != null && cursor.moveToFirst()) {
-            String displayName = null;
-            int colInd = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-            if (colInd >= 0){
-                displayName = cursor.getString(colInd);}
+            @SuppressLint("Range") String displayName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
             int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
             String size = cursor.getString(sizeIndex);
             cursor.close();
@@ -151,9 +145,9 @@ public class CVFragment extends Fragment {
             fileInfoLayout.setVisibility(View.VISIBLE);
         }
     }
+
     private void uploadFileToFirebase(Uri fileUri) {
         // Référence à Firebase Storage
-        FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageRef = storage.getReference();
 
         // Créer une référence de fichier pour l'upload
@@ -177,13 +171,19 @@ public class CVFragment extends Fragment {
     }
 
     private void addFileToFirestore(String downloadUrl) {
-        // Référence à Firestore
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (currentUser == null) {
+            Toast.makeText(getContext(), "Utilisateur non connecté", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String userId = currentUser.getUid();
 
         // Créer un document avec les informations du fichier
         Map<String, Object> file = new HashMap<>();
         file.put("url", downloadUrl);
         file.put("timestamp", System.currentTimeMillis());
+        file.put("userId", userId); // Ajouter l'ID de l'utilisateur
 
         // Ajouter le document à la collection 'cvs'
         db.collection("cvs")

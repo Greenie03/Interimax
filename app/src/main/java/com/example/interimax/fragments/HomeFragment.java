@@ -3,7 +3,6 @@ package com.example.interimax.fragments;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,12 +24,9 @@ import com.example.interimax.activities.OffersListActivity;
 import com.example.interimax.activities.ResearchActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -45,7 +41,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     private FirebaseFirestore db;
     private FirebaseAuth auth;
     private FusedLocationProviderClient fusedLocationClient;
-    private GoogleMap map;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -167,71 +162,60 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
-        this.map = googleMap;
-        requestLocationPermission();
-    }
-
-    private void requestLocationPermission() {
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // Demande de permissions
-            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 100);
-        } else {
-            getUserLocation();
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 100) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                getUserLocation();
-            } else {
-                handleLocationDenied();
-            }
-        }
-    }
-
-    private void getUserLocation() {
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        // Demander la permission de localisation
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
             return;
         }
-        fusedLocationClient.getLastLocation().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                Location location = task.getResult();
-                saveUserLocation(location);
-                loadOffersNearby(location.getLatitude(), location.getLongitude());
-            } else {
-                Log.d(TAG, "Failed to get user location");
-                handleLocationDenied();
-            }
-        });
+
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(location -> {
+                    if (location != null) {
+                        Log.d(TAG, "User location: " + location.getLatitude() + ", " + location.getLongitude());
+                        // Utiliser la localisation pour afficher les offres autour de l'utilisateur
+                        loadOffersNearby(location.getLatitude(), location.getLongitude());
+                    } else {
+                        Log.d(TAG, "Failed to get user location");
+                        loadUserCountryOffers();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.d(TAG, "Failed to get user location: " + e.getMessage());
+                    loadUserCountryOffers();
+                });
     }
 
-    private void saveUserLocation(Location location) {
+    private void loadOffersNearby(double latitude, double longitude) {
+        // Logique pour charger les offres autour de la localisation de l'utilisateur
+        Log.d(TAG, "Loading offers near " + latitude + ", " + longitude);
+        // Implémentez la logique pour charger et afficher les offres ici
+    }
+
+    private void loadUserCountryOffers() {
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser != null) {
             String userId = currentUser.getUid();
             DocumentReference userRef = db.collection("users").document(userId);
-            userRef.update("location", new LatLng(location.getLatitude(), location.getLongitude()))
-                    .addOnSuccessListener(aVoid -> Log.d(TAG, "User location updated"))
-                    .addOnFailureListener(e -> Log.d(TAG, "Failed to update user location", e));
-        }
-    }
-
-    private void handleLocationDenied() {
-        FirebaseUser currentUser = auth.getCurrentUser();
-        if (currentUser != null) {
-            String userId = currentUser.getUid();
-            db.collection("users").document(userId).get().addOnCompleteListener(task -> {
-                if (task.isSuccessful() && task.getResult() != null && task.getResult().exists()) {
-                    String country = task.getResult().getString("country");
-                    if (country != null) {
-                        loadOffersByCountry(country);
+            userRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null && document.exists()) {
+                        String country = document.getString("country");
+                        if (country != null && !country.isEmpty()) {
+                            Log.d(TAG, "User country: " + country);
+                            // Utiliser le pays pour afficher les offres
+                            loadOffersByCountry(country);
+                        } else {
+                            Log.d(TAG, "Country not set for user");
+                            loadRandomOffers();
+                        }
                     } else {
+                        Log.d(TAG, "Document does not exist");
                         loadRandomOffers();
                     }
                 } else {
+                    Log.d(TAG, "Failed to get user country", task.getException());
                     loadRandomOffers();
                 }
             });
@@ -240,72 +224,15 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    private void loadOffersNearby(double latitude, double longitude) {
-        // Logique pour charger et afficher les offres autour de la localisation de l'utilisateur
-        LatLng userLocation = new LatLng(latitude, longitude);
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 12));
-        map.addMarker(new MarkerOptions().position(userLocation).title("Vous êtes ici"));
-
-        // Exemple : charger les offres depuis Firestore et ajouter des marqueurs sur la carte
-        db.collection("offers")
-                .whereGreaterThan("latitude", latitude - 0.1)
-                .whereLessThan("latitude", latitude + 0.1)
-                .whereGreaterThan("longitude", longitude - 0.1)
-                .whereLessThan("longitude", longitude + 0.1)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (DocumentSnapshot document : task.getResult()) {
-                            double offerLat = document.getDouble("latitude");
-                            double offerLng = document.getDouble("longitude");
-                            String title = document.getString("title");
-                            map.addMarker(new MarkerOptions().position(new LatLng(offerLat, offerLng)).title(title));
-                        }
-                    } else {
-                        Log.d(TAG, "Error getting offers: ", task.getException());
-                    }
-                });
-    }
-
     private void loadOffersByCountry(String country) {
-        // Logique pour charger et afficher les offres basées sur le pays de l'utilisateur
-        Log.d(TAG, "Loading offers for country: " + country);
-        // Exemple : charger les offres depuis Firestore et ajouter des marqueurs sur la carte
-        db.collection("offers")
-                .whereEqualTo("country", country)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (DocumentSnapshot document : task.getResult()) {
-                            double offerLat = document.getDouble("latitude");
-                            double offerLng = document.getDouble("longitude");
-                            String title = document.getString("title");
-                            map.addMarker(new MarkerOptions().position(new LatLng(offerLat, offerLng)).title(title));
-                        }
-                    } else {
-                        Log.d(TAG, "Error getting offers: ", task.getException());
-                    }
-                });
+        // Logique pour charger les offres par pays
+        Log.d(TAG, "Loading offers in country: " + country);
+        // Implémentez la logique pour charger et afficher les offres ici
     }
 
     private void loadRandomOffers() {
-        // Logique pour charger et afficher des offres aléatoires
+        // Logique pour charger des offres aléatoires
         Log.d(TAG, "Loading random offers");
-        // Exemple : charger les offres depuis Firestore et ajouter des marqueurs sur la carte
-        db.collection("offers")
-                .limit(10)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (DocumentSnapshot document : task.getResult()) {
-                            double offerLat = document.getDouble("latitude");
-                            double offerLng = document.getDouble("longitude");
-                            String title = document.getString("title");
-                            map.addMarker(new MarkerOptions().position(new LatLng(offerLat, offerLng)).title(title));
-                        }
-                    } else {
-                        Log.d(TAG, "Error getting offers: ", task.getException());
-                    }
-                });
+        // Implémentez la logique pour charger et afficher les offres ici
     }
 }
