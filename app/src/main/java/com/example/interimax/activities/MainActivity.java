@@ -17,12 +17,13 @@ import com.example.interimax.R;
 import com.example.interimax.fragments.ApplicationsFragment;
 import com.example.interimax.fragments.CVFragment;
 import com.example.interimax.fragments.HomeFragment;
+import com.example.interimax.fragments.LDMFragment;
 import com.example.interimax.fragments.MessagesFragment;
 import com.example.interimax.fragments.NotificationsFragment;
 import com.example.interimax.fragments.SavedOffersFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -103,6 +104,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Log.d("Navigation", "CVs selected");
         } else if (itemId == R.id.nav_applications) {
             fragment = new ApplicationsFragment();
+            Log.d("Navigation", "Applications selected");
+        } else if (itemId == R.id.nav_cover_letters) {
+            fragment = new LDMFragment();
             Log.d("Navigation", "Applications selected");
         } else if (itemId == R.id.nav_logout) {
             handleLogout();
