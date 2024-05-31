@@ -24,9 +24,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Nom d'utilisateur"
                 android:textSize="24sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:text="Anonyme"
+                android:textColor="@color/blackish_blue"/>
 
             <FrameLayout
                 android:layout_width="wrap_content"

@@ -1,4 +1,4 @@
-package com.example.interimax;
+package com.example.interimax.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.interimax.R;
 import com.example.interimax.models.Application;
 
 import java.util.List;

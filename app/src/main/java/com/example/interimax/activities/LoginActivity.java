@@ -1,4 +1,4 @@
-package com.example.interimax;
+package com.example.interimax.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,22 +9,25 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.OnBackPressedCallback;
-import androidx.appcompat.widget.Toolbar;
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.NavUtils;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.example.interimax.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private FirebaseFirestore db;
+    private EditText etEmail, etPassword;
+    private Button btnLogin;
+
+    private FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,8 +37,12 @@ public class LoginActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Initialize Firestore
-        db = FirebaseFirestore.getInstance();
+        // Initialiser les vues
+        etEmail = findViewById(R.id.etEmail);
+        etPassword = findViewById(R.id.etPassword);
+        btnLogin = findViewById(R.id.btnLogin);
+        // Initialiser Firebase Auth
+        auth = FirebaseAuth.getInstance();
 
         // Active la flèche de retour
         if (getSupportActionBar() != null) {
@@ -76,38 +83,29 @@ public class LoginActivity extends AppCompatActivity {
         // Ajouter un listener sur le bouton de connexion
         Button buttonLogin = findViewById(R.id.btnLogin);
         buttonLogin.setOnClickListener(view -> {
-            String email = ((EditText) findViewById(R.id.etEmail)).getText().toString();
-            String password = ((EditText) findViewById(R.id.etPassword)).getText().toString();
-            if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Veuillez remplir tous les champs", Toast.LENGTH_SHORT).show();
-            } else {
+            String email = etEmail.getText().toString().trim();
+            String password = etPassword.getText().toString().trim();
+
+            if (!email.isEmpty() && !password.isEmpty()) {
                 loginUser(email, password);
+            } else {
+                Toast.makeText(LoginActivity.this, "Please enter email and password", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void loginUser(String email, String password) {
-        db.collection("users")
-                .whereEqualTo("email", email)
-                .whereEqualTo("password", password)
-                .get()
-                .addOnCompleteListener(task -> {
+        auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        QuerySnapshot result = task.getResult();
-                        if (!result.isEmpty()) {
-                            for (QueryDocumentSnapshot document : result) {
-                                Log.d("LoginActivity", "Connexion réussie pour l'utilisateur: " + document.getId());
-                                // Démarrer l'activité MainActivity
-                                Intent intentMain = new Intent(LoginActivity.this, MainActivity.class);
-                                startActivity(intentMain);
-                                finish();
-                            }
-                        } else {
-                            Toast.makeText(this, "Email ou mot de passe incorrect", Toast.LENGTH_SHORT).show();
+                        FirebaseUser user = auth.getCurrentUser();
+                        if (user != null) {
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            startActivity(intent);
+                            finish();
                         }
                     } else {
-                        Log.w("LoginActivity", "Erreur lors de la connexion: ", task.getException());
-                        Toast.makeText(this, "Erreur lors de la connexion", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                     }
                 });
     }

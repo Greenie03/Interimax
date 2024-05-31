@@ -1,4 +1,4 @@
-package com.example.interimax;
+package com.example.interimax.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,9 +17,14 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.interimax.R;
+import com.example.interimax.models.Application;
 import com.example.interimax.models.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -28,6 +33,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     private EditText etFirstname, etLastname, etEmail, etPassword, etPhoneNumber, etAddress, etCountry;
     private Button btnRegister;
+    private List<Application> applicationsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +42,8 @@ public class RegisterActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        // Initialiser la liste des applications
+        applicationsList = new ArrayList<>();
         // Configuration de la toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

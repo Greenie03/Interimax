@@ -1,4 +1,4 @@
-package com.example.interimax;
+package com.example.interimax.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,6 +11,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.interimax.R;
+import com.example.interimax.adapters.NotificationsAdapter;
 import com.example.interimax.models.Notification;
 
 import java.util.ArrayList;

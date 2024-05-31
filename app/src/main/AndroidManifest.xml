@@ -28,16 +28,16 @@
         <activity
             android:name=".SearchResultActivity"
             android:exported="false"
-            android:parentActivityName=".ResearchActivity" />
+            android:parentActivityName=".activities.ResearchActivity" />
         <activity
-            android:name=".ResearchActivity"
+            android:name=".activities.ResearchActivity"
             android:exported="false"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".activities.MainActivity" />
         <activity
             android:name=".JobViewActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -49,16 +49,16 @@
             android:name=".SearchActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".activities.LoginActivity"
             android:exported="false"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".activities.MainActivity" />
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
-            android:value=".MainActivity"/>
+            android:value=".activities.MainActivity"/>
         <activity
-            android:name=".RegisterActivity"
+            android:name=".activities.RegisterActivity"
             android:exported="false"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".activities.MainActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
