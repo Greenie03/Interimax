@@ -25,6 +25,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.interimax.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -32,11 +34,15 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CVFragment extends Fragment {
@@ -46,6 +52,9 @@ public class CVFragment extends Fragment {
     private FirebaseAuth auth;
     private FirebaseFirestore db;
     private FirebaseStorage storage;
+    private RecyclerView cvRecyclerView;
+    private CVAdapter cvAdapter;
+    private List<Map<String, Object>> cvList;
 
     // Registering for Activity Result
     private final ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
@@ -79,6 +88,12 @@ public class CVFragment extends Fragment {
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance();
+
+        cvRecyclerView = view.findViewById(R.id.cv_recycler_view);
+        cvRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        cvList = new ArrayList<>();
+        cvAdapter = new CVAdapter(cvList);
+        cvRecyclerView.setAdapter(cvAdapter);
 
         Button buttonChooseCV = view.findViewById(R.id.button_choose_cv);
         Button buttonValidate = view.findViewById(R.id.button_validate);
@@ -120,6 +135,9 @@ public class CVFragment extends Fragment {
                 }
             }
         });
+
+        loadUserCVs();
+
         return view;
     }
 
@@ -133,7 +151,7 @@ public class CVFragment extends Fragment {
         Cursor cursor = getContext().getContentResolver().query(fileUri, null, null, null, null);
         if (cursor != null && cursor.moveToFirst()) {
             @SuppressLint("Range") String displayName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
-            int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+            @SuppressLint("Range") int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
             String size = cursor.getString(sizeIndex);
             cursor.close();
 
@@ -194,11 +212,99 @@ public class CVFragment extends Fragment {
                         if (task.isSuccessful()) {
                             // Afficher un message de succès
                             Toast.makeText(getContext(), "CV téléchargé avec succès", Toast.LENGTH_SHORT).show();
+                            loadUserCVs(); // Recharger les CVs après l'ajout
                         } else {
                             // Afficher une erreur si l'ajout échoue
                             Toast.makeText(getContext(), "Erreur lors de l'ajout du CV à Firestore", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
+    }
+
+    private void loadUserCVs() {
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (currentUser == null) {
+            return;
+        }
+
+        String userId = currentUser.getUid();
+
+        db.collection("cvs")
+                .whereEqualTo("userId", userId)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            cvList.clear();
+                            for (DocumentSnapshot document : task.getResult()) {
+                                Map<String, Object> cv = document.getData();
+                                cv.put("id", document.getId()); // Ajouter l'ID du document pour la suppression
+                                cvList.add(cv);
+                            }
+                            cvAdapter.notifyDataSetChanged();
+                        } else {
+                            Toast.makeText(getContext(), "Erreur lors du chargement des CVs", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
+    private class CVAdapter extends RecyclerView.Adapter<CVAdapter.CVViewHolder> {
+        private List<Map<String, Object>> cvList;
+
+        public CVAdapter(List<Map<String, Object>> cvList) {
+            this.cvList = cvList;
+        }
+
+        @NonNull
+        @Override
+        public CVViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.cv_item_layout, parent, false);
+            return new CVViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull CVViewHolder holder, int position) {
+            Map<String, Object> cv = cvList.get(position);
+            holder.bind(cv);
+        }
+
+        @Override
+        public int getItemCount() {
+            return cvList.size();
+        }
+
+        class CVViewHolder extends RecyclerView.ViewHolder {
+            TextView fileName;
+            TextView fileSize;
+            ImageView deleteButton;
+
+            public CVViewHolder(@NonNull View itemView) {
+                super(itemView);
+                fileName = itemView.findViewById(R.id.cv_file_name);
+                fileSize = itemView.findViewById(R.id.cv_file_size);
+                deleteButton = itemView.findViewById(R.id.cv_delete_button);
+            }
+
+            public void bind(Map<String, Object> cv) {
+                fileName.setText((String) cv.get("url")); // Afficher l'URL en guise de nom de fichier
+                fileSize.setText(String.valueOf(cv.get("timestamp"))); // Afficher le timestamp en guise de taille
+
+                deleteButton.setOnClickListener(v -> {
+                    String cvId = (String) cv.get("id");
+                    db.collection("cvs").document(cvId)
+                            .delete()
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(getContext(), "CV supprimé", Toast.LENGTH_SHORT).show();
+                                    loadUserCVs(); // Recharger les CVs après la suppression
+                                } else {
+                                    Toast.makeText(getContext(), "Erreur lors de la suppression du CV", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                });
+            }
+        }
     }
 }
