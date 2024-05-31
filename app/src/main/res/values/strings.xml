@@ -36,6 +36,10 @@
     <string name="job_found">Offres trouvées</string>
     <string name="one_job_found">Offre trouvée</string>
     <string name="no_job_found">Aucune offres trouvées</string>
+    <plurals name="job_found">
+        <item quantity="one">%d job found</item>
+        <item quantity="other">%d jobs found</item>
+    </plurals>
     <string name="back_arrow_desc">back arrow</string>
     <string name="offer_icon">offer_icon</string>
     <string name="description_title">Description</string>

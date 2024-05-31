@@ -22,11 +22,12 @@ import com.example.interimax.fragments.NotificationsFragment;
 import com.example.interimax.fragments.SavedOffersFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, BottomNavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, NavigationBarView.OnItemSelectedListener {
 
     public DrawerLayout drawerLayout;
     private NavigationView navigationView;
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         bottomNavigationView = findViewById(R.id.navbar);
-        bottomNavigationView.setOnNavigationItemSelectedListener(this);
+        bottomNavigationView.setOnItemSelectedListener(this);
     }
 
     private void setupDrawer() {
@@ -70,12 +71,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void setupBottomNavigationView() {
-        bottomNavigationView.setOnNavigationItemSelectedListener(this);
+        bottomNavigationView.setOnItemSelectedListener(this);
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         handleNavigationItemSelected(item);
+        // Fermer le tiroir de navigation si un élément est sélectionné
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }

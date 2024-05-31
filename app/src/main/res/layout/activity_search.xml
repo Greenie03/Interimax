@@ -1,42 +1,35 @@
-<?xml version="1.0" encoding="utf-8"?>
+<!-- res/layout/activity_search_result.xml -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
-    tools:context=".SearchActivity">
+    android:id="@+id/main"
+    android:padding="16dp">
 
-    <EditText
-        android:id="@+id/search_field"
-        android:layout_width="match_parent"
+    <ImageButton
+        android:id="@+id/back_arrow"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="Search a job or position"
-        android:inputType="text"/>
+        android:src="@drawable/ic_back"
+        android:background="?attr/selectableItemBackgroundBorderless" />
 
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Recherches récentes"
-        android:paddingTop="16dp"/>
-
-    <LinearLayout
-        android:id="@+id/recent_searches_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"/>
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:padding="16dp" />
 
     <TextView
+        android:id="@+id/job_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="16dp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/list_result"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Populaires"
-        android:paddingTop="16dp"/>
-
-    <LinearLayout
-        android:id="@+id/popular_tags_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"/>
-
+        android:padding="16dp" />
 </LinearLayout>

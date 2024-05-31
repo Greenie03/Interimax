@@ -39,70 +39,77 @@ public class ApplicationsFragment extends Fragment {
     private List<Application> applicationsList;
     private TextView textViewApplicationsCount;
 
+    private static final String TAG = "ApplicationsFragment";
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_applications, container, false);
 
-        // Initialiser Firebase Auth et Firestore
+        initFirebase();
+        initViews(view);
+        setupToolbar(view);
+        checkUserConnection();
+        setupRecyclerView(view);
+        loadApplications();
+        handleBackPress();
+
+        return view;
+    }
+
+    private void initFirebase() {
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-
-        // Initialiser la liste des applications
         applicationsList = new ArrayList<>();
+        Log.d(TAG, "Firebase initialized");
+    }
 
-        // Initialiser la toolbar
+    private void initViews(View view) {
+        textViewApplicationsCount = view.findViewById(R.id.active_applications_text);
+        Log.d(TAG, "Views initialized");
+    }
+
+    private void setupToolbar(View view) {
         Toolbar toolbar = view.findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.applications_title);
         toolbar.setNavigationIcon(R.drawable.ic_back);
         toolbar.setNavigationOnClickListener(v -> navigateUpOrBack());
-
-        // Vérifier la connexion de l'utilisateur
-        checkUserConnection();
-
-        // Initialiser le RecyclerView et son adaptateur
-        recyclerViewApplications = view.findViewById(R.id.recycler_view_applications);
-        applicationsAdapter = new ApplicationsAdapter(applicationsList, application -> {
-            Intent intent = new Intent(getActivity(), JobViewActivity.class);
-            intent.putExtra("applicationId", application.getId());
-           Log.d("application frag", application.getId());
-            startActivity(intent);
-        });
-        recyclerViewApplications.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerViewApplications.setAdapter(applicationsAdapter);
-
-        // TextView pour le nombre de candidatures
-        textViewApplicationsCount = view.findViewById(R.id.active_applications_text);
-
-        // Charger les applications
-        loadApplications();
-
-        // Utiliser OnBackPressedDispatcher pour gérer le bouton de retour
-        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                // Gérer l'action de retour ici pour revenir à l'activité précédente
-                navigateUpOrBack();
-            }
-        });
-        return view;
+        Log.d(TAG, "Toolbar set up");
     }
 
     private void checkUserConnection() {
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser == null) {
-            // Rediriger vers l'activité de login si l'utilisateur n'est pas connecté
-            Intent intent = new Intent(getActivity(), LoginActivity.class);
-            startActivity(intent);
-            requireActivity().finish(); // Optionnel : fermer l'activité actuelle
-            Log.d("checkUserConnection","not connected");
+            redirectToLogin();
+            Log.d(TAG, "User not connected, redirecting to login");
+        } else {
+            Log.d(TAG, "User connected: " + currentUser.getUid());
         }
+    }
+
+    private void redirectToLogin() {
+        Intent intent = new Intent(getActivity(), LoginActivity.class);
+        startActivity(intent);
+        requireActivity().finish();
+    }
+
+    private void setupRecyclerView(View view) {
+        recyclerViewApplications = view.findViewById(R.id.recycler_view_applications);
+        applicationsAdapter = new ApplicationsAdapter(applicationsList, application -> {
+            Intent intent = new Intent(getActivity(), JobViewActivity.class);
+            intent.putExtra("applicationId", application.getId());
+            Log.d(TAG, "Opening job view for application: " + application.getId());
+            startActivity(intent);
+        });
+        recyclerViewApplications.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerViewApplications.setAdapter(applicationsAdapter);
+        Log.d(TAG, "RecyclerView set up");
     }
 
     private void loadApplications() {
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser == null) {
-            Log.e("ApplicationsFragment", "L'utilisateur n'est pas connecté");
+            Log.e(TAG, "L'utilisateur n'est pas connecté");
             return;
         }
 
@@ -118,22 +125,37 @@ public class ApplicationsFragment extends Fragment {
                             for (QueryDocumentSnapshot document : querySnapshot) {
                                 Application application = document.toObject(Application.class);
                                 applicationsList.add(application);
+                                Log.d(TAG, "Application loaded: " + application.getId());
                             }
                             applicationsAdapter.notifyDataSetChanged();
-                            textViewApplicationsCount.setText(String.format(String.valueOf(R.string.applications_count), applicationsList.size()));
+                            textViewApplicationsCount.setText(String.format("%d Applications", applicationsList.size()));
+                            Log.d(TAG, "Applications loaded, count: " + applicationsList.size());
                         } else {
-                            Log.e("ApplicationsFragment", "QuerySnapshot est null");
+                            Log.e(TAG, "QuerySnapshot is null");
                         }
                     } else {
-                        Log.e("ApplicationsFragment", "Erreur lors de la récupération des applications", task.getException());
+                        Log.e(TAG, "Erreur lors de la récupération des applications", task.getException());
                     }
                 });
     }
+
+    private void handleBackPress() {
+        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                navigateUpOrBack();
+                Log.d(TAG, "Back button pressed");
+            }
+        });
+    }
+
     private void navigateUpOrBack() {
         if (getParentFragmentManager().getBackStackEntryCount() > 0) {
             getParentFragmentManager().popBackStack();
+            Log.d(TAG, "Navigated up");
         } else {
             requireActivity().onBackPressed();
+            Log.d(TAG, "Navigated back");
         }
     }
 }
