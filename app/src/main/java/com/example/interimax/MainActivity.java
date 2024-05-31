@@ -92,6 +92,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (itemId == R.id.navigation_notification) {
             fragment = new NotificationsFragment();
             Log.d("handleNavigationItemSelected", "Other selected");
+        } else if (itemId == R.id.nav_cvs) {
+            fragment = new CVFragment();
+            Log.d("handleNavigationItemSelected", "CVs selected");
+        } else if (itemId == R.id.nav_applications) {
+            fragment = new ApplicationsFragment();
+            Log.d("handleNavigationItemSelected", "Candidatures selected");
         }
 
         if (fragment != null) {

@@ -2,78 +2,133 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:fillViewport="true"
     tools:context=".RegisterActivity">
 
     <LinearLayout
+        android:id="@+id/llRegister"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp"
         android:layout_marginVertical="20dp">
 
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#FFFFFF"
+            android:elevation="4dp"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Type de compte:"
+                android:textSize="16sp"
+                android:textColor="@color/grey_light" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchAccountType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:textOff="Employeur"
+                android:textOn="Candidat"
+                android:checked="true" />
+
+
+        </LinearLayout>
+
         <EditText
             android:id="@+id/etFirstName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/first_name"
+            android:hint="Nom"
             android:inputType="textPersonName"
             android:padding="8dp"
-            />
+            android:layout_marginTop="16dp" />
 
         <EditText
             android:id="@+id/etLastName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/last_name" />
+            android:hint="Prénom"
+            android:layout_marginTop="8dp" />
 
         <EditText
             android:id="@+id/etDob"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/date_of_birth"
-            android:focusable="false" />
+            android:hint="Date de naissance"
+            android:focusable="false"
+            android:layout_marginTop="8dp" />
 
         <EditText
             android:id="@+id/etCountry"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/country"
-            android:focusable="false" />
+            android:hint="Pays de résidence"
+            android:focusable="false"
+            android:layout_marginTop="8dp" />
 
         <EditText
             android:id="@+id/etPhone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/phone_number"
-            android:inputType="phone" />
+            android:hint="Numéro de téléphone"
+            android:inputType="phone"
+            android:layout_marginTop="8dp" />
 
         <EditText
             android:id="@+id/etEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/email"
-            android:inputType="textEmailAddress" />
+            android:hint="E-mail"
+            android:inputType="textEmailAddress"
+            android:layout_marginTop="8dp" />
 
         <EditText
             android:id="@+id/etPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/password"
-            android:inputType="textPassword" />
+            android:hint="Mot de passe"
+            android:inputType="textPassword"
+            android:layout_marginTop="8dp" />
 
         <EditText
             android:id="@+id/etConfirmPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/confirm_password"
-            android:inputType="textPassword" />
+            android:hint="Confirmez le mot de passe"
+            android:inputType="textPassword"
+            android:layout_marginTop="8dp" />
 
         <Button
             android:id="@+id/btnRegister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/register" />
+            android:text="Register"
+            android:background="@color/purple_hard"
+            android:textColor="@android:color/white"
+            android:layout_marginTop="16dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Vous avez un compte? Connectez-vous"
+            android:textColor="@color/purple_soft"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"
+            android:clickable="true"
+            android:id="@+id/tvLogin" />
     </LinearLayout>
 </ScrollView>

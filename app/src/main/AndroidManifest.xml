@@ -21,7 +21,6 @@
         <activity
             android:name=".MessagesActivity"
             android:exported="false"
-            android:label="@string/title_activity_messages"
             android:theme="@style/Theme.Interimax.NoActionBar" />
         <activity
             android:name=".OfferActivity"
