@@ -196,10 +196,12 @@ public class CVFragment extends Fragment {
         }
 
         String userId = currentUser.getUid();
+        String fileName = getFileName(fileUri);
 
         // Créer un document avec les informations du fichier
         Map<String, Object> file = new HashMap<>();
         file.put("url", downloadUrl);
+        file.put("name", fileName); // Ajouter le nom du fichier
         file.put("timestamp", System.currentTimeMillis());
         file.put("userId", userId); // Ajouter l'ID de l'utilisateur
 
@@ -219,6 +221,31 @@ public class CVFragment extends Fragment {
                         }
                     }
                 });
+    }
+
+    @SuppressLint("Range")
+    private String getFileName(Uri uri) {
+        String result = null;
+        if (uri.getScheme().equals("content")) {
+            Cursor cursor = getContext().getContentResolver().query(uri, null, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                }
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+        }
+        if (result == null) {
+            result = uri.getPath();
+            int cut = result.lastIndexOf('/');
+            if (cut != -1) {
+                result = result.substring(cut + 1);
+            }
+        }
+        return result;
     }
 
     private void loadUserCVs() {
@@ -288,7 +315,7 @@ public class CVFragment extends Fragment {
             }
 
             public void bind(Map<String, Object> cv) {
-                fileName.setText((String) cv.get("url")); // Afficher l'URL en guise de nom de fichier
+                fileName.setText((String) cv.get("name")); // Afficher le nom du fichier
                 fileSize.setText(String.valueOf(cv.get("timestamp"))); // Afficher le timestamp en guise de taille
 
                 deleteButton.setOnClickListener(v -> {
