@@ -5,7 +5,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -41,8 +40,7 @@ public class OfferActivity extends AppCompatActivity {
 
             String salary = offer.getSalary() + "/h";
 
-            name.setText(offer.getName());
-            employerName.setText(offer.getEmployerName());
+            name.setText(offer.getEmployerName());
             salaryTV.setText(salary);
             cityTV.setText(offer.getCity());
             descriptionTV.setText(offer.getDescription());

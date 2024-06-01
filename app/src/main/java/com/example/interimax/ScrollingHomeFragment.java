@@ -18,8 +18,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.List;
-
 public class ScrollingHomeFragment extends Fragment implements OnMapReadyCallback {
 
     private GoogleMap mMap;
@@ -69,7 +67,7 @@ public class ScrollingHomeFragment extends Fragment implements OnMapReadyCallbac
                 // Créer un marqueur pour chaque offre
                 MarkerOptions options = new MarkerOptions()
                         .position(new LatLng(offer.getCoordinate().getLatitude(), offer.getCoordinate().getLongitude()))
-                        .title(offer.getName())
+                        .title(offer.getEmployerName())
                         .snippet("Prix: " + offer.getSalary() + "€");
 
                 // Ajouter le marqueur sur la carte

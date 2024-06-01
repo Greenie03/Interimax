@@ -13,6 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.interimax.R;
 import com.example.interimax.models.Offer;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,10 +23,12 @@ public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.ViewHolder> 
 
     private List<Offer> itemList;
     private OnClickListener onClickListener;
+    private FirebaseFirestore db;
 
     public OfferAdapter(Context context, List<Offer> itemList) {
         this.itemList = itemList;
         Collections.reverse(this.itemList);
+        db = FirebaseFirestore.getInstance();
     }
 
     @NonNull
@@ -37,20 +41,33 @@ public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         Offer item = itemList.get(position);
-        holder.name.setText(item.getName());
-        holder.employerName.setText(item.getEmployerName());
-        String salary = String.valueOf(item.getSalary()) + "/h";
-        holder.salary.setText(salary);
+        holder.jobTitle.setText(item.getJobTitle());
+        holder.salary.setText(String.format("%s/h", item.getSalary()));
         holder.city.setText(item.getCity());
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(onClickListener != null){
-                    onClickListener.onClick(position, item);
-                }
+        holder.itemView.setOnClickListener(view -> {
+            if (onClickListener != null) {
+                onClickListener.onClick(position, item);
             }
         });
 
+        fetchEmployerName(item.getId(), holder.employerName, holder);
+    }
+
+    private void fetchEmployerName(String employerId, TextView employerNameView, OfferAdapter.ViewHolder holder) {
+        db.collection("users").document(employerId).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                DocumentSnapshot document = task.getResult();
+                String firstName = document.getString("firstname");
+                String lastName = document.getString("lastname");
+                if (firstName != null && lastName != null) {
+                    holder.employerName.setText(String.format("%s %s", firstName, lastName));
+                } else {
+                    employerNameView.setText("Nom inconnu");
+                }
+            } else {
+                employerNameView.setText("Nom inconnu");
+            }
+        });
     }
 
     @Override
@@ -68,7 +85,7 @@ public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.ViewHolder> 
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private ImageView icon;
-        private TextView name;
+        private TextView jobTitle;
         private TextView salary;
         private TextView employerName;
         private TextView city;
@@ -76,12 +93,10 @@ public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.ViewHolder> 
         public ViewHolder(View itemView) {
             super(itemView);
             icon = itemView.findViewById(R.id.icon);
-            name = itemView.findViewById(R.id.name);
+            jobTitle = itemView.findViewById(R.id.name);
             salary = itemView.findViewById(R.id.salary);
             employerName = itemView.findViewById(R.id.employer_name);
             city = itemView.findViewById(R.id.city);
-
         }
     }
-
 }
