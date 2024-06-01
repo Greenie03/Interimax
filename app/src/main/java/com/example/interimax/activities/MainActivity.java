@@ -174,8 +174,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Log.d("Navigation", "CVs selected");
         } else if (itemId == R.id.nav_profile) {
             loadUserProfileFragment(currentUser);
+            return; // Return here to avoid loading fragment twice
         } else if (itemId == R.id.nav_applications) {
             loadUserApplicationsFragment(currentUser);
+            return; // Return here to avoid loading fragment twice
         } else if (itemId == R.id.nav_cover_letters) {
             fragment = new LDMFragment();
             Log.d("Navigation", "LDM selected");
@@ -189,35 +191,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void loadFragment(Fragment fragment) {
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.main_fragment, fragment)
-                .commit();
-    }
+private void loadFragment(Fragment fragment) {
+    getSupportFragmentManager().beginTransaction()
+            .replace(R.id.main_fragment, fragment)
+            .addToBackStack(null) // Ensure the fragment is added to the back stack
+            .commit();
+}
 
-    private void handleLogout() {
-        auth.signOut();
-        Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
-        finish();
-    }
 
-    private void setupOnBackPressedDispatcher() {
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                    drawerLayout.closeDrawer(GravityCompat.START);
+private void handleLogout() {
+    auth.signOut();
+    Intent intent = new Intent(this, LoginActivity.class);
+    startActivity(intent);
+    finish();
+}
+
+private void setupOnBackPressedDispatcher() {
+    getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+        @Override
+        public void handleOnBackPressed() {
+            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                drawerLayout.closeDrawer(GravityCompat.START);
+            } else {
+                if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                    getSupportFragmentManager().popBackStack();
                 } else {
-                    if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-                        getSupportFragmentManager().popBackStack();
-                    } else {
-                        finish();
-                    }
+                    finish();
                 }
             }
-        });
-    }
+        }
+    });
+}
     private void loadUserProfileFragment(FirebaseUser currentUser) {
         String email = currentUser.getEmail();
         if (email != null) {

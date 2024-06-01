@@ -18,19 +18,24 @@ import com.bumptech.glide.Glide;
 import com.example.interimax.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 public class ProfileEmployerFragment extends Fragment {
 
     private static final String TAG = "ProfileEmployerFragment";
 
-    private ImageView profileImage;
-    private TextView profileName, profileRole, companySectionTitle;
-    private ImageView companyLogo;
-    private TextView companyName, companyLocation, companyDescription;
     private FirebaseAuth auth;
     private FirebaseFirestore db;
+
+    private ImageView profileImage;
+    private TextView profileName;
+    private TextView profileRole;
+    private TextView companySectionTitle;
+    private TextView companyName;
+    private TextView companyLocation;
+    private TextView companyDescription;
+    private ImageView companyLogo;
 
     @Nullable
     @Override
@@ -40,32 +45,30 @@ public class ProfileEmployerFragment extends Fragment {
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        initializeViews(view);
+        profileImage = view.findViewById(R.id.profile_image);
+        profileName = view.findViewById(R.id.profile_name);
+        profileRole = view.findViewById(R.id.profile_role);
+        companySectionTitle = view.findViewById(R.id.company_section_title);
+        companyName = view.findViewById(R.id.company_name);
+        companyLocation = view.findViewById(R.id.company_location);
+        companyDescription = view.findViewById(R.id.company_description);
+        companyLogo = view.findViewById(R.id.company_logo);
+
         setupToolbar(view);
         loadUserProfile();
 
         return view;
     }
 
-    private void initializeViews(View view) {
-        profileImage = view.findViewById(R.id.profile_image);
-        profileName = view.findViewById(R.id.profile_name);
-        profileRole = view.findViewById(R.id.profile_role);
-        companySectionTitle = view.findViewById(R.id.company_section_title);
-        companyLogo = view.findViewById(R.id.company_logo);
-        companyName = view.findViewById(R.id.company_name);
-        companyLocation = view.findViewById(R.id.company_location);
-        companyDescription = view.findViewById(R.id.company_description);
-    }
-
     private void setupToolbar(View view) {
         Toolbar toolbar = view.findViewById(R.id.toolbar);
-        toolbar.setTitle("");
         toolbar.setNavigationIcon(R.drawable.ic_back);
         toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
-
-        TextView modifyText = view.findViewById(R.id.modify_text);
-        modifyText.setOnClickListener(v -> Toast.makeText(getContext(), "Edit profile clicked", Toast.LENGTH_SHORT).show());
+        TextView editTextView = view.findViewById(R.id.modify_text);
+        editTextView.setOnClickListener(v -> {
+            // Logic to handle edit profile action
+            Toast.makeText(getContext(), "Modifier profil", Toast.LENGTH_SHORT).show();
+        });
     }
 
     private void loadUserProfile() {
@@ -117,5 +120,4 @@ public class ProfileEmployerFragment extends Fragment {
             });
         }
     }
-
 }
