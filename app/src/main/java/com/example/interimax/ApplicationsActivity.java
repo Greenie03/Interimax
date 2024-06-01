@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ApplicationsActivity extends AppCompatActivity {
+public class ApplicationsActivity extends AppCompatActivity implements ActiveApplicationAdapter.OnClickListener {
 
     FirebaseFirestore db;
     FirebaseAuth auth;
@@ -128,6 +128,35 @@ public class ApplicationsActivity extends AppCompatActivity {
     private void updateList(List<Map<String, Object>> list){
         listResult.setLayoutManager(new LinearLayoutManager(ApplicationsActivity.this));
         ActiveApplicationAdapter adapter = new ActiveApplicationAdapter(ApplicationsActivity.this, list);
+        adapter.setOnClickListener(this);
         listResult.setAdapter(adapter);
+    }
+
+    @Override
+    public void onAcceptClick(List<Map<String, Object>> list, Map<String, Object> item, int position) {
+        FirebaseFirestore.getInstance()
+                .collection("candidature")
+                .document(item.get("userId") + "_" + item.get("offer"))
+                .update("status", 3).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        list.get(position).put("status", 3L);
+                        updateList(list);
+                    }
+                });
+    }
+
+    @Override
+    public void onDeclineClick(List<Map<String, Object>> list, Map<String, Object> item, int position) {
+        FirebaseFirestore.getInstance()
+                .collection("candidature")
+                .document(item.get("userId") + "_" + item.get("offer"))
+                .update("status", 4).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        list.get(position).put("status", 4L);
+                        updateList(list);
+                    }
+                });
     }
 }

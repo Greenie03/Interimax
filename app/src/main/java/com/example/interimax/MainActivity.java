@@ -22,20 +22,9 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
-import com.example.interimax.R;
-import com.example.interimax.fragments.ApplicationsEmployerFragment;
-import com.example.interimax.fragments.ApplicationsFragment;
-import com.example.interimax.fragments.CVFragment;
-import com.example.interimax.fragments.HomeFragment;
-import com.example.interimax.fragments.LDMFragment;
-import com.example.interimax.fragments.MessagesFragment;
-import com.example.interimax.fragments.NotificationsFragment;
-import com.example.interimax.fragments.ProfileEmployerFragment;
-import com.example.interimax.fragments.SavedOffersFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.navigation.NavigationBarView;
-import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -252,24 +241,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void loadUserApplicationsFragment(FirebaseUser currentUser) {
-        String email = currentUser.getEmail();
-        if (email != null) {
-            db.collection("users").whereEqualTo("email", email).get().addOnCompleteListener(task -> {
-                if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                    DocumentSnapshot document = task.getResult().getDocuments().get(0);
-                    String role = document.getString("role");
-                    if ("Candidat".equals(role)) {
-                        loadFragment(new ApplicationsFragment());
-                    } else if ("Employeur".equals(role)) {
-                        loadFragment(new ApplicationsEmployerFragment());
-                    } else {
-                        Toast.makeText(this, "Rôle inconnu", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Toast.makeText(this, "Erreur lors de la récupération des informations utilisateur", Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
-    }
+
 }

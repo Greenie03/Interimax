@@ -43,6 +43,7 @@ public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.ViewHolder> 
         Offer item = itemList.get(position);
         holder.jobTitle.setText(item.getJobTitle());
         holder.salary.setText(String.format("%s/h", item.getSalary()));
+        holder.employerName.setText(item.getEmployerName());
         holder.city.setText(item.getCity());
         holder.itemView.setOnClickListener(view -> {
             if (onClickListener != null) {
@@ -50,7 +51,7 @@ public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.ViewHolder> 
             }
         });
 
-        fetchEmployerName(item.getId(), holder.employerName, holder);
+        //fetchEmployerName(item.getId(), holder.employerName, holder);
     }
 
     private void fetchEmployerName(String employerId, TextView employerNameView, OfferAdapter.ViewHolder holder) {

@@ -146,11 +146,11 @@ public class SearchResultActivity extends AppCompatActivity  implements OnMapRea
                     @Override
                     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                         if(b){
-                            listResult.setVisibility(View.INVISIBLE);
+                            listResult.setVisibility(View.GONE);
                             frame.setVisibility(View.VISIBLE);
                         }else{
                             listResult.setVisibility(View.VISIBLE);
-                            frame.setVisibility(View.INVISIBLE);
+                            frame.setVisibility(View.GONE);
                         }
                     }
                 });
@@ -205,42 +205,44 @@ public class SearchResultActivity extends AppCompatActivity  implements OnMapRea
 
         this.gMap = googleMap;
         Log.d("Map's ready", "map ready");
-        gMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(@NonNull Marker marker) {
-                Offer offer = (Offer) marker.getTag();
-                if(marker.equals(focusedMarker)) {
-                    Intent intent = new Intent(SearchResultActivity.this, OfferActivity.class);
-                    intent.putExtra("offer", offer);
-                    startActivity(intent);
-                    focusedMarker = null;
-                    return true;
+        if(!this.offers.isEmpty()) {
+            gMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(@NonNull Marker marker) {
+                    Offer offer = (Offer) marker.getTag();
+                    if(marker.equals(focusedMarker)) {
+                        Intent intent = new Intent(SearchResultActivity.this, OfferActivity.class);
+                        intent.putExtra("offer", offer);
+                        startActivity(intent);
+                        focusedMarker = null;
+                        return true;
+                    }
+                    focusedMarker = marker;
+                    //set infos
+                    ImageView icon = findViewById(R.id.icon);
+                    TextView name = findViewById(R.id.name);
+                    TextView salary = findViewById(R.id.salary);
+                    TextView employerName = findViewById(R.id.employer_name);
+                    TextView city = findViewById(R.id.city);
+                    name.setText(offer.getName());
+                    employerName.setText(offer.getEmployerName());
+                    String salaryText = offer.getSalary() + "/h";
+                    salary.setText(salaryText);
+                    city.setText(offer.getCity());
+                    return false;
                 }
-                focusedMarker = marker;
-                //set infos
-                ImageView icon = findViewById(R.id.icon);
-                TextView name = findViewById(R.id.name);
-                TextView salary = findViewById(R.id.salary);
-                TextView employerName = findViewById(R.id.employer_name);
-                TextView city = findViewById(R.id.city);
-                name.setText(offer.getName());
-                employerName.setText(offer.getEmployerName());
-                String salaryText = offer.getSalary() + "/h";
-                salary.setText(salaryText);
-                city.setText(offer.getCity());
-                return false;
-            }
-        });
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        for(Offer o : this.offers){
-            builder.include(new LatLng(o.getCoordinate().getLatitude(), o.getCoordinate().getLongitude()));
-            LatLng coordinates = new LatLng(o.getCoordinate().getLatitude(), o.getCoordinate().getLongitude());
-            Marker marker = gMap.addMarker(new MarkerOptions().position(coordinates).title(o.getName()));
-            marker.setTag(o);
-        }
-        LatLngBounds bounds = builder.build();
-        gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 200));
+            });
 
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+            for (Offer o : this.offers) {
+                builder.include(new LatLng(o.getCoordinate().getLatitude(), o.getCoordinate().getLongitude()));
+                LatLng coordinates = new LatLng(o.getCoordinate().getLatitude(), o.getCoordinate().getLongitude());
+                Marker marker = gMap.addMarker(new MarkerOptions().position(coordinates).title(o.getName()));
+                marker.setTag(o);
+            }
+            LatLngBounds bounds = builder.build();
+            gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 200));
+        }
 
 
     }

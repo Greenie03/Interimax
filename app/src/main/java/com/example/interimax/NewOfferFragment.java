@@ -1,4 +1,4 @@
-package com.example.interimax.fragments;
+package com.example.interimax;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -96,7 +96,7 @@ public class NewOfferFragment extends Fragment implements EditTextDialogFragment
             return;
         }
 
-        Offer offer = new Offer(employerId, jobTitle, companyName, description, null, 0, 0, new GeoPoint(0, 0), city);
+        Offer offer = new Offer(employerId, jobTitle, companyName, description, null, 0, 0, new GeoPoint(0, 0), city, 0);
 
         db.collection("Jobs")
                 .add(offer)

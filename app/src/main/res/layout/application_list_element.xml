@@ -68,6 +68,7 @@
         </RelativeLayout>
     </RelativeLayout>
     <RelativeLayout
+        android:id="@+id/status_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/offer"
@@ -92,5 +93,41 @@
             android:textStyle="bold"
             android:textColor="@color/black"/>
     </RelativeLayout>
-
+    <LinearLayout
+        android:id="@+id/decision_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/status_layout"
+        android:layout_marginTop="12dp"
+        android:orientation="vertical"
+        android:visibility="gone">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/accept_question"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="18dp"
+            android:layout_marginTop="12dp">
+            <Button
+                android:id="@+id/accept_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:text="@string/accept"
+                android:textColor="@color/green"
+                android:background="@color/transparent" />
+            <Button
+                android:id="@+id/refuse_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:text="@string/decline"
+                android:textColor="@color/red"
+                android:background="@color/transparent" />
+        </RelativeLayout>
+    </LinearLayout>
 </RelativeLayout>

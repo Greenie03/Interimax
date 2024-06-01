@@ -7,7 +7,9 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,6 +17,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.interimax.R;
 import com.example.interimax.models.Offer;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Collections;
 import java.util.List;
@@ -40,6 +46,11 @@ public class ActiveApplicationAdapter extends RecyclerView.Adapter<ActiveApplica
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
+        updateUI(holder, position);
+
+    }
+
+    private void updateUI(ViewHolder holder, int position){
         Map<String, Object> item = itemList.get(position);
         holder.name.setText((String) item.get("name"));
         holder.employerName.setText((String) item.get("employerName"));
@@ -59,14 +70,55 @@ public class ActiveApplicationAdapter extends RecyclerView.Adapter<ActiveApplica
                 holder.status.setText(context.getResources().getString(R.string.selection));
                 holder.status.setTextColor(context.getResources().getColor(R.color.green));
                 holder.status.setBackground(context.getResources().getDrawable(R.drawable.selection_status_background));
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if(holder.decisionLayout.getVisibility() == View.GONE){
+                            holder.decisionLayout.setVisibility(View.VISIBLE);
+                            holder.acceptButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    if(onClickListener != null){
+                                        onClickListener.onAcceptClick(itemList, item, position);
+                                    }
+                                }
+                            });
+
+                            holder.refuseButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    if(onClickListener != null){
+                                        onClickListener.onDeclineClick(itemList, item, position);
+                                    }
+                                }
+                            });
+                        }else{
+                            holder.decisionLayout.setVisibility(View.GONE);
+                        }
+                    }
+                });
                 break;
             case 2:
                 holder.status.setText(context.getResources().getString(R.string.refuse));
                 holder.status.setTextColor(context.getResources().getColor(R.color.red));
                 holder.status.setBackground(context.getResources().getDrawable(R.drawable.reject_status_background));
                 break;
+            case 3:
+                holder.status.setText(context.getResources().getString(R.string.accepted));
+                holder.status.setTextColor(context.getResources().getColor(R.color.green));
+                holder.status.setBackground(context.getResources().getDrawable(R.drawable.selection_status_background));
+                break;
+            case 4:
+                holder.status.setText(context.getResources().getString(R.string.declined_by_you));
+                holder.status.setTextColor(context.getResources().getColor(R.color.red));
+                holder.status.setBackground(context.getResources().getDrawable(R.drawable.reject_status_background));
+                break;
         }
+    }
 
+    public interface OnClickListener{
+        void onAcceptClick(List<Map<String, Object>> list, Map<String, Object> item, int position);
+        void onDeclineClick(List<Map<String, Object>> list, Map<String, Object> item, int position);
     }
 
     @Override
@@ -78,10 +130,6 @@ public class ActiveApplicationAdapter extends RecyclerView.Adapter<ActiveApplica
         this.onClickListener = onClickListener;
     }
 
-    public interface OnClickListener {
-        void onClick(int position, Map<String, Object> model);
-    }
-
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private ImageView icon;
         private TextView name;
@@ -90,6 +138,9 @@ public class ActiveApplicationAdapter extends RecyclerView.Adapter<ActiveApplica
         private TextView city;
         private TextView status;
         private TextView period;
+        private LinearLayout decisionLayout;
+        private Button acceptButton;
+        private Button refuseButton;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -100,6 +151,9 @@ public class ActiveApplicationAdapter extends RecyclerView.Adapter<ActiveApplica
             city = itemView.findViewById(R.id.city);
             status = itemView.findViewById(R.id.status);
             period = itemView.findViewById(R.id.period);
+            decisionLayout = itemView.findViewById(R.id.decision_layout);
+            acceptButton = itemView.findViewById(R.id.accept_button);
+            refuseButton = itemView.findViewById(R.id.refuse_button);
 
         }
     }

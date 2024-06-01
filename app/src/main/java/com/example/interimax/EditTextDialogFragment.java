@@ -1,4 +1,4 @@
-package com.example.interimax.fragments;
+package com.example.interimax;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
