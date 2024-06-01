@@ -1,0 +1,71 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/close_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentStart="true"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_close" />
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:text="Nouvelle offre"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:id="@+id/form_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/title"
+        android:layout_marginTop="32dp"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Section Intitulé du poste -->
+        <LinearLayout
+            android:id="@+id/section_job_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/rounded_background"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:id="@+id/job_title_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Intitulé du poste*"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:id="@+id/job_title_edit"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_edit" />
+        </LinearLayout>
+
+        <!-- Similar sections for other fields -->
+        <!-- Espace de travail, Nom de l'entreprise, Adresse, Expérience requise, Horaires, Description -->
+
+        <!-- Button to publish the job offer -->
+        <Button
+            android:id="@+id/publish_offer_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_background"
+            android:layout_marginTop="32dp"
+            android:text="Publier l'offre"
+            android:textSize="16sp"
+            android:enabled="false" />
+    </LinearLayout>
+</RelativeLayout>

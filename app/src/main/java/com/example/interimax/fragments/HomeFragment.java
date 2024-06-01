@@ -17,6 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.interimax.R;
 import com.example.interimax.activities.MainActivity;
@@ -98,50 +99,43 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
             String email = currentUser.getEmail();
             if (email != null) {
                 db.collection("users")
-                        .whereEqualTo("email", email)
-                        .get()
-                        .addOnCompleteListener(task -> {
-                            if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                                DocumentSnapshot document = task.getResult().getDocuments().get(0);
-                                String firstName = document.getString("firstname");
-                                String lastName = document.getString("lastname");
-                                String role = document.getString("role");
-                                Log.d(TAG, "First name: " + firstName + ", Last name: " + lastName + ", Role: " + role);
-                                if (firstName != null && lastName != null) {
-                                    if (getActivity() != null) {
-                                        getActivity().runOnUiThread(() -> {
-                                            nomUserTextView.setText(firstName + " " + lastName);
-                                            Toast.makeText(getContext(), "Login successful", Toast.LENGTH_SHORT).show();
-                                            if ("Employeur".equals(role)) {
-                                                fabAddOffer.setVisibility(View.VISIBLE);
-                                            } else {
-                                                fabAddOffer.setVisibility(View.GONE);
-                                            }
-                                        });
-                                    }
-                                } else {
-                                    Log.d(TAG, "First name or Last name is null");
-                                    nomUserTextView.setText("Anonyme");
+                    .whereEqualTo("email", email)
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                            DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                            String firstName = document.getString("firstname");
+                            String lastName = document.getString("lastname");
+                            String role = document.getString("role");
+                            Log.d(TAG, "First name: " + firstName + ", Last name: " + lastName + ", Role: " + role);
+                            if (firstName != null && lastName != null) {
+                                if (getActivity() != null) {
+                                    getActivity().runOnUiThread(() -> {
+                                        nomUserTextView.setText(firstName + " " + lastName);
+                                        Toast.makeText(getContext(), "Login successful", Toast.LENGTH_SHORT).show();
+                                        if ("Employeur".equals(role)) {
+                                            fabAddOffer.setVisibility(View.VISIBLE);
+                                        } else {
+                                            fabAddOffer.setVisibility(View.GONE);
+                                        }
+                                    });
                                 }
                             } else {
-                                Log.d(TAG, "Document does not exist");
+                                Log.d(TAG, "First name or Last name is null");
                                 nomUserTextView.setText("Anonyme");
                             }
-                        })
-                        .addOnFailureListener(e -> {
-                            Log.d(TAG, "Failed to get document: " + e.getMessage());
+                        } else {
+                            Log.d(TAG, "User document not found");
                             nomUserTextView.setText("Anonyme");
-                        });
-            } else {
-                Log.d(TAG, "Current user email is null");
-                nomUserTextView.setText("Anonyme");
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.d(TAG, "Error fetching user document: ", e);
+                        nomUserTextView.setText("Anonyme");
+                    });
             }
-        } else {
-            Log.d(TAG, "No current user");
-            nomUserTextView.setText("Anonyme");
         }
     }
-
 
     private void initializeViews() {
         searchField = rootView.findViewById(R.id.search_field);
@@ -167,8 +161,13 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         viewListLink.setOnClickListener(v -> viewList());
         viewAllLink.setOnClickListener(v -> viewAll());
 
-        fabAddOffer.setOnClickListener(v -> {
-            // Implémentez la logique pour ajouter une offre ici
+        fabAddOffer.setOnClickListener(view -> {
+            NewOfferFragment newOfferFragment = new NewOfferFragment();
+            FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+            transaction.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down, R.anim.slide_in_up, R.anim.slide_out_down);
+            transaction.replace(R.id.main_fragment, newOfferFragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
         });
     }
 
