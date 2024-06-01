@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
+
+    <ImageView
+        android:id="@+id/candidate_image"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/default_profile_image" />
+
+    <TextView
+        android:id="@+id/candidate_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/candidate_image"
+        android:layout_marginStart="16dp"
+        android:text="Sio Bando"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/candidate_role"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/candidate_name"
+        android:layout_toEndOf="@id/candidate_image"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:text="Master GL"
+        android:textSize="14sp"
+        android:textColor="@android:color/darker_gray" />
+
+    <Button
+        android:id="@+id/accept_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:text="Accepter"
+        android:background="@drawable/tag_unselected" />
+
+    <Button
+        android:id="@+id/refuse_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toStartOf="@id/accept_button"
+        android:layout_marginEnd="8dp"
+        android:layout_centerVertical="true"
+        android:text="Refuser"
+        android:background="@drawable/tag_unselected" />
+
+    <Button
+        android:id="@+id/profile_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/refuse_button"
+        android:layout_marginTop="8dp"
+        android:text="Voir profil"
+        android:background="@drawable/tag_unselected" />
+</RelativeLayout>

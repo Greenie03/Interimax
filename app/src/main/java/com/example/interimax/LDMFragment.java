@@ -1,4 +1,4 @@
-package com.example.interimax;
+package com.example.interimax.fragments;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -46,17 +46,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CVFragment extends Fragment {
+public class LDMFragment extends Fragment {
 
-    private static final String TAG = "CVFragment";
+    private static final String TAG = "LDMFragment";
     private static final int PICK_FILE_REQUEST = 1;
     private Uri fileUri;
     private FirebaseAuth auth;
     private FirebaseFirestore db;
     private FirebaseStorage storage;
-    private RecyclerView cvRecyclerView;
-    private CVAdapter cvAdapter;
-    private List<Map<String, Object>> cvList;
+    private RecyclerView ldmRecyclerView;
+    private LDMAdapter ldmAdapter;
+    private List<Map<String, Object>> ldmList;
 
     // Registering for Activity Result
     private final ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
@@ -71,9 +71,9 @@ public class CVFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_cv, container, false);
+        View view = inflater.inflate(R.layout.fragment_ldm, container, false);
 
-        Toolbar toolbar = view.findViewById(R.id.toolbar);
+        Toolbar toolbar = view.findViewById(R.id.toolbarLDM);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         if (((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
             ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -91,17 +91,17 @@ public class CVFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance();
 
-        cvRecyclerView = view.findViewById(R.id.cv_recycler_view);
-        cvRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        cvList = new ArrayList<>();
-        cvAdapter = new CVAdapter(cvList);
-        cvRecyclerView.setAdapter(cvAdapter);
+        ldmRecyclerView = view.findViewById(R.id.ldm_recycler_view);
+        ldmRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        ldmList = new ArrayList<>();
+        ldmAdapter = new LDMAdapter(ldmList);
+        ldmRecyclerView.setAdapter(ldmAdapter);
 
-        Button buttonChooseCV = view.findViewById(R.id.button_choose_cv);
-        Button buttonValidate = view.findViewById(R.id.cv_button_validate);
+        Button buttonChooseLDM = view.findViewById(R.id.button_choose_ldm);
+        Button buttonValidate = view.findViewById(R.id.ldm_button_validate);
 
-        buttonChooseCV.setOnClickListener(v -> {
-            // Ouvrir le sélecteur de fichiers pour choisir un CV
+        buttonChooseLDM.setOnClickListener(v -> {
+            // Ouvrir le sélecteur de fichiers pour choisir une LDM
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
             intent.setType("*/*");
             String[] mimeTypes = {"application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "image/*"};
@@ -113,7 +113,7 @@ public class CVFragment extends Fragment {
         buttonValidate.setOnClickListener(v -> {
             // Valider le fichier choisi
             if (fileUri != null) {
-                // Vérifier que c'est un fichier PDF
+                // Vérifier le type de fichier
                 String mimeType = getContext().getContentResolver().getType(fileUri);
                 if ("application/pdf".equals(mimeType) || "application/msword".equals(mimeType) || "application/vnd.openxmlformats-officedocument.wordprocessingml.document".equals(mimeType) || mimeType.startsWith("image/")) {
                     // Vérifier si le fichier existe déjà
@@ -138,6 +138,7 @@ public class CVFragment extends Fragment {
             }
         });
 
+
         // Gérer le bouton de retour de l'appareil
         requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
             @Override
@@ -151,7 +152,7 @@ public class CVFragment extends Fragment {
             }
         });
 
-        loadUserCVs();
+        loadUserLDMs();
 
         return view;
     }
@@ -160,15 +161,16 @@ public class CVFragment extends Fragment {
         View view = getView();
         if (view == null) return;
 
-        RelativeLayout fileInfoLayout = view.findViewById(R.id.file_info_layout);
-        ImageView fileIcon = view.findViewById(R.id.cv_file_icon);
-        TextView fileName = view.findViewById(R.id.cv_file_name);
-        TextView fileSize = view.findViewById(R.id.cv_file_size);
+        RelativeLayout fileInfoLayout = view.findViewById(R.id.ldm_file_info_layout);
+        ImageView fileIcon = view.findViewById(R.id.doc_icon);
+        TextView fileName = view.findViewById(R.id.doc_name);
+        TextView fileSize = view.findViewById(R.id.doc_size);
 
         if (fileInfoLayout == null || fileIcon == null || fileName == null || fileSize == null) {
             Log.e(TAG, "Some views are not initialized");
             return;
         }
+
         // Récupérer les informations du fichier
         Cursor cursor = getContext().getContentResolver().query(fileUri, null, null, null, null);
         if (cursor != null && cursor.moveToFirst()) {
@@ -210,12 +212,12 @@ public class CVFragment extends Fragment {
         StorageReference storageRef = storage.getReference();
 
         // Créer une référence de fichier pour l'upload
-        StorageReference cvRef = storageRef.child("cvs/" + System.currentTimeMillis() + ".pdf");
+        StorageReference ldmRef = storageRef.child("ldms/" + System.currentTimeMillis() + ".pdf");
 
-        cvRef.putFile(fileUri)
+        ldmRef.putFile(fileUri)
                 .addOnSuccessListener(taskSnapshot -> {
                     // Récupérer l'URL de téléchargement
-                    cvRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                    ldmRef.getDownloadUrl().addOnSuccessListener(uri -> {
                         // Ajouter les informations du fichier dans Firestore
                         addFileToFirestore(uri.toString());
                     }).addOnFailureListener(e -> {
@@ -248,19 +250,19 @@ public class CVFragment extends Fragment {
         file.put("timestamp", System.currentTimeMillis());
         file.put("userId", userId); // Ajouter l'ID de l'utilisateur
 
-        // Ajouter le document à la collection 'cvs'
-        db.collection("cvs")
+        // Ajouter le document à la collection 'ldms'
+        db.collection("ldms")
                 .add(file)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentReference> task) {
                         if (task.isSuccessful()) {
                             // Afficher un message de succès
-                            Toast.makeText(getContext(), "CV téléchargé avec succès", Toast.LENGTH_SHORT).show();
-                            loadUserCVs(); // Recharger les CVs après l'ajout
+                            Toast.makeText(getContext(), "LDM téléchargé avec succès", Toast.LENGTH_SHORT).show();
+                            loadUserLDMs(); // Recharger les LDMs après l'ajout
                         } else {
                             // Afficher une erreur si l'ajout échoue
-                            Toast.makeText(getContext(), "Erreur lors de l'ajout du CV à Firestore", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Erreur lors de l'ajout du LDM à Firestore", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -299,7 +301,7 @@ public class CVFragment extends Fragment {
 
         String userId = currentUser.getUid();
 
-        db.collection("cvs")
+        db.collection("ldms")
                 .whereEqualTo("userId", userId)
                 .whereEqualTo("name", fileName)
                 .get()
@@ -316,7 +318,7 @@ public class CVFragment extends Fragment {
         void onResult(boolean exists);
     }
 
-    private void loadUserCVs() {
+    private void loadUserLDMs() {
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser == null) {
             Log.d(TAG, "User not authenticated");
@@ -325,71 +327,71 @@ public class CVFragment extends Fragment {
 
         String userId = currentUser.getUid();
 
-        db.collection("cvs")
+        db.collection("ldms")
                 .whereEqualTo("userId", userId)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            cvList.clear();
+                            ldmList.clear();
                             for (DocumentSnapshot document : task.getResult()) {
-                                Map<String, Object> cv = document.getData();
-                                cv.put("id", document.getId()); // Ajouter l'ID du document pour la suppression
-                                cvList.add(cv);
+                                Map<String, Object> ldm = document.getData();
+                                ldm.put("id", document.getId()); // Ajouter l'ID du document pour la suppression
+                                ldmList.add(ldm);
                             }
-                            cvAdapter.notifyDataSetChanged();
+                            ldmAdapter.notifyDataSetChanged();
                         } else {
-                            Toast.makeText(getContext(), "Erreur lors du chargement des CVs", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Erreur lors du chargement des LDMs", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
     }
 
-    private class CVAdapter extends RecyclerView.Adapter<CVAdapter.CVViewHolder> {
-        private List<Map<String, Object>> cvList;
+    private class LDMAdapter extends RecyclerView.Adapter<LDMAdapter.LDMViewHolder> {
+        private List<Map<String, Object>> ldmList;
 
-        public CVAdapter(List<Map<String, Object>> cvList) {
-            this.cvList = cvList;
+        public LDMAdapter(List<Map<String, Object>> ldmList) {
+            this.ldmList = ldmList;
         }
 
         @NonNull
         @Override
-        public CVAdapter.CVViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.cv_item_layout, parent, false);
-            return new CVAdapter.CVViewHolder(view);
+        public LDMAdapter.LDMViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_ldm, parent, false);
+            return new LDMAdapter.LDMViewHolder(view);
         }
 
         @Override
-        public void onBindViewHolder(@NonNull CVViewHolder holder, int position) {
-            Map<String, Object> cv = cvList.get(position);
-            holder.bind(cv);
+        public void onBindViewHolder(@NonNull LDMAdapter.LDMViewHolder holder, int position) {
+            Map<String, Object> ldm = ldmList.get(position);
+            holder.bind(ldm);
         }
 
         @Override
         public int getItemCount() {
-            return cvList.size();
+            return ldmList.size();
         }
 
-        class CVViewHolder extends RecyclerView.ViewHolder {
+        class LDMViewHolder extends RecyclerView.ViewHolder {
             TextView fileName;
             TextView fileSize;
             ImageView deleteButton;
             ImageView fileIcon;
-            public CVViewHolder(@NonNull View itemView) {
+            public LDMViewHolder(@NonNull View itemView) {
                 super(itemView);
-                fileName = itemView.findViewById(R.id.cv_file_name);
-                fileSize = itemView.findViewById(R.id.cv_file_size);
-                deleteButton = itemView.findViewById(R.id.cv_delete_button);
-                fileIcon = itemView.findViewById(R.id.cv_file_icon);
+                fileName = itemView.findViewById(R.id.ldm_file_name);
+                fileSize = itemView.findViewById(R.id.ldm_file_size);
+                deleteButton = itemView.findViewById(R.id.ldm_delete_button);
+                fileIcon = itemView.findViewById(R.id.ldm_file_icon);
             }
 
-            public void bind(Map<String, Object> cv) {
-                fileName.setText((String) cv.get("name")); // Afficher le nom du fichier
-                fileSize.setText(String.valueOf(cv.get("timestamp"))); // Afficher le timestamp en guise de taille
+            public void bind(Map<String, Object> ldm) {
+                fileName.setText((String) ldm.get("name")); // Afficher le nom du fichier
+                fileSize.setText(String.valueOf(ldm.get("timestamp"))); // Afficher le timestamp en guise de taille
 
                 // Définir l'icône en fonction du type MIME
-                String mimeType = (String) cv.get("mimeType");
+                String mimeType = (String) ldm.get("mimeType");
                 if (mimeType != null) {
                     switch (mimeType) {
                         case "application/pdf":
@@ -409,15 +411,15 @@ public class CVFragment extends Fragment {
                     }
                 }
                 deleteButton.setOnClickListener(v -> {
-                    String cvId = (String) cv.get("id");
-                    db.collection("cvs").document(cvId)
+                    String ldmId = (String) ldm.get("id");
+                    db.collection("ldms").document(ldmId)
                             .delete()
                             .addOnCompleteListener(task -> {
                                 if (task.isSuccessful()) {
-                                    Toast.makeText(getContext(), "CV supprimé", Toast.LENGTH_SHORT).show();
-                                    loadUserCVs(); // Recharger les CVs après la suppression
+                                    Toast.makeText(getContext(), "LDM supprimé", Toast.LENGTH_SHORT).show();
+                                    loadUserLDMs(); // Recharger les LDMs après la suppression
                                 } else {
-                                    Toast.makeText(getContext(), "Erreur lors de la suppression du CV", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getContext(), "Erreur lors de la suppression du LDM", Toast.LENGTH_SHORT).show();
                                 }
                             });
                 });

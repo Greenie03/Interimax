@@ -25,7 +25,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
-        app:srcCompat="@drawable/ic_profile" />
+        app:srcCompat="@drawable/default_profile_image" />
 
     <TextView
         android:id="@+id/active_applications_text"

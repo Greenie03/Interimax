@@ -148,9 +148,7 @@
     <string name="optional">(Optionnelle)</string>
     <string name="applications_title">Candidatures</string>
     <string name="applications_count">Candidatures actives:</string>
-    <string name="applications">Candidatures</string>
-    <string name="all">Tout</string>
-    <string name="waiting">En attente</string>
-    <string name="selection">Sélectionné</string>
-    <string name="refuse">Refusé</string>
+    <string name="nav_header_name">Anonyme</string>
+    <string name="nav_header_role">Inconnu</string>
+    <string name="modify">Modifier</string>
 </resources>

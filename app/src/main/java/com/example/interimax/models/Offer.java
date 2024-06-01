@@ -49,7 +49,6 @@ public class Offer implements Parcelable {
         this.salary = salary;
         this.coordinate = coordinate;
         this.city = city;
-        this.popularity = popularity;
         addOffer(this); // Ajouter automatiquement l'offre à la liste
     }
 

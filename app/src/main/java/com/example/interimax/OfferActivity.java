@@ -8,7 +8,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -54,8 +53,7 @@ public class OfferActivity extends AppCompatActivity {
 
             String salary = offer.getSalary() + "/h";
 
-            name.setText(offer.getName());
-            employerName.setText(offer.getEmployerName());
+            name.setText(offer.getEmployerName());
             salaryTV.setText(salary);
             cityTV.setText(offer.getCity());
             descriptionTV.setText(offer.getDescription());

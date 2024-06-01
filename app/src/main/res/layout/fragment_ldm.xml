@@ -3,21 +3,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CVFragment">
-
+    tools:context=".fragments.LDMFragment">
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+        android:id="@+id/toolbarLDM"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
-        android:title="CV"
+        android:title="Lettres de Motivation"
         android:titleTextColor="@android:color/black" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_below="@id/toolbar"
+        android:layout_below="@id/toolbarLDM"
         android:padding="16dp"
         android:gravity="center"
         android:background="@android:color/white"
@@ -27,13 +26,13 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Choisissez votre CV pour l'utiliser quand vous postulez"
+            android:text="Choisissez votre Lettre de Motivation pour l'utiliser quand vous postulez"
             android:textSize="16sp"
             android:textColor="@android:color/darker_gray"
             android:gravity="center"
             android:layout_marginBottom="16dp" />
         <RelativeLayout
-            android:id="@+id/file_info_layout"
+            android:id="@+id/ldm_file_info_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone"
@@ -42,39 +41,39 @@
             android:background="@drawable/rounded_background">
 
             <ImageView
-                android:id="@+id/file_icon"
+                android:id="@+id/doc_icon"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:src="@drawable/ic_pdf"
+                android:src="@drawable/ic_doc"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true" />
 
             <TextView
-                android:id="@+id/file_name"
+                android:id="@+id/doc_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Nom du fichier"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:layout_toEndOf="@id/file_icon"
+                android:layout_toEndOf="@id/doc_icon"
                 android:layout_marginStart="16dp"
                 android:layout_centerVertical="true" />
 
             <TextView
-                android:id="@+id/file_size"
+                android:id="@+id/doc_size"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="287 KB"
                 android:textSize="14sp"
-                android:layout_below="@id/file_name"
-                android:layout_toEndOf="@id/file_icon"
+                android:layout_below="@id/doc_name"
+                android:layout_toEndOf="@id/doc_icon"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="4dp"
                 android:textColor="@android:color/darker_gray" />
         </RelativeLayout>
 
         <Button
-            android:id="@+id/button_choose_cv"
+            android:id="@+id/button_choose_ldm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Choisir un Doc/Docx/PDF"
@@ -83,7 +82,7 @@
             android:layout_marginBottom="16dp" />
 
         <Button
-            android:id="@+id/cv_button_validate"
+            android:id="@+id/ldm_button_validate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Valider"
@@ -92,7 +91,7 @@
             android:layout_marginBottom="16dp" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/cv_recycler_view"
+            android:id="@+id/ldm_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp" />

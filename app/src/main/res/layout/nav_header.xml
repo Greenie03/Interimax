@@ -4,31 +4,30 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp"
-    android:background="@color/white">
+    android:background="?attr/colorPrimaryDark">
 
     <ImageView
-        android:id="@+id/profile_image"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
-        android:src="@drawable/ic_profile"
-        android:layout_gravity="center" />
+        android:id="@+id/nav_header_image"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/default_profile_image"
+        android:layout_gravity="center_horizontal"/>
+
 
     <TextView
-        android:id="@+id/profile_name"
+        android:id="@+id/nav_header_fullname"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Bando Sio"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:paddingTop="8dp" />
+        android:text="Nom de l'utilisateur"
+        android:layout_marginTop="8dp"
+        android:textColor="@android:color/white"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
 
     <TextView
-        android:id="@+id/profile_role"
+        android:id="@+id/nav_header_role"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Designer"
-        android:textSize="14sp"
-        android:paddingTop="4dp" />
+        android:text="Rôle de l'utilisateur"
+        android:textColor="@android:color/white"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"/>
 </LinearLayout>

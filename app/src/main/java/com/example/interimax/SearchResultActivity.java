@@ -27,8 +27,8 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.interimax.models.Offer;
 import com.example.interimax.adapters.OfferAdapter;
+import com.example.interimax.models.Offer;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -60,6 +60,8 @@ public class SearchResultActivity extends AppCompatActivity  implements OnMapRea
     private Marker focusedMarker;
     private List<Offer> offers;
 
+    private static final String TAG = "SearchResultActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,12 +74,7 @@ public class SearchResultActivity extends AppCompatActivity  implements OnMapRea
         });
 
         ImageButton backButton = findViewById(R.id.back_arrow);
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+        backButton.setOnClickListener(view -> finish());
 
         Intent data = getIntent();
         Optional<String> name;

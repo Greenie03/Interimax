@@ -24,6 +24,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.interimax.models.Offer;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -55,10 +56,11 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class HomeFragment extends Fragment implements OnMapReadyCallback {
-    private static final String TAG = "HomeFragment";
+    private final String TAG = "HomeFragment";
     private View rootView;
     private EditText searchField;
     private TextView nomUserTextView, viewListLink, viewAllLink;
+    private FloatingActionButton fabAddOffer;
     private FirebaseFirestore db;
     private FirebaseAuth auth;
     private FusedLocationProviderClient fusedLocationClient;
@@ -96,13 +98,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
             mapFragment.getMapAsync(this);
         }
 
-        /*FirebaseStorage.getInstance().getReference("pfp/Otacos_logo.svg.png").getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
-            @Override
-            public void onComplete(@NonNull Task<Uri> task) {
-                Log.d("OTacos logo", task.getResult().toString());
-            }
-        });*/
-
         return rootView;
     }
 
@@ -116,7 +111,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser != null) {
             String userId = currentUser.getUid();
-            Log.d(TAG, "Current user ID: " + userId);
+            Log.d("updateUI", "Current user ID: " + userId);
             getUserInfo(userId);
         } else {
             Log.d(TAG, "No current user");
@@ -125,37 +120,47 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void getUserInfo(String userId) {
-        DocumentReference userRef = db.collection("users").document(userId);
-        userRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
-                if (document != null && document.exists()) {
-                    String firstName = document.getString("firstname");
-                    String lastName = document.getString("lastname");
-                    Log.d(TAG, "First name: " + firstName + ", Last name: " + lastName);
-                    if (firstName != null && lastName != null) {
-                        if (getActivity() != null) {
-                            getActivity().runOnUiThread(() -> {
-                                nomUserTextView.setText(firstName + " " + lastName);
-                                Toast.makeText(getContext(), "Login successful", Toast.LENGTH_SHORT).show();
-                            });
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (currentUser != null) {
+            String email = currentUser.getEmail();
+            if (email != null) {
+                db.collection("users")
+                    .whereEqualTo("email", email)
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                            DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                            String firstName = document.getString("firstname");
+                            String lastName = document.getString("lastname");
+                            String role = document.getString("role");
+                            Log.d(TAG, "First name: " + firstName + ", Last name: " + lastName + ", Role: " + role);
+                            if (firstName != null && lastName != null) {
+                                if (getActivity() != null) {
+                                    getActivity().runOnUiThread(() -> {
+                                        nomUserTextView.setText(firstName + " " + lastName);
+                                        Toast.makeText(getContext(), "Login successful", Toast.LENGTH_SHORT).show();
+                                        if ("Employeur".equals(role)) {
+                                            fabAddOffer.setVisibility(View.VISIBLE);
+                                        } else {
+                                            fabAddOffer.setVisibility(View.GONE);
+                                        }
+                                    });
+                                }
+                            } else {
+                                Log.d(TAG, "First name or Last name is null");
+                                nomUserTextView.setText("Anonyme");
+                            }
+                        } else {
+                            Log.d(TAG, "User document not found");
+                            nomUserTextView.setText("Anonyme");
                         }
-                    } else {
-                        Log.d(TAG, "First name or Last name is null");
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.d(TAG, "Error fetching user document: ", e);
                         nomUserTextView.setText("Anonyme");
-                    }
-                } else {
-                    Log.d(TAG, "Document does not exist");
-                    nomUserTextView.setText("Anonyme");
-                }
-            } else {
-                Log.d(TAG, "Task failed with exception: ", task.getException());
-                nomUserTextView.setText("Anonyme");
+                    });
             }
-        }).addOnFailureListener(e -> {
-            Log.d(TAG, "Failed to get document: " + e.getMessage());
-            nomUserTextView.setText("Anonyme");
-        });
+        }
     }
 
     private void initializeViews() {
@@ -163,6 +168,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         viewListLink = rootView.findViewById(R.id.view_list_link);
         viewAllLink = rootView.findViewById(R.id.view_all_link);
         nomUserTextView = rootView.findViewById(R.id.nom_user);
+        fabAddOffer = rootView.findViewById(R.id.fab_add_offer);
 
         rootView.findViewById(R.id.profile_image).setOnClickListener(view -> {
             MainActivity mainActivity = (MainActivity) getActivity();
@@ -180,6 +186,15 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
 
         viewListLink.setOnClickListener(v -> viewList());
         viewAllLink.setOnClickListener(v -> viewAll());
+
+        fabAddOffer.setOnClickListener(view -> {
+            NewOfferFragment newOfferFragment = new NewOfferFragment();
+            FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+            transaction.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down, R.anim.slide_in_up, R.anim.slide_out_down);
+            transaction.replace(R.id.main_fragment, newOfferFragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
+        });
     }
 
     private void viewList() {
@@ -232,10 +247,10 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                         Log.d(TAG, "User location: " + location.getLatitude() + ", " + location.getLongitude());
                         // Utiliser la localisation pour afficher les offres autour de l'utilisateur
                         Bitmap icon = drawableToBitmap(getResources().getDrawable(R.drawable.home_icon));
-                        LatLng currentPosition = new LatLng(43.636350, 3.846360);
+                        LatLng currentPosition = new LatLng(location.getLatitude(), location.getLongitude());
                         builder.include(currentPosition);
                         CURRENT_POSITION_MARKER = gMap.addMarker(new MarkerOptions().position(currentPosition).title("Vous").icon(BitmapDescriptorFactory.fromBitmap(icon)));
-                        loadOffersNearby(43.636350, 3.846360);
+                        loadOffersNearby(currentPosition.latitude, currentPosition.longitude);
                     } else {
                         Log.d(TAG, "Failed to get user location");
                         loadUserCountryOffers();
