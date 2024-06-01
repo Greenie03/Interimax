@@ -47,6 +47,11 @@ public class ApplicationsAdapter extends RecyclerView.Adapter<ApplicationsAdapte
         return applications.size();
     }
 
+    public void updateApplications(List<Application> newApplications) {
+        applications = newApplications;
+        notifyDataSetChanged();
+    }
+
     public static class ApplicationViewHolder extends RecyclerView.ViewHolder {
         private ImageView companyLogo;
         private TextView jobTitle;
