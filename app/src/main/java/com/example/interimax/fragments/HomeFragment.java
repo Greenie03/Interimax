@@ -27,6 +27,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -38,6 +39,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     private View rootView;
     private EditText searchField;
     private TextView nomUserTextView, viewListLink, viewAllLink;
+    private FloatingActionButton fabAddOffer;
     private FirebaseFirestore db;
     private FirebaseAuth auth;
     private FusedLocationProviderClient fusedLocationClient;
@@ -82,7 +84,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser != null) {
             String userId = currentUser.getUid();
-            Log.d(TAG, "Current user ID: " + userId);
+            Log.d("updateUI", "Current user ID: " + userId);
             getUserInfo(userId);
         } else {
             Log.d(TAG, "No current user");
@@ -91,44 +93,62 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void getUserInfo(String userId) {
-        DocumentReference userRef = db.collection("users").document(userId);
-        userRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
-                if (document != null && document.exists()) {
-                    String firstName = document.getString("firstname");
-                    String lastName = document.getString("lastname");
-                    Log.d(TAG, "First name: " + firstName + ", Last name: " + lastName);
-                    if (firstName != null && lastName != null) {
-                        if (getActivity() != null) {
-                            getActivity().runOnUiThread(() -> {
-                                nomUserTextView.setText(firstName + " " + lastName);
-                                Toast.makeText(getContext(), "Login successful", Toast.LENGTH_SHORT).show();
-                            });
-                        }
-                    } else {
-                        Log.d(TAG, "First name or Last name is null");
-                        nomUserTextView.setText("Anonyme");
-                    }
-                } else {
-                    Log.d(TAG, "Document does not exist");
-                    nomUserTextView.setText("Anonyme");
-                }
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (currentUser != null) {
+            String email = currentUser.getEmail();
+            if (email != null) {
+                db.collection("users")
+                        .whereEqualTo("email", email)
+                        .get()
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                                DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                                String firstName = document.getString("firstname");
+                                String lastName = document.getString("lastname");
+                                String role = document.getString("role");
+                                Log.d(TAG, "First name: " + firstName + ", Last name: " + lastName + ", Role: " + role);
+                                if (firstName != null && lastName != null) {
+                                    if (getActivity() != null) {
+                                        getActivity().runOnUiThread(() -> {
+                                            nomUserTextView.setText(firstName + " " + lastName);
+                                            Toast.makeText(getContext(), "Login successful", Toast.LENGTH_SHORT).show();
+                                            if ("Employeur".equals(role)) {
+                                                fabAddOffer.setVisibility(View.VISIBLE);
+                                            } else {
+                                                fabAddOffer.setVisibility(View.GONE);
+                                            }
+                                        });
+                                    }
+                                } else {
+                                    Log.d(TAG, "First name or Last name is null");
+                                    nomUserTextView.setText("Anonyme");
+                                }
+                            } else {
+                                Log.d(TAG, "Document does not exist");
+                                nomUserTextView.setText("Anonyme");
+                            }
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.d(TAG, "Failed to get document: " + e.getMessage());
+                            nomUserTextView.setText("Anonyme");
+                        });
             } else {
-                Log.d(TAG, "Task failed with exception: ", task.getException());
+                Log.d(TAG, "Current user email is null");
                 nomUserTextView.setText("Anonyme");
             }
-        }).addOnFailureListener(e -> {
-            Log.d(TAG, "Failed to get document: " + e.getMessage());
+        } else {
+            Log.d(TAG, "No current user");
             nomUserTextView.setText("Anonyme");
-        });
+        }
     }
+
 
     private void initializeViews() {
         searchField = rootView.findViewById(R.id.search_field);
         viewListLink = rootView.findViewById(R.id.view_list_link);
         viewAllLink = rootView.findViewById(R.id.view_all_link);
         nomUserTextView = rootView.findViewById(R.id.nom_user);
+        fabAddOffer = rootView.findViewById(R.id.fab_add_offer);
 
         rootView.findViewById(R.id.profile_image).setOnClickListener(view -> {
             MainActivity mainActivity = (MainActivity) getActivity();
@@ -146,6 +166,10 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
 
         viewListLink.setOnClickListener(v -> viewList());
         viewAllLink.setOnClickListener(v -> viewAll());
+
+        fabAddOffer.setOnClickListener(v -> {
+            // Implémentez la logique pour ajouter une offre ici
+        });
     }
 
     private void viewList() {
