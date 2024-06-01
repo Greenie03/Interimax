@@ -1,4 +1,4 @@
-package com.example.interimax.activities;
+package com.example.interimax;
 
 import android.os.Bundle;
 import android.util.Log;

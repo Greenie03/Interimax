@@ -32,8 +32,17 @@ public class DoneActivity extends AppCompatActivity {
             String successString = getResources().getString(R.string.success_text) + " " + offer.getEmployerName();
             successTV.setText(successString);
 
-            Button otherOther = findViewById(R.id.other_offer);
-            otherOther.setOnClickListener(new View.OnClickListener() {
+            Button applicationsButton = findViewById(R.id.applications);
+            applicationsButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(DoneActivity.this, ApplicationsActivity.class);
+                    startActivity(intent);
+                }
+            });
+
+            Button otherOffer = findViewById(R.id.other_offer);
+            otherOffer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(DoneActivity.this, ResearchActivity.class);

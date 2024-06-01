@@ -1,25 +1,22 @@
-package com.example.interimax.activities;
+package com.example.interimax;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
+import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
-import com.example.interimax.R;
-import com.example.interimax.fragments.ApplicationsFragment;
-import com.example.interimax.fragments.CVFragment;
-import com.example.interimax.fragments.HomeFragment;
-import com.example.interimax.fragments.MessagesFragment;
-import com.example.interimax.fragments.NotificationsFragment;
-import com.example.interimax.fragments.SavedOffersFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -37,6 +34,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_search);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
         FirebaseApp.initializeApp(this);
         setContentView(R.layout.activity_main);
 
@@ -102,7 +106,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             fragment = new CVFragment();
             Log.d("Navigation", "CVs selected");
         } else if (itemId == R.id.nav_applications) {
-            fragment = new ApplicationsFragment();
+            Intent intent = new Intent(MainActivity.this, ApplicationsActivity.class);
+            startActivity(intent);
             Log.d("Navigation", "Applications selected");
         } else if (itemId == R.id.nav_logout) {
             handleLogout();

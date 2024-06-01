@@ -1,4 +1,4 @@
-package com.example.interimax.activities;
+package com.example.interimax;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -19,19 +20,28 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.interimax.R;
-import com.example.interimax.SearchResultActivity;
 import com.example.interimax.adapters.HistoryAdapter;
-import com.example.interimax.fragments.FilterFragment;
 import com.example.interimax.models.Offer;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -53,8 +63,9 @@ public class ResearchActivity extends AppCompatActivity implements FilterFragmen
         });
         search_input = findViewById(R.id.search_input);
         LinearLayout button_layout = findViewById(R.id.popular_buttons);
-        Offer.getAllOffers().thenAccept(offers -> {
+        /*Offer.getAllOffers().thenAccept(offers -> {
             runOnUiThread(() -> {
+                offers.sort(Comparator.comparingInt(Offer::getPopularity));
                 Set<String> jobTitle = offers.stream().map(Offer::getJobTitle).collect(Collectors.toSet());
                 jobTitle.forEach(jt -> {
                     Button b = createNewPopularButton(jt);
@@ -62,6 +73,19 @@ public class ResearchActivity extends AppCompatActivity implements FilterFragmen
                     Log.d("Job", jt);
                 });
             });
+        });*/
+        FirebaseFirestore.getInstance().collection("job_popularity").orderBy("popularity", Query.Direction.DESCENDING).limit(5).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()){
+                    runOnUiThread(() -> {
+                        for(QueryDocumentSnapshot doc : task.getResult()){
+                            Button b = createNewPopularButton(doc.getId());
+                            button_layout.addView(b);
+                        }
+                    });
+                }
+            }
         });
         historyData = loadHistory(HISTORY_FILE);
 
@@ -78,9 +102,11 @@ public class ResearchActivity extends AppCompatActivity implements FilterFragmen
             @Override
             public void onClick(View view) {
                 String search_text = search_input.getText().toString();
-                if(!search_text.isEmpty()){
+                if(!search_text.isEmpty() || filterData!=null){
                     Intent intent = new Intent(ResearchActivity.this, SearchResultActivity.class);
-                    intent.putExtra("job_name", search_text);
+                    if(!search_text.isEmpty()) {
+                        intent.putExtra("job_name", search_text);
+                    }
                     if(filterData!=null){
                         intent.putExtra("salaryFrom", (int) filterData.get("salaryFrom"));
                         intent.putExtra("salaryTo", (int) filterData.get("salaryTo"));
@@ -98,7 +124,9 @@ public class ResearchActivity extends AppCompatActivity implements FilterFragmen
                     if(historyData.contains(search_text)){
                         historyData.remove(search_text);
                     }
-                    historyData.add(search_text);
+                    if(!search_text.isEmpty()) {
+                        historyData.add(search_text);
+                    }
                     saveHistory(historyData, HISTORY_FILE);
                     updateHistory();
                     startActivity(intent);
@@ -151,26 +179,47 @@ public class ResearchActivity extends AppCompatActivity implements FilterFragmen
     }
 
     public LinkedHashSet<String> loadHistory(String fileName) {
-        LinkedHashSet<String> set;
-        try (FileInputStream fis = new FileInputStream(fileName);
-             ObjectInputStream ois = new ObjectInputStream(fis)) {
-            set = (LinkedHashSet<String>) ois.readObject();
-            Log.d("history", set.toString());
-        } catch (IOException | ClassNotFoundException e) {
-            Log.d("history error", "y'a une erreur chef");
-            Log.e(e.toString(),Log.getStackTraceString(e));
-            return new LinkedHashSet<>();
+        LinkedHashSet<String> data = new LinkedHashSet<>();
+        FileInputStream fis = null;
+        try {
+            fis = openFileInput(fileName);
+            Scanner scanner = new Scanner(fis);
+            while (scanner.hasNextLine()) {
+                data.add(scanner.nextLine());
+            }
+            Log.d("FileRead", "Fichier lu avec succès");
+        } catch (IOException e) {
+            Log.e("FileRead", "Erreur lors de la lecture du fichier", e);
+        } finally {
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    Log.e("FileRead", "Erreur lors de la fermeture du fichier", e);
+                }
+            }
         }
-        return set;
+        return data;
     }
 
     public void saveHistory(LinkedHashSet<String> set, String fileName) {
-        try (FileOutputStream fos = openFileOutput(fileName, Context.MODE_PRIVATE);
-             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-            oos.writeObject(set);
+        FileOutputStream fos = null;
+        try {
+            fos = openFileOutput(fileName, MODE_PRIVATE);
+            for (String item : set) {
+                fos.write((item + System.lineSeparator()).getBytes());
+            }
+            Log.d("FileWrite", "Fichier écrit avec succès");
         } catch (IOException e) {
-            Log.d("loading error", "y'a une erreur chef");
-            Log.e("Save History Error", "Error while saving history: " + e.getMessage(), e);
+            Log.e("FileWrite", "Erreur lors de l'écriture du fichier", e);
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    Log.e("FileWrite", "Erreur lors de la fermeture du fichier", e);
+                }
+            }
         }
     }
 

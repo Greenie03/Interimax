@@ -37,7 +37,8 @@ public class CandidateActivity extends AppCompatActivity {
     private final int REQUEST_CODE_UPLOAD_MOTIVATION_LETTER = 2;
     private Uri cvUri;
     private Uri mlUri;
-    private DocumentReference candidature;
+    private Map<String, Object> candidature;
+    private Offer offer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +52,9 @@ public class CandidateActivity extends AppCompatActivity {
         });
         if(FirebaseAuth.getInstance().getCurrentUser() != null){
             if(getIntent().getExtras() != null){
-                Offer offer = getIntent().getParcelableExtra("offer");
+                offer = getIntent().getParcelableExtra("offer");
+
+                candidature = new HashMap<>();
 
                 ImageView icon = findViewById(R.id.icon);
                 TextView name = findViewById(R.id.name);
@@ -97,7 +100,6 @@ public class CandidateActivity extends AppCompatActivity {
                             String mimeType = CandidateActivity.this.getContentResolver().getType(cvUri);
                             if ("application/pdf".equals(mimeType) || "image/*".equals(mimeType)) {
                                 // Code pour télécharger le fichier vers Firebase Storage
-                                candidature = FirebaseFirestore.getInstance().collection("candidature").document();
                                 String[] ext = mimeType.split("/");
                                 uploadFileToFirebase(cvUri, "cvs/", "cv", ext[ext.length-1]);
                                 if(mlUri != null){
@@ -106,12 +108,14 @@ public class CandidateActivity extends AppCompatActivity {
                                         // Code pour télécharger le fichier vers Firebase Storage
                                         String[] mlExt = mimeType.split("/");
                                         uploadFileToFirebase(mlUri, "motivation_letters/", "motivation_letter", mlExt[mlExt.length-1]);
-                                        candidature.update("userId", FirebaseAuth.getInstance().getCurrentUser().getUid());
-                                        candidature.update("offer", offer.getId());
                                     } else {
                                         Toast.makeText(CandidateActivity.this, "Veuillez choisir un fichier PDF", Toast.LENGTH_SHORT).show();
                                     }
                                 }
+                                candidature.put("userId", FirebaseAuth.getInstance().getCurrentUser().getUid());
+                                candidature.put("offer", offer.getId());
+                                candidature.put("status", 0);
+                                FirebaseFirestore.getInstance().collection("candidature").document(FirebaseAuth.getInstance().getCurrentUser().getUid() + "_" + offer.getId()).set(candidature);
                             } else {
                                 Toast.makeText(CandidateActivity.this, "Veuillez choisir un fichier PDF", Toast.LENGTH_SHORT).show();
                             }
@@ -182,16 +186,17 @@ public class CandidateActivity extends AppCompatActivity {
     private void uploadFileToFirebase(Uri fileUri, String path, String field, String ext) {
         // Référence à Firebase Storage
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
-
+        String name = getFileName(fileUri).split(ext)[0];
         // Créer une référence de fichier pour l'upload
-        StorageReference cvRef = storageRef.child(path + System.currentTimeMillis() + "." + ext);
+        StorageReference cvRef = storageRef.child(path + name.substring(0, name.length() - 1) + System.currentTimeMillis() + "." + ext);
 
         cvRef.putFile(fileUri)
                 .addOnSuccessListener(taskSnapshot -> {
                     // Récupérer l'URL de téléchargement
                     cvRef.getDownloadUrl().addOnSuccessListener(uri -> {
                         // Ajouter les informations du fichier dans Firestore
-                        candidature.update(field,uri.toString());
+                        candidature.put(field,uri.toString());
+                        FirebaseFirestore.getInstance().collection("candidature").document(FirebaseAuth.getInstance().getCurrentUser().getUid() + "_" + offer.getId()).set(candidature);
                     }).addOnFailureListener(e -> {
                         // Afficher une erreur si l'URL de téléchargement ne peut pas être récupérée
                         Toast.makeText(CandidateActivity.this, "Erreur lors de la récupération de l'URL", Toast.LENGTH_SHORT).show();

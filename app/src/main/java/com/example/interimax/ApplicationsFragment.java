@@ -1,4 +1,4 @@
-package com.example.interimax.fragments;
+package com.example.interimax;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,9 +16,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.interimax.JobViewActivity;
-import com.example.interimax.R;
-import com.example.interimax.activities.LoginActivity;
 import com.example.interimax.adapters.ApplicationsAdapter;
 import com.example.interimax.models.Application;
 import com.google.firebase.auth.FirebaseAuth;

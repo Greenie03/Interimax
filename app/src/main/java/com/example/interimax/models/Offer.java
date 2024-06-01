@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.Query;
@@ -31,13 +32,14 @@ public class Offer implements Parcelable {
     private double salary; // Rémunération
     private GeoPoint coordinate;
     private String city;
+    private int popularity;
 
     // Liste statique qui contient toutes les offres
     private static List<Offer> allOffers = new ArrayList<>();
     private static FirebaseFirestore database = FirebaseFirestore.getInstance();
 
     // Constructeur complet
-    public Offer(String id, String name, String employerName, String jobTitle, String description, Integer period, double salary, GeoPoint coordinate, String city) {
+    public Offer(String id, String name, String employerName, String jobTitle, String description, Integer period, double salary, GeoPoint coordinate, String city, int popularity) {
         this.id = id;
         this.name = name;
         this.employerName = employerName;
@@ -47,6 +49,7 @@ public class Offer implements Parcelable {
         this.salary = salary;
         this.coordinate = coordinate;
         this.city = city;
+        this.popularity = popularity;
         addOffer(this); // Ajouter automatiquement l'offre à la liste
     }
 
@@ -94,7 +97,9 @@ public class Offer implements Parcelable {
                 if(task.isSuccessful()){
                     for(QueryDocumentSnapshot doc : task.getResult()){
                         Log.d("document "+doc.getId(), doc.getData().toString());
-                        offers.add(doc.toObject(Offer.class));
+                        Offer offer = doc.toObject(Offer.class);
+                        offer.setId(doc.getId());
+                        offers.add(offer);
                     }
                 }else{
                     Exception e = task.getException();
@@ -108,7 +113,7 @@ public class Offer implements Parcelable {
         return future;
     }
 
-    public static CompletableFuture<List<Offer>> findOffer(Context context, Optional<String> name, Optional<String[]> employers, Optional<Integer> salaryFrom, Optional<Integer> salaryTo, Optional<String[]> locations){
+    public static CompletableFuture<List<Offer>> findOffer(Optional<String> name, Optional<String[]> employers, Optional<Integer> salaryFrom, Optional<Integer> salaryTo, Optional<String[]> locations, Optional<Long> limit){
         CompletableFuture<List<Offer>> future = new CompletableFuture<>();
         List<Offer> offers = new ArrayList<>();
         Query query = database.collection("Job");
@@ -120,6 +125,9 @@ public class Offer implements Parcelable {
         }
         if(locations.isPresent()){
             query = query.whereIn("city", Arrays.asList(locations.get()));
+        }
+        if(limit.isPresent()){
+            query = query.limit(limit.get());
         }
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -194,6 +202,10 @@ public class Offer implements Parcelable {
         return city;
     }
 
+    public int getPopularity(){
+        return popularity;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -201,6 +213,7 @@ public class Offer implements Parcelable {
 
     @Override
     public void writeToParcel(@NonNull Parcel parcel, int i) {
+        parcel.writeString(this.id);
         parcel.writeString(this.name);
         parcel.writeString(this.description);
         parcel.writeString(this.employerName);
@@ -210,9 +223,11 @@ public class Offer implements Parcelable {
         parcel.writeDouble(this.salary);
         parcel.writeDouble(this.getCoordinate().getLatitude());
         parcel.writeDouble(this.getCoordinate().getLongitude());
+        parcel.writeInt(this.popularity);
     }
 
     public Offer(Parcel in){
+        this.id = in.readString();
         this.name = in.readString();
         this.description = in.readString();
         this.employerName = in.readString();
@@ -223,5 +238,6 @@ public class Offer implements Parcelable {
         Double lat = in.readDouble();
         Double lng = in.readDouble();
         this.coordinate = new GeoPoint(lat,lng);
+        this.popularity = in.readInt();
     }
 }

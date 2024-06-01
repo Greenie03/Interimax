@@ -1,8 +1,15 @@
-package com.example.interimax.fragments;
+package com.example.interimax;
 
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.location.Geocoder;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,20 +25,34 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.fragment.app.Fragment;
 
-import com.example.interimax.R;
-import com.example.interimax.activities.MainActivity;
-import com.example.interimax.activities.OffersListActivity;
-import com.example.interimax.activities.ResearchActivity;
+import com.example.interimax.models.Offer;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
 
 public class HomeFragment extends Fragment implements OnMapReadyCallback {
     private static final String TAG = "HomeFragment";
@@ -41,6 +62,11 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     private FirebaseFirestore db;
     private FirebaseAuth auth;
     private FusedLocationProviderClient fusedLocationClient;
+    private GoogleMap gMap;
+    private List<Offer> offers;
+    private Marker CURRENT_POSITION_MARKER;
+    private Marker focusedMarker;
+    private LatLngBounds.Builder builder;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -61,6 +87,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
 
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
+        offers = new ArrayList<>();
 
         updateUI();
 
@@ -68,6 +95,13 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
+
+        /*FirebaseStorage.getInstance().getReference("pfp/Otacos_logo.svg.png").getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                Log.d("OTacos logo", task.getResult().toString());
+            }
+        });*/
 
         return rootView;
     }
@@ -169,12 +203,39 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
             return;
         }
 
+        this.gMap = googleMap;
+        gMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(@NonNull Marker marker) {
+                Log.d("Marker1", marker.toString());
+                if(!marker.equals(CURRENT_POSITION_MARKER)) {
+                    Log.d("not current position marker", marker.getId());
+                    if(marker.equals(focusedMarker)) {
+                        Log.d("already focused", marker.toString());
+                        Offer o = (Offer) marker.getTag();
+                        Intent intent = new Intent(getContext(), OfferActivity.class);
+                        intent.putExtra("offer", o);
+                        startActivity(intent);
+                        focusedMarker = null;
+                        return true;
+                    }
+                }
+                focusedMarker = marker;
+                Log.d("Marker", focusedMarker.toString());
+                return false;
+            }
+        });
+        builder = new LatLngBounds.Builder();
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(location -> {
                     if (location != null) {
                         Log.d(TAG, "User location: " + location.getLatitude() + ", " + location.getLongitude());
                         // Utiliser la localisation pour afficher les offres autour de l'utilisateur
-                        loadOffersNearby(location.getLatitude(), location.getLongitude());
+                        Bitmap icon = drawableToBitmap(getResources().getDrawable(R.drawable.home_icon));
+                        LatLng currentPosition = new LatLng(43.636350, 3.846360);
+                        builder.include(currentPosition);
+                        CURRENT_POSITION_MARKER = gMap.addMarker(new MarkerOptions().position(currentPosition).title("Vous").icon(BitmapDescriptorFactory.fromBitmap(icon)));
+                        loadOffersNearby(43.636350, 3.846360);
                     } else {
                         Log.d(TAG, "Failed to get user location");
                         loadUserCountryOffers();
@@ -190,6 +251,15 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         // Logique pour charger les offres autour de la localisation de l'utilisateur
         Log.d(TAG, "Loading offers near " + latitude + ", " + longitude);
         // Implémentez la logique pour charger et afficher les offres ici
+        String city = getCityNameFromCoordinates(latitude, longitude);
+        gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 11));
+        Offer.findOffer(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(new String[]{city}), Optional.empty())
+                .thenAccept(offers -> {
+                    getActivity().runOnUiThread(() -> {
+                        this.offers = offers;
+                        displayOffers();
+                    });
+                });
     }
 
     private void loadUserCountryOffers() {
@@ -211,7 +281,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                             loadRandomOffers();
                         }
                     } else {
-                        Log.d(TAG, "Document does not exist");
+                        Log.d(TAG, "Document for user does not exist");
                         loadRandomOffers();
                     }
                 } else {
@@ -228,11 +298,76 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         // Logique pour charger les offres par pays
         Log.d(TAG, "Loading offers in country: " + country);
         // Implémentez la logique pour charger et afficher les offres ici
+        Offer.getAllOffers().thenAccept(offers -> {
+            Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
+            LatLng countryLatLng;
+            try{
+                List<Address> countryList = geocoder.getFromLocationName(country, 1);
+                Address countryAddr = countryList.get(0);
+                countryLatLng = new LatLng(countryAddr.getLatitude(), countryAddr.getLongitude());
+                for(Offer o : offers){
+                         List<Address> addresses = geocoder.getFromLocation(o.getCoordinate().getLatitude(), o.getCoordinate().getLongitude(), 1);
+                        Address address = addresses.get(0);
+                        if(Objects.equals(address.getCountryName(), country)){
+                            this.offers.add(o);
+                        }
+                 }
+                displayOffers();
+                gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(countryLatLng, 5.5F));
+            } catch (IOException e) {
+
+            }
+
+        });
+    }
+
+    private void displayOffers(){
+        for(Offer o : this.offers){
+            builder.include(new LatLng(o.getCoordinate().getLatitude(), o.getCoordinate().getLongitude()));
+            LatLng coordinates = new LatLng(o.getCoordinate().getLatitude(), o.getCoordinate().getLongitude());
+            Marker marker = gMap.addMarker(new MarkerOptions().position(coordinates).title(o.getName()));
+            marker.setTag(o);
+        }
+        LatLngBounds bounds = builder.build();
+        gMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 200));
     }
 
     private void loadRandomOffers() {
         // Logique pour charger des offres aléatoires
         Log.d(TAG, "Loading random offers");
         // Implémentez la logique pour charger et afficher les offres ici
+        Offer.getAllOffers().thenAccept(offers1 -> {
+            this.offers = offers1;
+            displayOffers();
+        });
+    }
+
+    private String getCityNameFromCoordinates(double latitude, double longitude) {
+        Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+            if (addresses != null && !addresses.isEmpty()) {
+                Address address = addresses.get(0);
+                return address.getLocality();
+            } else {
+                Log.e("error address", "No address found");
+            }
+        } catch (IOException e) {
+            Log.e(e.getClass().getName(), e.getMessage(), e);
+        }
+        return "";
+    }
+
+    public Bitmap drawableToBitmap(Drawable drawable) {
+        if (drawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable) drawable).getBitmap();
+        }
+
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
     }
 }

@@ -1,9 +1,11 @@
 package com.example.interimax.models;
 
+import androidx.annotation.Nullable;
+
 public class User {
     private String id;
-    private String Firstname;
-    private String Lastname;
+    private String firstname;
+    private String lastname;
     private String email;
     private String password;
     private String DoB;
@@ -17,18 +19,22 @@ public class User {
         // Required empty constructor for Firebase
     }
 
-    public User(String id, String firstname, String lastname, String email, String password, String DoB, String profileImageUrl, String phoneNumber, String country, String role, String bio) {
+    public User(String id, String firstname, String lastname, String email, String password, String DoB, @Nullable String profileImageUrl, String phoneNumber, String country, String role, @Nullable String bio) {
         this.id = id;
-        Firstname = firstname;
-        Lastname = lastname;
+        this.firstname = firstname;
+        this.lastname = lastname;
         this.email = email;
         this.password = password;
         this.DoB = DoB;
-        this.profileImageUrl = profileImageUrl;
+        if(profileImageUrl != null) {
+            this.profileImageUrl = profileImageUrl;
+        }
         this.phoneNumber = phoneNumber;
         this.country = country;
         this.role = role;
-        this.bio = bio;
+        if(bio != null) {
+            this.bio = bio;
+        }
     }
     // Getters and Setters
 
@@ -42,19 +48,19 @@ public class User {
     }
 
     public String getFirstname() {
-        return Firstname;
+        return firstname;
     }
 
     public void setFirstname(String firstname) {
-        Firstname = firstname;
+        this.firstname = firstname;
     }
 
     public String getLastname() {
-        return Lastname;
+        return lastname;
     }
 
     public void setLastname(String lastname) {
-        Lastname = lastname;
+        this.lastname = lastname;
     }
 
     public String getEmail() {

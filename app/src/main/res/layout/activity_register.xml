@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    tools:context=".activities.RegisterActivity">
+    tools:context=".RegisterActivity">
 
     <LinearLayout
         android:id="@+id/llRegister"
@@ -69,15 +69,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Date de naissance"
-            android:focusable="false"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="8dp"
+            android:inputType="date"/>
 
         <EditText
             android:id="@+id/etCountry"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Pays de résidence"
-            android:focusable="false"
             android:layout_marginTop="8dp" />
 
         <EditText

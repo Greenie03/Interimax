@@ -1,4 +1,4 @@
-package com.example.interimax.fragments;
+package com.example.interimax;
 
 import static androidx.appcompat.content.res.AppCompatResources.getDrawable;
 
@@ -11,7 +11,6 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 
-import com.example.interimax.R;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.slider.RangeSlider;
 

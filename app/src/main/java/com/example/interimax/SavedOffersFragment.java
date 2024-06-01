@@ -1,4 +1,4 @@
-package com.example.interimax.fragments;
+package com.example.interimax;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,7 +12,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.example.interimax.activities.LoginActivity;
 import com.example.interimax.adapters.SavedOffersAdapter;
 import com.example.interimax.databinding.FragmentSavedOffersBinding;
 import com.example.interimax.models.Offer;

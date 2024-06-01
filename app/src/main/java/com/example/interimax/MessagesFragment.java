@@ -1,4 +1,4 @@
-package com.example.interimax.fragments;
+package com.example.interimax;
 
 import android.os.Bundle;
 import androidx.annotation.NonNull;
