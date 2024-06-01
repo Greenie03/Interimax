@@ -7,6 +7,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
@@ -18,6 +19,7 @@ import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.example.interimax.R;
+import com.example.interimax.fragments.ApplicationsEmployerFragment;
 import com.example.interimax.fragments.ApplicationsFragment;
 import com.example.interimax.fragments.CVFragment;
 import com.example.interimax.fragments.HomeFragment;
@@ -165,8 +167,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             fragment = new CVFragment();
             Log.d("Navigation", "CVs selected");
         } else if (itemId == R.id.nav_applications) {
-            fragment = new ApplicationsFragment();
-            Log.d("Navigation", "Applications selected");
+            FirebaseUser currentUser = auth.getCurrentUser();
+            if (currentUser != null) {
+                String email = currentUser.getEmail();
+                if (email != null) {
+                    db.collection("users").whereEqualTo("email", email).get().addOnCompleteListener(task -> {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                            String role = document.getString("role");
+                            if ("Candidat".equals(role)) {
+                                loadFragment(new ApplicationsFragment());
+                            } else if ("Employeur".equals(role)) {
+                                loadFragment(new ApplicationsEmployerFragment());
+                            } else {
+                                Toast.makeText(this, "Rôle inconnu", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(this, "Erreur lors de la récupération des informations utilisateur", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            } else {
+                Toast.makeText(this, "Connectez-vous pour accéder à vos candidatures", Toast.LENGTH_SHORT).show();
+            }
+            return;
         } else if (itemId == R.id.nav_cover_letters) {
             fragment = new LDMFragment();
             Log.d("Navigation", "LDM selected");

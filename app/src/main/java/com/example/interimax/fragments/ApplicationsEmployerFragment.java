@@ -33,6 +33,7 @@ public class ApplicationsEmployerFragment extends Fragment {
     private TextView filterAll;
     private TextView filterRefused;
     private TextView filterPending;
+    private TextView filterAccepted;
 
     public static ApplicationsEmployerFragment newInstance() {
         return new ApplicationsEmployerFragment();
@@ -48,7 +49,7 @@ public class ApplicationsEmployerFragment extends Fragment {
         filterAll = view.findViewById(R.id.filter_all);
         filterRefused = view.findViewById(R.id.filter_refused);
         filterPending = view.findViewById(R.id.filter_pending);
-
+        filterAccepted = view.findViewById(R.id.filter_accepted);
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
@@ -62,6 +63,7 @@ public class ApplicationsEmployerFragment extends Fragment {
         filterAll.setOnClickListener(v -> filterApplications("all"));
         filterRefused.setOnClickListener(v -> filterApplications("refused"));
         filterPending.setOnClickListener(v -> filterApplications("pending"));
+        filterAccepted.setOnClickListener(v -> filterApplications("accepted"));
 
         return view;
     }
@@ -109,6 +111,7 @@ public class ApplicationsEmployerFragment extends Fragment {
         filterAll.setBackgroundColor(selectedFilter.equals("all") ? selectedColor : unselectedColor);
         filterRefused.setBackgroundColor(selectedFilter.equals("refused") ? selectedColor : unselectedColor);
         filterPending.setBackgroundColor(selectedFilter.equals("pending") ? selectedColor : unselectedColor);
+        filterAccepted.setBackgroundColor(selectedFilter.equals("accepted") ? selectedColor : unselectedColor);
     }
 
     private void onApplicationClick(Application application) {

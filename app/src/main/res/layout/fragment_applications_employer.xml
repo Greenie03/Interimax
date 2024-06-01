@@ -45,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:text="Toutes"
                 android:padding="12dp"
-                android:background="@drawable/tag_unselected"
+                android:background="@drawable/tag_selector"
                 android:layout_marginEnd="8dp" />
 
             <TextView
@@ -54,7 +54,7 @@
                 android:layout_height="wrap_content"
                 android:text="Acceptées"
                 android:padding="12dp"
-                android:background="@drawable/tag_unselected"
+                android:background="@drawable/tag_selector"
                 android:layout_marginEnd="8dp" />
 
             <TextView
@@ -63,7 +63,7 @@
                 android:layout_height="wrap_content"
                 android:text="Refusées"
                 android:padding="12dp"
-                android:background="@drawable/tag_unselected"
+                android:background="@drawable/tag_selector"
                 android:layout_marginEnd="8dp" />
 
             <TextView
@@ -72,7 +72,7 @@
                 android:layout_height="wrap_content"
                 android:text="En attente"
                 android:padding="12dp"
-                android:background="@drawable/tag_unselected" />
+                android:background="@drawable/tag_selector" />
         </LinearLayout>
     </HorizontalScrollView>
 
