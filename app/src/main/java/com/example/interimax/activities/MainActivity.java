@@ -26,6 +26,7 @@ import com.example.interimax.fragments.HomeFragment;
 import com.example.interimax.fragments.LDMFragment;
 import com.example.interimax.fragments.MessagesFragment;
 import com.example.interimax.fragments.NotificationsFragment;
+import com.example.interimax.fragments.ProfileEmployerFragment;
 import com.example.interimax.fragments.SavedOffersFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -150,6 +151,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void handleNavigationItemSelected(MenuItem item) {
         Fragment fragment = null;
         int itemId = item.getItemId();
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (currentUser == null) {
+            Toast.makeText(this, "Connectez-vous pour accéder à cette fonctionnalité", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         if (itemId == R.id.navigation_home) {
             fragment = new HomeFragment();
@@ -166,31 +172,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (itemId == R.id.nav_cvs) {
             fragment = new CVFragment();
             Log.d("Navigation", "CVs selected");
+        } else if (itemId == R.id.nav_profile) {
+            loadUserProfileFragment(currentUser);
         } else if (itemId == R.id.nav_applications) {
-            FirebaseUser currentUser = auth.getCurrentUser();
-            if (currentUser != null) {
-                String email = currentUser.getEmail();
-                if (email != null) {
-                    db.collection("users").whereEqualTo("email", email).get().addOnCompleteListener(task -> {
-                        if (task.isSuccessful() && task.getResult() != null) {
-                            DocumentSnapshot document = task.getResult().getDocuments().get(0);
-                            String role = document.getString("role");
-                            if ("Candidat".equals(role)) {
-                                loadFragment(new ApplicationsFragment());
-                            } else if ("Employeur".equals(role)) {
-                                loadFragment(new ApplicationsEmployerFragment());
-                            } else {
-                                Toast.makeText(this, "Rôle inconnu", Toast.LENGTH_SHORT).show();
-                            }
-                        } else {
-                            Toast.makeText(this, "Erreur lors de la récupération des informations utilisateur", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-            } else {
-                Toast.makeText(this, "Connectez-vous pour accéder à vos candidatures", Toast.LENGTH_SHORT).show();
-            }
-            return;
+            loadUserApplicationsFragment(currentUser);
         } else if (itemId == R.id.nav_cover_letters) {
             fragment = new LDMFragment();
             Log.d("Navigation", "LDM selected");
@@ -232,5 +217,45 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         });
+    }
+    private void loadUserProfileFragment(FirebaseUser currentUser) {
+        String email = currentUser.getEmail();
+        if (email != null) {
+            db.collection("users").whereEqualTo("email", email).get().addOnCompleteListener(task -> {
+                if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                    DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                    String role = document.getString("role");
+                    if ("Employeur".equals(role)) {
+                        loadFragment(new ProfileEmployerFragment());
+                    } else {
+                        // loadFragment(ProfileFragment()); // Assuming you have a ProfileFragment for other roles
+                        Toast.makeText(this, "Rôle inconnu ou non supporté", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(this, "Erreur lors de la récupération du rôle", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    private void loadUserApplicationsFragment(FirebaseUser currentUser) {
+        String email = currentUser.getEmail();
+        if (email != null) {
+            db.collection("users").whereEqualTo("email", email).get().addOnCompleteListener(task -> {
+                if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                    DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                    String role = document.getString("role");
+                    if ("Candidat".equals(role)) {
+                        loadFragment(new ApplicationsFragment());
+                    } else if ("Employeur".equals(role)) {
+                        loadFragment(new ApplicationsEmployerFragment());
+                    } else {
+                        Toast.makeText(this, "Rôle inconnu", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(this, "Erreur lors de la récupération des informations utilisateur", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 }
