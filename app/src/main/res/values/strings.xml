@@ -46,4 +46,6 @@
     <string name="candidate">Postuler</string>
     <string name="applications_title">Candidatures</string>
     <string name="applications_count">Candidatures actives:</string>
+    <string name="nav_header_name">Anonyme</string>
+    <string name="nav_header_role">Inconnu</string>
 </resources>

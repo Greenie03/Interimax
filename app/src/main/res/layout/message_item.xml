@@ -10,7 +10,7 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_alignParentStart="true"
-        android:src="@drawable/ic_profile" />
+        android:src="@drawable/default_profile_image" />
 
     <TextView
         android:id="@+id/message_name"
