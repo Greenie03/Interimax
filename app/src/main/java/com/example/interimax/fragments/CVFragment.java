@@ -97,6 +97,7 @@ public class CVFragment extends Fragment {
         cvAdapter = new CVAdapter(cvList);
         cvRecyclerView.setAdapter(cvAdapter);
 
+
         Button buttonChooseCV = view.findViewById(R.id.button_choose_cv);
         Button buttonValidate = view.findViewById(R.id.cv_button_validate);
 
@@ -155,10 +156,13 @@ public class CVFragment extends Fragment {
     }
 
     private void displayFileInfo(Uri fileUri) {
-        RelativeLayout fileInfoLayout = getView().findViewById(R.id.file_info_layout);
-        ImageView fileIcon = getView().findViewById(R.id.file_icon);
-        TextView fileName = getView().findViewById(R.id.file_name);
-        TextView fileSize = getView().findViewById(R.id.file_size);
+        View view = getView();
+        if (view == null) return;
+
+        RelativeLayout fileInfoLayout = view.findViewById(R.id.file_info_layout);
+        ImageView fileIcon = view.findViewById(R.id.file_icon);
+        TextView fileName = view.findViewById(R.id.file_name);
+        TextView fileSize = view.findViewById(R.id.file_size);
 
         // Récupérer les informations du fichier
         Cursor cursor = getContext().getContentResolver().query(fileUri, null, null, null, null);
@@ -170,7 +174,7 @@ public class CVFragment extends Fragment {
 
             // Afficher les informations du fichier
             fileName.setText(displayName);
-            fileSize.setText(size + " KB");
+            fileSize.setText(String.format("%s KB", size));
             fileIcon.setImageResource(R.drawable.ic_pdf); // Assurez-vous que vous avez un icône PDF dans votre dossier drawable
 
             fileInfoLayout.setVisibility(View.VISIBLE);

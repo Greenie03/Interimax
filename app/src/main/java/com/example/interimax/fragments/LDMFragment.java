@@ -159,9 +159,9 @@ public class LDMFragment extends Fragment {
         if (view == null) return;
 
         RelativeLayout fileInfoLayout = view.findViewById(R.id.ldm_file_info_layout);
-        ImageView fileIcon = view.findViewById(R.id.file_icon);
-        TextView fileName = view.findViewById(R.id.file_name);
-        TextView fileSize = view.findViewById(R.id.file_size);
+        ImageView fileIcon = view.findViewById(R.id.doc_icon);
+        TextView fileName = view.findViewById(R.id.doc_name);
+        TextView fileSize = view.findViewById(R.id.doc_size);
 
         if (fileInfoLayout == null || fileIcon == null || fileName == null || fileSize == null) {
             Log.e(TAG, "Some views are not initialized");
@@ -178,7 +178,7 @@ public class LDMFragment extends Fragment {
 
             // Afficher les informations du fichier
             fileName.setText(displayName);
-            fileSize.setText(size + " KB");
+            fileSize.setText(String.format("%s KB", size));
             fileIcon.setImageResource(R.drawable.ic_pdf); // Assurez-vous que vous avez un icône PDF dans votre dossier drawable
 
             fileInfoLayout.setVisibility(View.VISIBLE);
