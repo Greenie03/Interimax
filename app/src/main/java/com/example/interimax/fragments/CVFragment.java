@@ -97,14 +97,15 @@ public class CVFragment extends Fragment {
         cvAdapter = new CVAdapter(cvList);
         cvRecyclerView.setAdapter(cvAdapter);
 
-
         Button buttonChooseCV = view.findViewById(R.id.button_choose_cv);
         Button buttonValidate = view.findViewById(R.id.cv_button_validate);
 
         buttonChooseCV.setOnClickListener(v -> {
             // Ouvrir le sélecteur de fichiers pour choisir un CV
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.setType("application/pdf");
+            intent.setType("*/*");
+            String[] mimeTypes = {"application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "image/*"};
+            intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             activityResultLauncher.launch(Intent.createChooser(intent, "Choisir un fichier"));
         });
@@ -114,7 +115,7 @@ public class CVFragment extends Fragment {
             if (fileUri != null) {
                 // Vérifier que c'est un fichier PDF
                 String mimeType = getContext().getContentResolver().getType(fileUri);
-                if ("application/pdf".equals(mimeType)) {
+                if ("application/pdf".equals(mimeType) || "application/msword".equals(mimeType) || "application/vnd.openxmlformats-officedocument.wordprocessingml.document".equals(mimeType) || mimeType.startsWith("image/")) {
                     // Vérifier si le fichier existe déjà
                     String fileName = getFileName(fileUri);
                     checkIfFileExists(fileName, new FileExistsCallback() {
@@ -129,7 +130,7 @@ public class CVFragment extends Fragment {
                         }
                     });
                 } else {
-                    Toast.makeText(getContext(), "Veuillez choisir un fichier PDF", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Veuillez choisir un fichier PDF, DOC, DOCX ou une image", Toast.LENGTH_SHORT).show();
                 }
             } else {
                 // Afficher un message pour choisir un fichier
@@ -160,10 +161,14 @@ public class CVFragment extends Fragment {
         if (view == null) return;
 
         RelativeLayout fileInfoLayout = view.findViewById(R.id.file_info_layout);
-        ImageView fileIcon = view.findViewById(R.id.file_icon);
-        TextView fileName = view.findViewById(R.id.file_name);
-        TextView fileSize = view.findViewById(R.id.file_size);
+        ImageView fileIcon = view.findViewById(R.id.cv_file_icon);
+        TextView fileName = view.findViewById(R.id.cv_file_name);
+        TextView fileSize = view.findViewById(R.id.cv_file_size);
 
+        if (fileInfoLayout == null || fileIcon == null || fileName == null || fileSize == null) {
+            Log.e(TAG, "Some views are not initialized");
+            return;
+        }
         // Récupérer les informations du fichier
         Cursor cursor = getContext().getContentResolver().query(fileUri, null, null, null, null);
         if (cursor != null && cursor.moveToFirst()) {
@@ -175,8 +180,27 @@ public class CVFragment extends Fragment {
             // Afficher les informations du fichier
             fileName.setText(displayName);
             fileSize.setText(String.format("%s KB", size));
-            fileIcon.setImageResource(R.drawable.ic_pdf); // Assurez-vous que vous avez un icône PDF dans votre dossier drawable
 
+            // Définir l'icône en fonction du type MIME
+            String mimeType = getContext().getContentResolver().getType(fileUri);
+            if (mimeType != null) {
+                switch (mimeType) {
+                    case "application/pdf":
+                        fileIcon.setImageResource(R.drawable.ic_pdf); // Icône pour les fichiers PDF
+                        break;
+                    case "application/msword":
+                    case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                        fileIcon.setImageResource(R.drawable.ic_doc); // Icône pour les fichiers Word
+                        break;
+                    default:
+                        if (mimeType.startsWith("image/")) {
+                            fileIcon.setImageResource(R.drawable.ic_image); // Icône pour les fichiers image
+                        } else {
+                            fileIcon.setImageResource(R.drawable.ic_file); // Icône générique pour les autres types de fichiers
+                        }
+                        break;
+                }
+            }
             fileInfoLayout.setVisibility(View.VISIBLE);
         }
     }
@@ -214,11 +238,13 @@ public class CVFragment extends Fragment {
 
         String userId = currentUser.getUid();
         String fileName = getFileName(fileUri);
+        String mimeType = getContext().getContentResolver().getType(fileUri);
 
         // Créer un document avec les informations du fichier
         Map<String, Object> file = new HashMap<>();
         file.put("url", downloadUrl);
         file.put("name", fileName); // Ajouter le nom du fichier
+        file.put("mimeType", mimeType); // Ajouter le type MIME
         file.put("timestamp", System.currentTimeMillis());
         file.put("userId", userId); // Ajouter l'ID de l'utilisateur
 
@@ -329,9 +355,9 @@ public class CVFragment extends Fragment {
 
         @NonNull
         @Override
-        public CVViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        public CVAdapter.CVViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.cv_item_layout, parent, false);
-            return new CVViewHolder(view);
+            return new CVAdapter.CVViewHolder(view);
         }
 
         @Override
@@ -349,18 +375,39 @@ public class CVFragment extends Fragment {
             TextView fileName;
             TextView fileSize;
             ImageView deleteButton;
-
+            ImageView fileIcon;
             public CVViewHolder(@NonNull View itemView) {
                 super(itemView);
                 fileName = itemView.findViewById(R.id.cv_file_name);
                 fileSize = itemView.findViewById(R.id.cv_file_size);
                 deleteButton = itemView.findViewById(R.id.cv_delete_button);
+                fileIcon = itemView.findViewById(R.id.cv_file_icon);
             }
 
             public void bind(Map<String, Object> cv) {
                 fileName.setText((String) cv.get("name")); // Afficher le nom du fichier
                 fileSize.setText(String.valueOf(cv.get("timestamp"))); // Afficher le timestamp en guise de taille
 
+                // Définir l'icône en fonction du type MIME
+                String mimeType = (String) cv.get("mimeType");
+                if (mimeType != null) {
+                    switch (mimeType) {
+                        case "application/pdf":
+                            fileIcon.setImageResource(R.drawable.ic_pdf); // Icône pour les fichiers PDF
+                            break;
+                        case "application/msword":
+                        case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                            fileIcon.setImageResource(R.drawable.ic_doc); // Icône pour les fichiers Word
+                            break;
+                        default:
+                            if (mimeType.startsWith("image/")) {
+                                fileIcon.setImageResource(R.drawable.ic_image); // Icône pour les fichiers image
+                            } else {
+                                fileIcon.setImageResource(R.drawable.ic_file); // Icône générique pour les autres types de fichiers
+                            }
+                            break;
+                    }
+                }
                 deleteButton.setOnClickListener(v -> {
                     String cvId = (String) cv.get("id");
                     db.collection("cvs").document(cvId)

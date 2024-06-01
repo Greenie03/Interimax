@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Log.d("Navigation", "Applications selected");
         } else if (itemId == R.id.nav_cover_letters) {
             fragment = new LDMFragment();
-            Log.d("Navigation", "Applications selected");
+            Log.d("Navigation", "LDM selected");
         } else if (itemId == R.id.nav_logout) {
             handleLogout();
             return;

@@ -292,7 +292,6 @@ public class LDMFragment extends Fragment {
         }
         return result;
     }
-
     private void checkIfFileExists(String fileName, FileExistsCallback callback) {
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser == null) {
