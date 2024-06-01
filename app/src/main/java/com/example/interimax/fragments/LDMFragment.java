@@ -103,7 +103,9 @@ public class LDMFragment extends Fragment {
         buttonChooseLDM.setOnClickListener(v -> {
             // Ouvrir le sélecteur de fichiers pour choisir une LDM
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.setType("application/pdf");
+            intent.setType("*/*");
+            String[] mimeTypes = {"application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "image/*"};
+            intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             activityResultLauncher.launch(Intent.createChooser(intent, "Choisir un fichier"));
         });
@@ -111,9 +113,9 @@ public class LDMFragment extends Fragment {
         buttonValidate.setOnClickListener(v -> {
             // Valider le fichier choisi
             if (fileUri != null) {
-                // Vérifier que c'est un fichier PDF
+                // Vérifier le type de fichier
                 String mimeType = getContext().getContentResolver().getType(fileUri);
-                if ("application/pdf".equals(mimeType)) {
+                if ("application/pdf".equals(mimeType) || "application/msword".equals(mimeType) || "application/vnd.openxmlformats-officedocument.wordprocessingml.document".equals(mimeType) || mimeType.startsWith("image/")) {
                     // Vérifier si le fichier existe déjà
                     String fileName = getFileName(fileUri);
                     checkIfFileExists(fileName, new FileExistsCallback() {
@@ -128,13 +130,14 @@ public class LDMFragment extends Fragment {
                         }
                     });
                 } else {
-                    Toast.makeText(getContext(), "Veuillez choisir un fichier PDF", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Veuillez choisir un fichier PDF, DOC, DOCX ou une image", Toast.LENGTH_SHORT).show();
                 }
             } else {
                 // Afficher un message pour choisir un fichier
                 Toast.makeText(getContext(), "Veuillez choisir un fichier", Toast.LENGTH_SHORT).show();
             }
         });
+
 
         // Gérer le bouton de retour de l'appareil
         requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
@@ -179,8 +182,27 @@ public class LDMFragment extends Fragment {
             // Afficher les informations du fichier
             fileName.setText(displayName);
             fileSize.setText(String.format("%s KB", size));
-            fileIcon.setImageResource(R.drawable.ic_pdf); // Assurez-vous que vous avez un icône PDF dans votre dossier drawable
 
+            // Définir l'icône en fonction du type MIME
+            String mimeType = getContext().getContentResolver().getType(fileUri);
+            if (mimeType != null) {
+                switch (mimeType) {
+                    case "application/pdf":
+                        fileIcon.setImageResource(R.drawable.ic_pdf); // Icône pour les fichiers PDF
+                        break;
+                    case "application/msword":
+                    case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                        fileIcon.setImageResource(R.drawable.ic_doc); // Icône pour les fichiers Word
+                        break;
+                    default:
+                        if (mimeType.startsWith("image/")) {
+                            fileIcon.setImageResource(R.drawable.ic_image); // Icône pour les fichiers image
+                        } else {
+                            fileIcon.setImageResource(R.drawable.ic_file); // Icône générique pour les autres types de fichiers
+                        }
+                        break;
+                }
+            }
             fileInfoLayout.setVisibility(View.VISIBLE);
         }
     }
@@ -218,11 +240,13 @@ public class LDMFragment extends Fragment {
 
         String userId = currentUser.getUid();
         String fileName = getFileName(fileUri);
+        String mimeType = getContext().getContentResolver().getType(fileUri);
 
         // Créer un document avec les informations du fichier
         Map<String, Object> file = new HashMap<>();
         file.put("url", downloadUrl);
         file.put("name", fileName); // Ajouter le nom du fichier
+        file.put("mimeType", mimeType); // Ajouter le type MIME
         file.put("timestamp", System.currentTimeMillis());
         file.put("userId", userId); // Ajouter l'ID de l'utilisateur
 
@@ -354,18 +378,39 @@ public class LDMFragment extends Fragment {
             TextView fileName;
             TextView fileSize;
             ImageView deleteButton;
-
+            ImageView fileIcon;
             public LDMViewHolder(@NonNull View itemView) {
                 super(itemView);
                 fileName = itemView.findViewById(R.id.ldm_file_name);
                 fileSize = itemView.findViewById(R.id.ldm_file_size);
                 deleteButton = itemView.findViewById(R.id.ldm_delete_button);
+                fileIcon = itemView.findViewById(R.id.ldm_file_icon);
             }
 
             public void bind(Map<String, Object> ldm) {
                 fileName.setText((String) ldm.get("name")); // Afficher le nom du fichier
                 fileSize.setText(String.valueOf(ldm.get("timestamp"))); // Afficher le timestamp en guise de taille
 
+                // Définir l'icône en fonction du type MIME
+                String mimeType = (String) ldm.get("mimeType");
+                if (mimeType != null) {
+                    switch (mimeType) {
+                        case "application/pdf":
+                            fileIcon.setImageResource(R.drawable.ic_pdf); // Icône pour les fichiers PDF
+                            break;
+                        case "application/msword":
+                        case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                            fileIcon.setImageResource(R.drawable.ic_doc); // Icône pour les fichiers Word
+                            break;
+                        default:
+                            if (mimeType.startsWith("image/")) {
+                                fileIcon.setImageResource(R.drawable.ic_image); // Icône pour les fichiers image
+                            } else {
+                                fileIcon.setImageResource(R.drawable.ic_file); // Icône générique pour les autres types de fichiers
+                            }
+                            break;
+                    }
+                }
                 deleteButton.setOnClickListener(v -> {
                     String ldmId = (String) ldm.get("id");
                     db.collection("ldms").document(ldmId)
