@@ -1,0 +1,116 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    tools:context=".fragments.ChatFragment">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#99390A6E"
+        app:titleTextColor="#FFFFFF"
+        app:subtitleTextColor="#E0E0E0"
+        app:navigationIcon="@drawable/ic_back">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingStart="2dp"
+        android:paddingEnd="16dp"
+        android:gravity="center_vertical">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/profile_image"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_centerVertical="true"
+        android:src="@drawable/default_profile_image"
+        app:civ_border_width="2dp"
+        app:civ_border_color="#FFFFFF" />
+
+    <ImageView
+        android:id="@+id/ic_notif_green"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:layout_alignBottom="@id/profile_image"
+        android:layout_alignEnd="@id/profile_image"
+        android:src="@drawable/ic_notif_green" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_toEndOf="@id/profile_image"
+        android:layout_marginStart="8dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tvNameUser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:layout_marginBottom="2dp" />
+
+        <TextView
+            android:id="@+id/tvRole"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="@color/grey_light"
+            android:textSize="12sp" />
+    </LinearLayout>
+</RelativeLayout>
+    </androidx.appcompat.widget.Toolbar>
+
+<androidx.recyclerview.widget.RecyclerView
+android:id="@+id/rvChat"
+android:layout_width="match_parent"
+android:layout_height="0dp"
+android:layout_below="@id/toolbar"
+android:layout_above="@+id/layout_send_message"
+android:padding="8dp" />
+
+<LinearLayout
+android:id="@+id/layout_send_message"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_alignParentBottom="true"
+android:orientation="horizontal"
+android:padding="8dp"
+android:background="@drawable/border_top">
+
+<EditText
+    android:id="@+id/etMessage"
+    android:layout_width="0dp"
+    android:layout_height="match_parent"
+    android:layout_weight="1"
+    android:hint="Tapez votre message..."
+    android:background="@drawable/border"
+    android:padding="8dp" />
+
+<ImageButton
+    android:id="@+id/btnMore"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackgroundBorderless"
+    android:padding="3dp"
+    android:scaleX="0.8"
+    android:scaleY="0.8"
+    android:src="@drawable/ic_more" />
+
+<ImageButton
+    android:id="@+id/btnSend"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackgroundBorderless"
+    android:padding="3dp"
+    android:scaleX="0.8"
+    android:scaleY="0.8"
+    android:src="@drawable/ic_send" />
+</LinearLayout>
+    </RelativeLayout>

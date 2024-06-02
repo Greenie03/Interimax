@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,6 +28,11 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.interimax.models.Offer;
+import com.bumptech.glide.Glide;
+import com.example.interimax.R;
+import com.example.interimax.activities.MainActivity;
+import com.example.interimax.activities.OffersListActivity;
+import com.example.interimax.activities.ResearchActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -62,6 +68,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     private EditText searchField;
     private TextView nomUserTextView, viewListLink, viewAllLink;
     private FloatingActionButton fabAddOffer;
+    private ImageView profileImageView;
     private FirebaseFirestore db;
     private FirebaseAuth auth;
     private FusedLocationProviderClient fusedLocationClient;
@@ -126,40 +133,47 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
             String email = currentUser.getEmail();
             if (email != null) {
                 db.collection("users")
-                    .whereEqualTo("email", email)
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                            DocumentSnapshot document = task.getResult().getDocuments().get(0);
-                            String firstName = document.getString("firstname");
-                            String lastName = document.getString("lastname");
-                            String role = document.getString("role");
-                            Log.d(TAG, "First name: " + firstName + ", Last name: " + lastName + ", Role: " + role);
-                            if (firstName != null && lastName != null) {
-                                if (getActivity() != null) {
-                                    getActivity().runOnUiThread(() -> {
-                                        nomUserTextView.setText(firstName + " " + lastName);
-                                        Toast.makeText(getContext(), "Login successful", Toast.LENGTH_SHORT).show();
-                                        if ("Employeur".equals(role)) {
-                                            fabAddOffer.setVisibility(View.VISIBLE);
-                                        } else {
-                                            fabAddOffer.setVisibility(View.GONE);
-                                        }
-                                    });
+                        .whereEqualTo("email", email)
+                        .get()
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                                DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                                String firstName = document.getString("firstname");
+                                String lastName = document.getString("lastname");
+                                String role = document.getString("role");
+                                String profileImageUrl = document.getString("profileImageUrl");
+                                Log.d(TAG, "First name: " + firstName + ", Last name: " + lastName + ", Role: " + role);
+                                if (firstName != null && lastName != null) {
+                                    if (getActivity() != null) {
+                                        getActivity().runOnUiThread(() -> {
+                                            nomUserTextView.setText(firstName + " " + lastName);
+                                            Toast.makeText(getContext(), "Login successful", Toast.LENGTH_SHORT).show();
+                                            if ("Employeur".equals(role)) {
+                                                fabAddOffer.setVisibility(View.VISIBLE);
+                                            } else {
+                                                fabAddOffer.setVisibility(View.GONE);
+                                            }
+
+                                            if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
+                                                Glide.with(this).load(profileImageUrl).circleCrop().into(profileImageView);
+                                            } else {
+                                                profileImageView.setImageResource(R.drawable.default_profile_image);
+                                            }
+                                        });
+                                    }
+                                } else {
+                                    Log.d(TAG, "First name or Last name is null");
+                                    nomUserTextView.setText("Anonyme");
                                 }
                             } else {
-                                Log.d(TAG, "First name or Last name is null");
+                                Log.d(TAG, "User document not found");
                                 nomUserTextView.setText("Anonyme");
                             }
-                        } else {
-                            Log.d(TAG, "User document not found");
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.d(TAG, "Error fetching user document: ", e);
                             nomUserTextView.setText("Anonyme");
-                        }
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.d(TAG, "Error fetching user document: ", e);
-                        nomUserTextView.setText("Anonyme");
-                    });
+                        });
             }
         }
     }
@@ -170,6 +184,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         viewAllLink = rootView.findViewById(R.id.view_all_link);
         nomUserTextView = rootView.findViewById(R.id.nom_user);
         fabAddOffer = rootView.findViewById(R.id.fab_add_offer);
+        profileImageView = rootView.findViewById(R.id.profile_image);
 
         rootView.findViewById(R.id.profile_image).setOnClickListener(view -> {
             MainActivity mainActivity = (MainActivity) getActivity();

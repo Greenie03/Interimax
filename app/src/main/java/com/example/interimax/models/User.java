@@ -118,5 +118,13 @@ public class User {
     public void setBio(String bio) {
         this.bio = bio;
     }
+
+    public String getDoB() {
+        return DoB;
+    }
+
+    public void setBirthDate(String dob) {
+        this.DoB = DoB;
+    }
 }
 

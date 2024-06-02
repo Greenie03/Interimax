@@ -22,6 +22,19 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.example.interimax.R;
+import com.example.interimax.fragments.ApplicationsEmployerFragment;
+import com.example.interimax.fragments.ApplicationsFragment;
+import com.example.interimax.fragments.CVFragment;
+import com.example.interimax.fragments.HomeFragment;
+import com.example.interimax.fragments.LDMFragment;
+import com.example.interimax.fragments.MessagesFragment;
+import com.example.interimax.fragments.NotificationsFragment;
+import com.example.interimax.fragments.OfferCreatedFragment;
+import com.example.interimax.fragments.ProfileEmployerFragment;
+import com.example.interimax.fragments.ProfileFragment;
+import com.example.interimax.fragments.SavedOffersFragment;
+import com.example.interimax.fragments.SettingsFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -128,6 +141,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
         bottomNavigationView = findViewById(R.id.navbar);
         bottomNavigationView.setOnItemSelectedListener(this);
+
+        // Initialiser les éléments du menu pour les utilisateurs anonymes
+        updateMenuForAnonymousUser();
+    }
+
+    private void updateMenuForAnonymousUser() {
+        MenuItem profileItem = navigationView.getMenu().findItem(R.id.nav_profile);
+        MenuItem logoutItem = navigationView.getMenu().findItem(R.id.nav_logout);
+
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (currentUser == null) {
+            profileItem.setTitle("Voir Profil");
+            logoutItem.setTitle("Login");
+        } else {
+            profileItem.setTitle("Profil");
+            logoutItem.setTitle("Déconnexion");
+        }
     }
 
     private void setupDrawer() {
@@ -154,37 +184,59 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int itemId = item.getItemId();
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser == null) {
-            Toast.makeText(this, "Connectez-vous pour accéder à cette fonctionnalité", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (itemId == R.id.navigation_home) {
-            fragment = new HomeFragment();
-            Log.d("Navigation", "Home selected");
-        } else if (itemId == R.id.navigation_message) {
-            fragment = new MessagesFragment();
-            Log.d("Navigation", "Messages selected");
-        } else if (itemId == R.id.navigation_bookmark) {
-            fragment = new SavedOffersFragment();
-            Log.d("Navigation", "Saved selected");
-        } else if (itemId == R.id.navigation_notification) {
-            fragment = new NotificationsFragment();
-            Log.d("Navigation", "Notifications selected");
-        } else if (itemId == R.id.nav_cvs) {
-            fragment = new CVFragment();
-            Log.d("Navigation", "CVs selected");
-        } else if (itemId == R.id.nav_profile) {
-            loadUserProfileFragment(currentUser);
-        } else if (itemId == R.id.nav_applications) {
-            Intent intent = new Intent(MainActivity.this, ApplicationsActivity.class);
-            startActivity(intent);
-            Log.d("Navigation", "Applications selected");
-        } else if (itemId == R.id.nav_cover_letters) {
-            fragment = new LDMFragment();
-            Log.d("Navigation", "LDM selected");
-        } else if (itemId == R.id.nav_logout) {
-            handleLogout();
-            return;
+            if (itemId == R.id.navigation_home || itemId == R.id.search_field || itemId == R.id.nav_profile || itemId == R.id.nav_settings) {
+                // Permettre l'accès à la page d'accueil, à la recherche, à voir profil et aux réglages
+                if (itemId == R.id.nav_profile) {
+                    fragment = new ProfileFragment(); // Profil générique pour utilisateur anonyme
+                } else if (itemId == R.id.nav_settings) {
+                    fragment = new SettingsFragment(); // Fragment des réglages
+                } else {
+                    fragment = new HomeFragment(); // ou un fragment de recherche si nécessaire
+                }
+                Log.d("Navigation", "Allowed navigation for anonymous user");
+            } else if (itemId == R.id.nav_logout) {
+                // Gérer l'option de déconnexion pour les utilisateurs anonymes (connexion ou inscription)
+                Intent intent = new Intent(this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+                return;
+            } else {
+                // Bloquer l'accès à d'autres pages
+                Toast.makeText(this, "Connectez-vous pour accéder à cette fonctionnalité", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        } else {
+            if (itemId == R.id.navigation_home) {
+                fragment = new HomeFragment();
+                Log.d("Navigation", "Home selected");
+            } else if (itemId == R.id.navigation_message) {
+                fragment = new MessagesFragment();
+                Log.d("Navigation", "Messages selected");
+            } else if (itemId == R.id.navigation_bookmark) {
+                fragment = new SavedOffersFragment();
+                Log.d("Navigation", "Saved selected");
+            } else if (itemId == R.id.navigation_notification) {
+                fragment = new NotificationsFragment();
+                Log.d("Navigation", "Notifications selected");
+            } else if (itemId == R.id.nav_cvs) {
+                fragment = new CVFragment();
+                Log.d("Navigation", "CVs selected");
+            } else if (itemId == R.id.nav_profile) {
+                loadUserProfileFragment(currentUser);
+                return;// Return here to avoid loading fragment twice
+            } else if (itemId == R.id.nav_applications) {
+                loadUserApplicationsFragment(currentUser);
+                return;
+            } else if (itemId == R.id.nav_cover_letters) {
+                fragment = new LDMFragment();
+                Log.d("Navigation", "LDM selected");
+            } else if (itemId == R.id.publish_offer_button) {
+                fragment = new OfferCreatedFragment();
+                Log.d("New Offer", "Offer created");
+            } else if (itemId == R.id.nav_logout) {
+                handleLogout();
+                return;
+            }
         }
 
         if (fragment != null) {
@@ -195,6 +247,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void loadFragment(Fragment fragment) {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.main_fragment, fragment)
+                .addToBackStack(null) // Ensure the fragment is added to the back stack
                 .commit();
     }
 
@@ -241,5 +294,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-
+    private void loadUserApplicationsFragment(FirebaseUser currentUser) {
+        String email = currentUser.getEmail();
+        if (email != null) {
+            db.collection("users").whereEqualTo("email", email).get().addOnCompleteListener(task -> {
+                if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                    DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                    String role = document.getString("role");
+                    if ("Candidat".equals(role)) {
+                        Intent intent = new Intent(MainActivity.this, ApplicationsActivity.class);
+                        startActivity(intent);
+                    } else if ("Employeur".equals(role)) {
+                        loadFragment(new ApplicationsEmployerFragment());
+                    } else {
+                        Toast.makeText(this, "Rôle inconnu", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(this, "Erreur lors de la récupération des informations utilisateur", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
 }

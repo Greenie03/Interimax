@@ -25,16 +25,23 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:gravity="center_vertical"
             android:layout_marginTop="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Type de compte:"
-                android:textSize="16sp"
-                android:textColor="@color/grey_light" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="0dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="top"
+                    android:text="Type de compte:"
+                    android:textColor="@color/grey_hard"
+                    android:textSize="16sp" />
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/switchAccountType"
@@ -45,6 +52,31 @@
                 android:textOn="Candidat"
                 android:checked="true" />
 
+            <TextView
+                android:id="@+id/tvEmployeur"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="top"
+                android:text="Employeur"
+                android:layout_marginStart="12dp"
+                android:textSize="16sp"
+                android:textColor="@color/grey_hard" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="top"
+                android:text="  /  "
+                android:textSize="16sp"
+                android:textColor="@color/grey_hard" />
+            <TextView
+                android:id="@+id/tvCandidat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="top"
+                android:text="Candidat"
+                android:textSize="16sp"
+                android:textColor="@color/black" />
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -52,7 +84,7 @@
             android:id="@+id/etFirstName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nom"
+            android:hint="Prénom"
             android:inputType="textPersonName"
             android:padding="8dp"
             android:layout_marginTop="16dp" />
@@ -61,7 +93,7 @@
             android:id="@+id/etLastName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Prénom"
+            android:hint="Nom"
             android:layout_marginTop="8dp" />
 
         <EditText

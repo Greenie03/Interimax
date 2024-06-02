@@ -27,7 +27,8 @@
             android:textStyle="italic"
             android:textSize="16sp"
             android:clickable="true"
-            android:focusable="true" />
+            android:focusable="true"
+            android:visibility="gone"/>
     </androidx.appcompat.widget.Toolbar>
 
     <ScrollView
@@ -61,7 +62,7 @@
                 android:textSize="24sp"
                 android:textStyle="bold"
                 android:textColor="@color/black"
-                android:text="Otya Zoula" />
+                android:text="Anonyme" />
 
             <TextView
                 android:id="@+id/profile_role"
@@ -70,73 +71,29 @@
                 android:layout_gravity="center_horizontal"
                 android:textSize="18sp"
                 android:textColor="@color/grey"
-                android:text="Recruteur" />
-
-            <LinearLayout
+                android:text="Inconnu" />
+            <Button
+                android:id="@+id/registerbtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="16dp">
+                android:layout_marginTop="110dp"
+                android:text="Créer un compte"
+                android:textSize="16sp"
+                android:textColor="@color/white">
 
-                <TextView
-                    android:id="@+id/company_section_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:text="Entreprise"
-                    android:textColor="@color/black"
-                    android:visibility="gone" />
+            </Button>
+            <Button
+                android:id="@+id/loginbtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="J'ai déjà un compte"
+                android:textSize="16sp"
+                android:textColor="@color/white">
 
-                <LinearLayout
-                    android:id="@+id/company_section"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp"
-                    android:visibility="gone">
+            </Button>
 
-                    <ImageView
-                        android:id="@+id/company_logo"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:src="@drawable/spotify_logo"
-                        android:layout_marginEnd="8dp" />
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/company_name"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:text="Spotify"
-                            android:textColor="@color/black" />
-
-                        <TextView
-                            android:id="@+id/company_location"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="14sp"
-                            android:textColor="@color/grey"
-                            android:text="Lyon, France" />
-
-                        <TextView
-                            android:id="@+id/company_description"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="14sp"
-                            android:textColor="@color/grey"
-                            android:text="Plateforme musicale" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <!-- Add other sections similarly -->
-            </LinearLayout>
         </LinearLayout>
+
     </ScrollView>
 </LinearLayout>

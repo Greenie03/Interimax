@@ -69,12 +69,12 @@
         android:layout_below="@id/search_bar"
         android:padding="16dp">
 
-        <LinearLayout
-            android:id="@+id/messages_layout"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/messages_recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-        </LinearLayout>
+            android:layout_height="match_parent"
+            android:layout_below="@id/search_bar"
+            android:padding="16dp"/>
     </ScrollView>
 
     <!-- Bouton flottant -->
