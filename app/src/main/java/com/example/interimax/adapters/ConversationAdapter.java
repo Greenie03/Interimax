@@ -75,8 +75,6 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
 
             tvUnreadCount.setText(String.valueOf(conversation.getUnreadCount()));
 
-            itemView.setOnClickListener(v -> onConversationClickListener.onConversationClick(conversation));
-
             // Load profile image using Glide
             if (conversation.getProfileImageUrl() != null && !conversation.getProfileImageUrl().isEmpty()) {
                 Glide.with(profileImage.getContext())

@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.interimax.R;
 import com.example.interimax.models.Message;
-import com.google.firebase.auth.FirebaseAuth;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -35,18 +34,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     @Override
     public void onBindViewHolder(@NonNull MessageViewHolder holder, int position) {
         Message message = messageList.get(position);
-
-        holder.messageText.setText(message.getContent());
-        holder.timeText.setText(new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(new Date(message.getTime())));
-
-        // Détermine si le message est envoyé ou reçu
-        if (message.getSender().equals(FirebaseAuth.getInstance().getCurrentUser().getEmail())) {
-            // Message envoyé par l'utilisateur
-            holder.messageText.setBackgroundResource(R.drawable.message_background_sent);
-        } else {
-            // Message reçu
-            holder.messageText.setBackgroundResource(R.drawable.message_background_received);
-        }
+        holder.bind(message);
     }
 
     @Override
@@ -58,10 +46,15 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         public TextView messageText;
         public TextView timeText;
 
-        public MessageViewHolder(View itemView) {
+        public MessageViewHolder(@NonNull View itemView) {
             super(itemView);
             messageText = itemView.findViewById(R.id.message_text);
             timeText = itemView.findViewById(R.id.time_text);
+        }
+
+        public void bind(Message message) {
+            messageText.setText(message.getContent());
+            timeText.setText(new SimpleDateFormat("hh:mm a", Locale.getDefault()).format(new Date(message.getTime())));
         }
     }
 }

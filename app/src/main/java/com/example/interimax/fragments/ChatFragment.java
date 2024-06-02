@@ -27,9 +27,10 @@ import java.util.List;
 import java.util.Objects;
 
 public class ChatFragment extends Fragment {
-
     private static final String ARG_EMAIL = "email";
     private static final String TAG = "ChatFragment";
+
+    private String recieverMail;
 
     private FragmentChatBinding binding;
     private FirebaseFirestore db;
@@ -63,7 +64,7 @@ public class ChatFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         if (getArguments() != null) {
-            userEmail = getArguments().getString(ARG_EMAIL);
+            recieverMail = getArguments().getString(ARG_EMAIL);
         }
 
         db = FirebaseFirestore.getInstance();
@@ -81,7 +82,7 @@ public class ChatFragment extends Fragment {
     }
 
     private void setupToolbar() {
-        db.collection("users").whereEqualTo("email", userEmail).get()
+        db.collection("users").whereEqualTo("email", recieverMail).get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && !task.getResult().isEmpty()) {
                         DocumentSnapshot document = task.getResult().getDocuments().get(0);
@@ -103,27 +104,41 @@ public class ChatFragment extends Fragment {
 
     private void loadMessages() {
         db.collection("messages")
-                .whereEqualTo("sender", auth.getCurrentUser().getEmail())
-                .whereEqualTo("receiver", userEmail)
-                .orderBy("timestamp", Query.Direction.ASCENDING)
-                .addSnapshotListener((value, error) -> {
-                    if (error != null) {
-                        Toast.makeText(getContext(), "Failed to load messages.", Toast.LENGTH_SHORT).show();
-                        Log.e(TAG, "Failed to load messages: ", error);
-                        return;
-                    }
+            .orderBy("time", Query.Direction.ASCENDING)
+            .addSnapshotListener((value, error) -> {
+                if (error != null) {
+                    Toast.makeText(getContext(), "Failed to load messages.", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Failed to load messages: ", error);
+                    return;
+                }
 
-                    messageList.clear();
-                    String currentUserEmail = auth.getCurrentUser().getEmail();
-                    for (QueryDocumentSnapshot doc : value) {
-                        Message message = doc.toObject(Message.class);
-                        if ((message.getSender().equals(currentUserEmail) && message.getReceiver().equals(userEmail)) ||
-                                (message.getSender().equals(userEmail) && message.getReceiver().equals(currentUserEmail))) {
-                            messageList.add(message);
-                        }
+                if (value == null) {
+                    Log.e(TAG, "No messages found.");
+                    return;
+                }
+
+                messageList.clear();
+                auth = FirebaseAuth.getInstance();
+                String currentUserEmail = auth.getCurrentUser().getEmail();
+                for (QueryDocumentSnapshot doc : value) {
+                    Message message = doc.toObject(Message.class);
+                    Log.d(TAG, "Message retrieved: " + message.getContent());
+
+                    message.setTime((Long) doc.get("time"));
+
+
+                    // Ajout de vérifications nulles avant de comparer les adresses e-mail
+                    if (message.getSender() != null && message.getReceiver() != null &&
+                            currentUserEmail != null && recieverMail != null &&
+                            ((message.getSender().equals(currentUserEmail) && message.getReceiver().equals(recieverMail)) ||
+                             (message.getSender().equals(recieverMail) && message.getReceiver().equals(currentUserEmail)))) {
+                        messageList.add(message);
+                        Log.d(TAG, "Message added to list: " + message.getContent());
                     }
-                    adapter.notifyDataSetChanged();
-                });
+                }
+                adapter.notifyDataSetChanged();
+                Log.d(TAG, "Total messages: " + messageList.size());
+            });
     }
 
     private void sendMessage() {
@@ -132,18 +147,20 @@ public class ChatFragment extends Fragment {
             return;
         }
         auth = FirebaseAuth.getInstance();
-        Message message = new Message(Objects.requireNonNull(auth.getCurrentUser()).getEmail(), messageContent, System.currentTimeMillis(), "text");
-        message.setReceiver(userEmail);  // Add receiver email to the message object
+        String mail = Objects.requireNonNull(auth.getCurrentUser()).getEmail();
+        Message message = new Message(mail, messageContent, System.currentTimeMillis(), "text", recieverMail);
+        message.setReceiver(recieverMail);  // Add receiver email to the message object
         db.collection("messages").add(message)
-                .addOnSuccessListener(documentReference -> {
-                    binding.etMessage.setText("");
-                    Log.d(TAG, "Message sent successfully");
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Failed to send message", Toast.LENGTH_SHORT).show();
-                    Log.e(TAG, "Failed to send message: ", e);
-                });
-    }
+            .addOnSuccessListener(documentReference -> {
+                binding.etMessage.setText("");
+                Log.d(TAG, "Message sent successfully");
+            })
+            .addOnFailureListener(e -> {
+                Toast.makeText(getContext(), "Failed to send message", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Failed to send message: ", e);
+            });
+}
+
 
     @Override
     public void onDestroyView() {
