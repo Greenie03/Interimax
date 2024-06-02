@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:background="#FFFFFF">
+
+<!-- RecyclerView pour afficher les messages -->
+<androidx.recyclerview.widget.RecyclerView
+    android:id="@+id/rvChat"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_above="@+id/layout_send_message"
+    android:layout_alignParentTop="true"
+    android:padding="8dp"/>
+
+<!-- Zone pour envoyer un nouveau message -->
+<LinearLayout
+    android:id="@+id/layout_send_message"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:background="@drawable/border_top">
+
+    <EditText
+        android:id="@+id/etMessage"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:hint="Tapez votre message..."
+        android:background="@drawable/border"
+        android:padding="8dp"/>
+
+    <ImageButton
+        android:id="@+id/btnMore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:padding="3dp"
+        android:scaleX="0.8"
+        android:scaleY="0.8"
+        android:src="@drawable/ic_more" />
+
+    <ImageButton
+        android:id="@+id/btnSend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:padding="3dp"
+        android:scaleX="0.8"
+        android:scaleY="0.8"
+        android:src="@drawable/ic_send" />
+</LinearLayout>
+
+</RelativeLayout>

@@ -8,12 +8,13 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.interimax.R;
 import com.example.interimax.adapters.UserAdapter;
 import com.example.interimax.databinding.FragmentUserListBinding;
 import com.example.interimax.models.User;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -24,9 +25,8 @@ public class UserListFragment extends Fragment {
 
     private FragmentUserListBinding binding;
     private FirebaseFirestore db;
-    private FirebaseAuth auth;
-    private UserAdapter adapter;
     private List<User> userList;
+    private UserAdapter adapter;
 
     public UserListFragment() {
         // Required empty public constructor
@@ -45,9 +45,8 @@ public class UserListFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         db = FirebaseFirestore.getInstance();
-        auth = FirebaseAuth.getInstance();
         userList = new ArrayList<>();
-        adapter = new UserAdapter(userList);
+        adapter = new UserAdapter(userList, this::openChatFragment);
 
         binding.rvUsers.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.rvUsers.setAdapter(adapter);
@@ -68,6 +67,14 @@ public class UserListFragment extends Fragment {
                         adapter.notifyDataSetChanged();
                     }
                 });
+    }
+
+    private void openChatFragment(User user) {
+        ChatFragment chatFragment = ChatFragment.newInstance(user.getEmail());
+        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+        transaction.replace(R.id.main_fragment, chatFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
     @Override
