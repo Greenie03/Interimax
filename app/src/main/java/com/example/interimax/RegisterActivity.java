@@ -121,7 +121,7 @@ public class RegisterActivity extends AppCompatActivity {
             auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
-                    if(task.isSuccessful()){
+                    if (task.isSuccessful()) {
                         FirebaseUser fUser = auth.getCurrentUser();
                         assert fUser != null;
                         User user = new User(fUser.getUid(), firstName, lastName, email, password, dob, null, phone, country, accountType, null);
@@ -139,9 +139,8 @@ public class RegisterActivity extends AppCompatActivity {
                     }
                 }
             });
-
-
-
+        });
+    }
 
     private void updateToggleTextColors(boolean isEmployeur) {
         if (isEmployeur) {

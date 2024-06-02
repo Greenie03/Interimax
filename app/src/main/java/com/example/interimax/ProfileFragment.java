@@ -1,4 +1,4 @@
-package com.example.interimax.fragments;
+package com.example.interimax;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,8 +13,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.interimax.R;
-import com.example.interimax.activities.LoginActivity;
-import com.example.interimax.activities.RegisterActivity;
+import com.example.interimax.LoginActivity;
+import com.example.interimax.RegisterActivity;
 
 public class ProfileFragment extends Fragment {
 
