@@ -83,4 +83,6 @@ dependencies {
 
     implementation("com.github.yalantis:ucrop:2.2.8")
 
+
+    implementation("de.hdodenhof:circleimageview:3.1.0")
 }

@@ -12,9 +12,9 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.interimax.R;
-import com.example.interimax.adapters.MessageAdapter;
+import com.example.interimax.adapters.ConversationAdapter;
 import com.example.interimax.databinding.FragmentMessagesBinding;
-import com.example.interimax.models.Message;
+import com.example.interimax.models.Conversation;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -28,8 +28,8 @@ public class MessagesFragment extends Fragment {
     private FragmentMessagesBinding binding;
     private FirebaseFirestore db;
     private FirebaseAuth auth;
-    private MessageAdapter adapter;
-    private List<Message> messageList;
+    private ConversationAdapter adapter;
+    private List<Conversation> conversationList;
 
     public MessagesFragment() {
         // Required empty public constructor
@@ -49,40 +49,42 @@ public class MessagesFragment extends Fragment {
 
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
-        messageList = new ArrayList<>();
-        adapter = new MessageAdapter(messageList);
+        conversationList = new ArrayList<>();
+        adapter = new ConversationAdapter(conversationList, this::openChatFragment);
 
-        binding.messagesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        binding.messagesRecyclerView.setAdapter(adapter);
+        binding.rvConversations.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.rvConversations.setAdapter(adapter);
 
-        loadMessages();
+        loadConversations();
 
-        binding.fab.setOnClickListener(view1 -> showUserListFragment());
+        binding.fab.setOnClickListener(view1 -> {
+            UserListFragment userListFragment = UserListFragment.newInstance();
+            userListFragment.show(getParentFragmentManager(), "UserListFragment");
+        });
     }
 
-    private void loadMessages() {
-        db.collection("messages")
-                .orderBy("time")
+    private void loadConversations() {
+        db.collection("conversations")
+                .whereArrayContains("participants", auth.getCurrentUser().getUid())
                 .addSnapshotListener((value, error) -> {
                     if (error != null) {
-                        Snackbar.make(binding.getRoot(), "Failed to load messages.", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(binding.getRoot(), "Failed to load conversations.", Snackbar.LENGTH_SHORT).show();
                         return;
                     }
 
-                    messageList.clear();
+                    conversationList.clear();
                     for (QueryDocumentSnapshot doc : value) {
-                        Message message = doc.toObject(Message.class);
-                        messageList.add(message);
+                        Conversation conversation = doc.toObject(Conversation.class);
+                        conversationList.add(conversation);
                     }
                     adapter.notifyDataSetChanged();
                 });
     }
 
-    private void showUserListFragment() {
-        UserListFragment userListFragment = new UserListFragment();
+    private void openChatFragment(Conversation conversation) {
+        ChatFragment chatFragment = ChatFragment.newInstance(String.valueOf(conversation));
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out, R.anim.fade_in, R.anim.fade_out);
-        transaction.add(R.id.main_fragment, userListFragment);
+        transaction.replace(R.id.main_fragment, chatFragment);
         transaction.addToBackStack(null);
         transaction.commit();
     }

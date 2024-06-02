@@ -5,37 +5,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    tools:context=".activities.MainActivity">
+    tools:context=".fragments.MessagesFragment">
 
-    <!-- En-tête des messages -->
-    <LinearLayout
-        android:id="@+id/header_layout"
+    <!-- Toolbar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="8dp"
-        android:background="#FFFFFF"
-        android:layout_marginTop="26dp">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Messages"
-            android:textStyle="bold"
-            android:textColor="#000000"
-            android:textSize="24sp"/>
-
-        <ImageView
-            android:id="@+id/write_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:scaleX="0.8"
-            android:scaleY="0.8"
-            android:src="@drawable/ic_write"
-            app:tint="#6D648B"
-            android:visibility="gone"/>
-    </LinearLayout>
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:title="Messages"
+        app:titleTextColor="#FFFFFF" />
 
     <!-- Barre de recherche -->
     <LinearLayout
@@ -45,7 +25,7 @@
         android:orientation="horizontal"
         android:padding="16dp"
         android:background="#FFFFFF"
-        android:layout_below="@id/header_layout">
+        android:layout_below="@id/toolbar">
 
         <EditText
             android:id="@+id/search_field"
@@ -57,26 +37,18 @@
             android:drawablePadding="12dp"
             android:padding="12dp"
             android:background="@drawable/border"
-            android:layout_marginTop="4dp"
             android:textColor="#6D648B"
-            android:textSize="16sp"/>
+            android:textSize="16sp" />
     </LinearLayout>
 
-    <!-- Zone Scrollable pour les messages -->
-    <ScrollView
-        android:id="@+id/scroll_view"
+    <!-- RecyclerView pour afficher les aperçus des conversations -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvConversations"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/search_bar"
-        android:padding="16dp">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/messages_recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/search_bar"
-            android:padding="16dp"/>
-    </ScrollView>
+        android:padding="8dp"
+        android:clipToPadding="false" />
 
     <!-- Bouton flottant -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton

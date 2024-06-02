@@ -1,14 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:background="#FFFFFF">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    tools:context=".fragments.ChatFragment">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#99390A6E"
+        app:titleTextColor="#FFFFFF"
+        app:subtitleTextColor="#E0E0E0"
+        app:navigationIcon="@drawable/ic_back"/>
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/profile_image"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="12dp"
+        android:src="@drawable/default_profile_image"
+        app:civ_border_width="2dp"
+        app:civ_border_color="#FFFFFF"/>
+
+    <ImageView
+        android:id="@+id/ic_notif_green"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:layout_alignEnd="@id/profile_image"
+        android:layout_alignBottom="@id/profile_image"
+        android:src="@drawable/ic_notif_green"/>
+
+    <TextView
+        android:id="@+id/tvNameUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:text="Test Johnson"
+        android:textColor="@color/white"
+        android:layout_toRightOf="@+id/profile_image"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp">
+    </TextView>
+
+    <LinearLayout
+        android:id="@+id/layout_info_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="34dp"
+        android:layout_marginStart="105dp">
+        <TextView
+            android:id="@+id/tvRole"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="1dp"
+            android:text="Recruteur"
+            android:textColor="@color/grey_light"
+            android:textSize="8sp"
+            android:layout_toRightOf="@+id/profile_image">
+        </TextView>
+        <TextView
+            android:id="@+id/tvPour"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="1dp"
+            android:text="pour"
+            android:textColor="@color/grey_light"
+            android:textSize="8sp"
+            android:layout_toRightOf="@+id/profile_image">
+        </TextView>
+        <TextView
+            android:id="@+id/tvNomEntreprise"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="1dp"
+            android:text="Test Johnson"
+            android:textColor="@color/grey_light"
+            android:textSize="8sp"
+            android:layout_toRightOf="@+id/profile_image">
+        </TextView>
+    </LinearLayout>
 <!-- RecyclerView pour afficher les messages -->
 <androidx.recyclerview.widget.RecyclerView
     android:id="@+id/rvChat"
     android:layout_width="match_parent"
     android:layout_height="0dp"
+    android:layout_marginTop="75dp"
     android:layout_above="@+id/layout_send_message"
     android:layout_alignParentTop="true"
     android:padding="8dp"/>

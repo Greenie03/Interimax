@@ -13,32 +13,33 @@ import com.example.interimax.models.User;
 
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
 
     private List<User> userList;
-    private OnUserClickListener onUserClickListener;
+    private OnItemClickListener onItemClickListener;
 
-    public interface OnUserClickListener {
-        void onUserClick(User user);
+    public interface OnItemClickListener {
+        void onItemClick(User user);
     }
 
-    public UserAdapter(List<User> userList, OnUserClickListener onUserClickListener) {
+    public UserAdapter(List<User> userList, OnItemClickListener onItemClickListener) {
         this.userList = userList;
-        this.onUserClickListener = onUserClickListener;
+        this.onItemClickListener = onItemClickListener;
     }
 
     @NonNull
     @Override
     public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_user, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_list_item, parent, false);
         return new UserViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
         User user = userList.get(position);
-        holder.userName.setText(user.getFirstname() + " " + user.getLastname());
-        holder.itemView.setOnClickListener(v -> onUserClickListener.onUserClick(user));
+        holder.bind(user, onItemClickListener);
     }
 
     @Override
@@ -47,11 +48,21 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     }
 
     public static class UserViewHolder extends RecyclerView.ViewHolder {
-        public TextView userName;
 
-        public UserViewHolder(View itemView) {
+        private CircleImageView profileImage;
+        private TextView tvNameUser, tvEmailUser;
+
+        public UserViewHolder(@NonNull View itemView) {
             super(itemView);
-            userName = itemView.findViewById(R.id.tvUserName);
+            profileImage = itemView.findViewById(R.id.profile_image);
+            tvNameUser = itemView.findViewById(R.id.tvNameUser);
+            tvEmailUser = itemView.findViewById(R.id.tvEmailUser);
+        }
+
+        public void bind(User user, OnItemClickListener onItemClickListener) {
+            tvNameUser.setText(user.getFirstname() + " " + user.getLastname());
+            tvEmailUser.setText(user.getEmail());
+            itemView.setOnClickListener(v -> onItemClickListener.onItemClick(user));
         }
     }
 }
