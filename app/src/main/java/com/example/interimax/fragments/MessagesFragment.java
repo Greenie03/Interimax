@@ -8,8 +8,10 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.interimax.R;
 import com.example.interimax.adapters.MessageAdapter;
 import com.example.interimax.databinding.FragmentMessagesBinding;
 import com.example.interimax.models.Message;
@@ -55,9 +57,7 @@ public class MessagesFragment extends Fragment {
 
         loadMessages();
 
-        binding.fab.setOnClickListener(view1 -> Snackbar.make(view1, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null)
-                .setAnchorView(binding.fab).show());
+        binding.fab.setOnClickListener(view1 -> showUserListFragment());
     }
 
     private void loadMessages() {
@@ -76,6 +76,15 @@ public class MessagesFragment extends Fragment {
                     }
                     adapter.notifyDataSetChanged();
                 });
+    }
+
+    private void showUserListFragment() {
+        UserListFragment userListFragment = new UserListFragment();
+        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out, R.anim.fade_in, R.anim.fade_out);
+        transaction.add(R.id.main_fragment, userListFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
     @Override
