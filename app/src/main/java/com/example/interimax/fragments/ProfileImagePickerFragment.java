@@ -70,19 +70,19 @@ public class ProfileImagePickerFragment extends Fragment {
 
     private void startCrop(@NonNull Uri uri) {
         String destinationFileName = UUID.randomUUID().toString() + ".jpg";
-        Uri destinationUri = Uri.fromFile(new File(getContext().getCacheDir(), destinationFileName));
-
-        UCrop uCrop = UCrop.of(uri, destinationUri);
+        UCrop uCrop = UCrop.of(uri, Uri.fromFile(new File(getContext().getCacheDir(), destinationFileName)));
         uCrop.withAspectRatio(1, 1);
         uCrop.withMaxResultSize(1080, 1080);
+        uCrop.withOptions(getCropOptions());
+        uCrop.start(getContext(), this);
+    }
 
+    private UCrop.Options getCropOptions() {
         UCrop.Options options = new UCrop.Options();
         options.setCircleDimmedLayer(true);
         options.setShowCropFrame(false);
         options.setShowCropGrid(false);
-
-        uCrop.withOptions(options);
-        uCrop.start(getContext(), this);
+        return options;
     }
 
     @Override

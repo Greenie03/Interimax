@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,6 +20,7 @@ import androidx.core.view.GravityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.bumptech.glide.Glide;
 import com.example.interimax.R;
 import com.example.interimax.activities.MainActivity;
 import com.example.interimax.activities.OffersListActivity;
@@ -41,6 +43,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     private EditText searchField;
     private TextView nomUserTextView, viewListLink, viewAllLink;
     private FloatingActionButton fabAddOffer;
+    private ImageView profileImageView;
     private FirebaseFirestore db;
     private FirebaseAuth auth;
     private FusedLocationProviderClient fusedLocationClient;
@@ -107,6 +110,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                             String firstName = document.getString("firstname");
                             String lastName = document.getString("lastname");
                             String role = document.getString("role");
+                            String profileImageUrl = document.getString("profileImageUrl");
                             Log.d(TAG, "First name: " + firstName + ", Last name: " + lastName + ", Role: " + role);
                             if (firstName != null && lastName != null) {
                                 if (getActivity() != null) {
@@ -117,6 +121,12 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                                             fabAddOffer.setVisibility(View.VISIBLE);
                                         } else {
                                             fabAddOffer.setVisibility(View.GONE);
+                                        }
+
+                                        if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
+                                            Glide.with(this).load(profileImageUrl).circleCrop().into(profileImageView);
+                                        } else {
+                                            profileImageView.setImageResource(R.drawable.default_profile_image);
                                         }
                                     });
                                 }
@@ -143,6 +153,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         viewAllLink = rootView.findViewById(R.id.view_all_link);
         nomUserTextView = rootView.findViewById(R.id.nom_user);
         fabAddOffer = rootView.findViewById(R.id.fab_add_offer);
+        profileImageView = rootView.findViewById(R.id.profile_image);
 
         rootView.findViewById(R.id.profile_image).setOnClickListener(view -> {
             MainActivity mainActivity = (MainActivity) getActivity();
