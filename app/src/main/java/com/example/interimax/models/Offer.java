@@ -69,13 +69,15 @@ public class Offer implements Parcelable {
     };
 
     // Ajoute une offre à la liste
-    private static void addOffer(Offer offer) {
+    private static CompletableFuture<Offer> addOffer(Offer offer) {
+        CompletableFuture<Offer> future = new CompletableFuture<>();
         database.collection("Job").add(offer).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
             @Override
             public void onComplete(@NonNull Task<DocumentReference> task) {
                 if(task.isSuccessful()){
                     DocumentReference doc = task.getResult();
                     offer.setId(doc.getId());
+                    future.complete(offer);
                 }else{
                     Exception e = task.getException();
                     if (e != null) {
@@ -84,6 +86,7 @@ public class Offer implements Parcelable {
                 }
             }
         });
+        return future;
     }
 
     // Retourne la liste des offres
@@ -112,7 +115,12 @@ public class Offer implements Parcelable {
         return future;
     }
 
-    public static CompletableFuture<List<Offer>> findOffer(Optional<String> name, Optional<String[]> employers, Optional<Integer> salaryFrom, Optional<Integer> salaryTo, Optional<String[]> locations, Optional<Long> limit){
+    public static CompletableFuture<List<Offer>> findOffer(Optional<String> name,
+                                                           Optional<String[]> employers,
+                                                           Optional<Integer> salaryFrom,
+                                                           Optional<Integer> salaryTo,
+                                                           Optional<String[]> locations,
+                                                           Optional<Long> limit){
         CompletableFuture<List<Offer>> future = new CompletableFuture<>();
         List<Offer> offers = new ArrayList<>();
         Query query = database.collection("Job");
