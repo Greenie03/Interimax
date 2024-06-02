@@ -216,7 +216,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-            return;
         }
 
         this.gMap = googleMap;
@@ -314,31 +313,31 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         // Logique pour charger les offres par pays
         Log.d(TAG, "Loading offers in country: " + country);
         // Implémentez la logique pour charger et afficher les offres ici
-        Offer.getAllOffers().thenAccept(offers -> {
+        Offer.getAllOffers().thenAccept(offersRes -> getActivity().runOnUiThread(() -> {
+
             Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
-            LatLng countryLatLng;
             try{
-                List<Address> countryList = geocoder.getFromLocationName(country, 1);
-                Address countryAddr = countryList.get(0);
-                countryLatLng = new LatLng(countryAddr.getLatitude(), countryAddr.getLongitude());
-                for(Offer o : offers){
-                         List<Address> addresses = geocoder.getFromLocation(o.getCoordinate().getLatitude(), o.getCoordinate().getLongitude(), 1);
+                Log.d(TAG + " offers total", String.valueOf(offersRes.size()));
+                for(Offer o : offersRes){
+                    List<Address> addresses = geocoder.getFromLocation(o.getCoordinate().getLatitude(), o.getCoordinate().getLongitude(), 1);
+                    if(addresses != null && !addresses.isEmpty()) {
                         Address address = addresses.get(0);
-                        if(Objects.equals(address.getCountryName(), country)){
+                        if (Objects.equals(address.getCountryName(), country)) {
                             this.offers.add(o);
                         }
-                 }
+                    }
+                }
                 displayOffers();
-                gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(countryLatLng, 5.5F));
             } catch (IOException e) {
-
+                Log.e(TAG, e.getMessage(), e);
             }
 
-        });
+        }));
     }
 
     private void displayOffers(){
         for(Offer o : this.offers){
+            Log.d(TAG, o.toString());
             builder.include(new LatLng(o.getCoordinate().getLatitude(), o.getCoordinate().getLongitude()));
             LatLng coordinates = new LatLng(o.getCoordinate().getLatitude(), o.getCoordinate().getLongitude());
             Marker marker = gMap.addMarker(new MarkerOptions().position(coordinates).title(o.getName()));
