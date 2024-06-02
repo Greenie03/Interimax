@@ -90,12 +90,16 @@ public class ChatFragment extends Fragment {
                         String role = document.getString("role");
                         String profileImageUrl = document.getString("profileImageUrl");
 
-                        binding.toolbar.setTitle(name);
-                        binding.toolbar.setSubtitle(role);
-                        Glide.with(this).load(profileImageUrl).circleCrop().into(binding.profileImage);
-                    } else {
-                        Toast.makeText(getContext(), "Failed to load user info", Toast.LENGTH_SHORT).show();
-                        Log.e(TAG, "Failed to load user info: " + task.getException());
+                        binding.toolbar.setTitle("");
+                        binding.tvNameUser.setText(name);
+                        binding.tvRole.setText(role);
+
+                        if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
+                            Glide.with(this).load(profileImageUrl).circleCrop().into(binding.profileImage);
+                        } else {
+                            Toast.makeText(getContext(), "Failed to load user info", Toast.LENGTH_SHORT).show();
+                            Log.e(TAG, "Failed to load user info: " + task.getException());
+                        }
                     }
                 });
 
@@ -103,19 +107,19 @@ public class ChatFragment extends Fragment {
     }
 
     private void loadMessages() {
-        db.collection("messages")
-            .orderBy("time", Query.Direction.ASCENDING)
-            .addSnapshotListener((value, error) -> {
-                if (error != null) {
-                    Toast.makeText(getContext(), "Failed to load messages.", Toast.LENGTH_SHORT).show();
-                    Log.e(TAG, "Failed to load messages: ", error);
-                    return;
-                }
+    db.collection("messages")
+        .orderBy("time", Query.Direction.ASCENDING)
+        .addSnapshotListener((value, error) -> {
+            if (error != null) {
+                Toast.makeText(getContext(), "Failed to load messages.", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Failed to load messages: ", error);
+                return;
+            }
 
-                if (value == null) {
-                    Log.e(TAG, "No messages found.");
-                    return;
-                }
+            if (value == null) {
+                Log.e(TAG, "No messages found.");
+                return;
+            }
 
                 messageList.clear();
                 auth = FirebaseAuth.getInstance();
@@ -142,15 +146,14 @@ public class ChatFragment extends Fragment {
     }
 
     private void sendMessage() {
-        String messageContent = binding.etMessage.getText().toString().trim();
-        if (messageContent.isEmpty()) {
-            return;
-        }
-        auth = FirebaseAuth.getInstance();
-        String mail = Objects.requireNonNull(auth.getCurrentUser()).getEmail();
-        Message message = new Message(mail, messageContent, System.currentTimeMillis(), "text", recieverMail);
-        message.setReceiver(recieverMail);  // Add receiver email to the message object
-        db.collection("messages").add(message)
+    String messageContent = binding.etMessage.getText().toString().trim();
+    if (messageContent.isEmpty()) {
+        return;
+    }
+    auth = FirebaseAuth.getInstance();
+    String senderEmail = Objects.requireNonNull(auth.getCurrentUser()).getEmail();
+    Message message = new Message(senderEmail, messageContent, System.currentTimeMillis(), "text", userEmail);  // Add receiver email to the message object
+    db.collection("messages").add(message)
             .addOnSuccessListener(documentReference -> {
                 binding.etMessage.setText("");
                 Log.d(TAG, "Message sent successfully");
@@ -162,9 +165,11 @@ public class ChatFragment extends Fragment {
 }
 
 
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
     }
+
 }

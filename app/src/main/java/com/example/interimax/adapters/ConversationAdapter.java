@@ -58,7 +58,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
         public ConversationViewHolder(@NonNull View itemView) {
             super(itemView);
             profileImage = itemView.findViewById(R.id.profile_image);
-            tvNameUser = itemView.findViewById(R.id.tvNameUser);
+            tvNameUser = itemView.findViewById(R.id.tvName);
             tvLastMessage = itemView.findViewById(R.id.tvLastMessage);
             tvTimestamp = itemView.findViewById(R.id.tvTimestamp);
             tvUnreadCount = itemView.findViewById(R.id.tvUnreadCount);
@@ -66,7 +66,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
 
         public void bind(Conversation conversation, OnConversationClickListener onConversationClickListener) {
             tvNameUser.setText(conversation.getUserName());
-            tvLastMessage.setText(conversation.getLastMessage());
+            tvLastMessage.setText(String.format("%s", conversation.getLastMessage()));
 
             // Convert timestamp to readable date format
             SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
@@ -74,6 +74,8 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
             tvTimestamp.setText(formattedDate);
 
             tvUnreadCount.setText(String.valueOf(conversation.getUnreadCount()));
+
+            itemView.setOnClickListener(v -> onConversationClickListener.onConversationClick(conversation));
 
             // Load profile image using Glide
             if (conversation.getProfileImageUrl() != null && !conversation.getProfileImageUrl().isEmpty()) {
