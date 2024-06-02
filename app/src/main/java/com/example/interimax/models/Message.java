@@ -3,14 +3,14 @@ package com.example.interimax.models;
 public class Message {
     private String sender;
     private String content;
-    private String time;
+    private long time;
     private String type;
 
     public Message() {
         // Constructeur vide requis pour Firebase
     }
 
-    public Message(String sender, String content, String time, String type) {
+    public Message(String sender, String content, long time, String type) {
         this.sender = sender;
         this.content = content;
         this.time = time;
@@ -33,11 +33,11 @@ public class Message {
         this.content = content;
     }
 
-    public String getTime() {
+    public long getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(long time) {
         this.time = time;
     }
 

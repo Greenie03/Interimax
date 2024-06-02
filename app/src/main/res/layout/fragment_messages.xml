@@ -26,7 +26,15 @@
             android:textColor="#000000"
             android:textSize="24sp"/>
 
-
+        <ImageView
+            android:id="@+id/write_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleX="0.8"
+            android:scaleY="0.8"
+            android:src="@drawable/ic_write"
+            app:tint="#6D648B"
+            android:visibility="gone"/>
     </LinearLayout>
 
     <!-- Barre de recherche -->
@@ -62,12 +70,12 @@
         android:layout_below="@id/search_bar"
         android:padding="16dp">
 
-        <LinearLayout
-            android:id="@+id/messages_layout"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/messages_recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-        </LinearLayout>
+            android:layout_height="match_parent"
+            android:layout_below="@id/search_bar"
+            android:padding="16dp"/>
     </ScrollView>
 
     <!-- Bouton flottant -->
@@ -78,5 +86,5 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_margin="16dp"
-        app:srcCompat="@drawable/ic_write" />
+        app:srcCompat="@drawable/ic_write"/>
 </RelativeLayout>

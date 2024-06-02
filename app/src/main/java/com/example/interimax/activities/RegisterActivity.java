@@ -22,6 +22,7 @@ import com.example.interimax.R;
 import com.example.interimax.models.Application;
 import com.example.interimax.models.User;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -94,7 +95,7 @@ public class RegisterActivity extends AppCompatActivity {
         btnRegister = findViewById(R.id.btnRegister);
 
         // Configuration du Switch pour le type de compte
-        switchAccountType.setOnCheckedChangeListener((buttonView, isChecked) -> updateToggleTextColors(isChecked));
+        switchAccountType.setOnCheckedChangeListener((buttonView, isChecked) -> updateToggleTextColors(!isChecked));
 
         // Configuration du bouton de validation du formulaire
         btnRegister.setOnClickListener(view -> {
@@ -113,29 +114,55 @@ public class RegisterActivity extends AppCompatActivity {
                 return;
             }
 
-            User user = new User();
-            user.setFirstname(firstName);
-            user.setLastname(lastName);
-            user.setEmail(email);
-            user.setPassword(password);
-            user.setCountry(country);
-            user.setPhoneNumber(phone);
-            user.setBirthDate(dob);
-            user.setRole(accountType);
+            createAccount(email, password, firstName, lastName, dob, country, phone, accountType);
+        });
+    }
 
-            db.collection("users").add(user)
+    private void createAccount(String email, String password, String firstName, String lastName, String dob, String country, String phone, String accountType) {
+        auth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        // Sign in success, update UI with the signed-in user's information
+                        Log.d("RegisterActivity", "createUserWithEmail:success");
+                        FirebaseUser firebaseUser = auth.getCurrentUser();
+                        if (firebaseUser != null) {
+                            User user = new User();
+                            user.setFirstname(firstName);
+                            user.setLastname(lastName);
+                            user.setEmail(email);
+                            user.setPassword(password);
+                            user.setCountry(country);
+                            user.setPhoneNumber(phone);
+                            user.setBirthDate(dob);
+                            user.setRole(accountType);
+
+           /* db.collection("users").add(user)
                     .addOnSuccessListener(documentReference -> {
                         Toast.makeText(this, "Enregistrement réussi!", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
                         startActivity(intent);
                         finish();
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.w("RegisterActivity", "Erreur lors de l'enregistrement", e);
-                        Toast.makeText(this, "Erreur lors de l'enregistrement", Toast.LENGTH_SHORT).show();
-                    });
-        });
+                    })*/
+                            db.collection("users").document(firebaseUser.getUid()).set(user)
+                                    .addOnSuccessListener(aVoid -> {
+                                        Toast.makeText(this, "Enregistrement réussi!", Toast.LENGTH_SHORT).show();
+                                        Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                                        startActivity(intent);
+                                        finish();
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Log.w("RegisterActivity", "Erreur lors de l'enregistrement", e);
+                                        Toast.makeText(this, "Erreur lors de l'enregistrement", Toast.LENGTH_SHORT).show();
+                                    });
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w("RegisterActivity", "createUserWithEmail:failure", task.getException());
+                            Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
+
 
     private void updateToggleTextColors(boolean isEmployeur) {
         if (isEmployeur) {

@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser == null) {
             profileItem.setTitle("Voir Profil");
-            logoutItem.setTitle("Connexion");
+            logoutItem.setTitle("Login");
         } else {
             profileItem.setTitle("Profil");
             logoutItem.setTitle("Déconnexion");

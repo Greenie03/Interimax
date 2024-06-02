@@ -84,7 +84,7 @@
             android:id="@+id/etFirstName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nom"
+            android:hint="Prénom"
             android:inputType="textPersonName"
             android:padding="8dp"
             android:layout_marginTop="16dp" />
@@ -93,7 +93,7 @@
             android:id="@+id/etLastName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Prénom"
+            android:hint="Nom"
             android:layout_marginTop="8dp" />
 
         <EditText
