@@ -26,8 +26,11 @@ import com.example.interimax.fragments.HomeFragment;
 import com.example.interimax.fragments.LDMFragment;
 import com.example.interimax.fragments.MessagesFragment;
 import com.example.interimax.fragments.NotificationsFragment;
+import com.example.interimax.fragments.OfferCreatedFragment;
 import com.example.interimax.fragments.ProfileEmployerFragment;
+import com.example.interimax.fragments.ProfileFragment;
 import com.example.interimax.fragments.SavedOffersFragment;
+import com.example.interimax.fragments.SettingsFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.navigation.NavigationView;
@@ -77,49 +80,48 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void getUserInfo(String userId) {
-    FirebaseUser currentUser = auth.getCurrentUser();
-    String email = currentUser.getEmail();
-    if (email != null) {
-        db.collection("users").whereEqualTo("email", email).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                DocumentSnapshot document = task.getResult().getDocuments().get(0);
-                String firstName = document.getString("firstname");
-                String lastName = document.getString("lastname");
-                String role = document.getString("role");
-                String profileImageUrl = document.getString("profileImageUrl");
-                View headerView = navigationView.getHeaderView(0);
-                TextView navUsername = headerView.findViewById(R.id.nav_header_fullname);
-                TextView navRole = headerView.findViewById(R.id.nav_header_role);
-                ImageView navProfileImage = headerView.findViewById(R.id.nav_header_image);
+        FirebaseUser currentUser = auth.getCurrentUser();
+        String email = currentUser.getEmail();
+        if (email != null) {
+            db.collection("users").whereEqualTo("email", email).get().addOnCompleteListener(task -> {
+                if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                    DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                    String firstName = document.getString("firstname");
+                    String lastName = document.getString("lastname");
+                    String role = document.getString("role");
+                    String profileImageUrl = document.getString("profileImageUrl");
+                    View headerView = navigationView.getHeaderView(0);
+                    TextView navUsername = headerView.findViewById(R.id.nav_header_fullname);
+                    TextView navRole = headerView.findViewById(R.id.nav_header_role);
+                    ImageView navProfileImage = headerView.findViewById(R.id.nav_header_image);
 
-                Log.d(TAG, "First name: " + firstName + ", Last name: " + lastName + ", Role: " + role);
-                if (firstName != null && lastName != null) {
-                    navUsername.setText(String.format("%s %s", firstName, lastName));
-                } else {
-                    navUsername.setText("Anonyme");
-                    Log.e(TAG, "User full name is null.");
-                }
+                    Log.d(TAG, "First name: " + firstName + ", Last name: " + lastName + ", Role: " + role);
+                    if (firstName != null && lastName != null) {
+                        navUsername.setText(String.format("%s %s", firstName, lastName));
+                    } else {
+                        navUsername.setText("Anonyme");
+                        Log.e(TAG, "User full name is null.");
+                    }
 
-                if (role != null) {
-                    navRole.setText(role);
-                } else {
-                    navRole.setText("Rôle inconnu");
-                    Log.e(TAG, "User role is null.");
-                }
+                    if (role != null) {
+                        navRole.setText(role);
+                    } else {
+                        navRole.setText("Rôle inconnu");
+                        Log.e(TAG, "User role is null.");
+                    }
 
-                if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
-                    Glide.with(MainActivity.this).load(profileImageUrl).circleCrop().into(navProfileImage);
+                    if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
+                        Glide.with(MainActivity.this).load(profileImageUrl).circleCrop().into(navProfileImage);
+                    } else {
+                        navProfileImage.setImageResource(R.drawable.default_profile_image); // Image par défaut
+                        Log.e(TAG, "Profile image URL is null or empty.");
+                    }
                 } else {
-                    navProfileImage.setImageResource(R.drawable.default_profile_image); // Image par défaut
-                    Log.e(TAG, "Profile image URL is null or empty.");
+                    Log.e(TAG, "Error getting user details", task.getException());
                 }
-            } else {
-                Log.e(TAG, "Error getting user details", task.getException());
-            }
-        });
+            });
+        }
     }
-}
-
 
     private void initializeViews() {
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -127,6 +129,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
         bottomNavigationView = findViewById(R.id.navbar);
         bottomNavigationView.setOnItemSelectedListener(this);
+
+        // Initialiser les éléments du menu pour les utilisateurs anonymes
+        updateMenuForAnonymousUser();
+    }
+
+    private void updateMenuForAnonymousUser() {
+        MenuItem profileItem = navigationView.getMenu().findItem(R.id.nav_profile);
+        MenuItem logoutItem = navigationView.getMenu().findItem(R.id.nav_logout);
+
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if (currentUser == null) {
+            profileItem.setTitle("Voir Profil");
+            logoutItem.setTitle("Connexion");
+        } else {
+            profileItem.setTitle("Profil");
+            logoutItem.setTitle("Déconnexion");
+        }
     }
 
     private void setupDrawer() {
@@ -153,37 +172,59 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int itemId = item.getItemId();
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser == null) {
-            Toast.makeText(this, "Connectez-vous pour accéder à cette fonctionnalité", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (itemId == R.id.navigation_home) {
-            fragment = new HomeFragment();
-            Log.d("Navigation", "Home selected");
-        } else if (itemId == R.id.navigation_message) {
-            fragment = new MessagesFragment();
-            Log.d("Navigation", "Messages selected");
-        } else if (itemId == R.id.navigation_bookmark) {
-            fragment = new SavedOffersFragment();
-            Log.d("Navigation", "Saved selected");
-        } else if (itemId == R.id.navigation_notification) {
-            fragment = new NotificationsFragment();
-            Log.d("Navigation", "Notifications selected");
-        } else if (itemId == R.id.nav_cvs) {
-            fragment = new CVFragment();
-            Log.d("Navigation", "CVs selected");
-        } else if (itemId == R.id.nav_profile) {
-            loadUserProfileFragment(currentUser);
-            return; // Return here to avoid loading fragment twice
-        } else if (itemId == R.id.nav_applications) {
-            loadUserApplicationsFragment(currentUser);
-            return; // Return here to avoid loading fragment twice
-        } else if (itemId == R.id.nav_cover_letters) {
-            fragment = new LDMFragment();
-            Log.d("Navigation", "LDM selected");
-        } else if (itemId == R.id.nav_logout) {
-            handleLogout();
-            return;
+            if (itemId == R.id.navigation_home || itemId == R.id.search_field || itemId == R.id.nav_profile || itemId == R.id.nav_settings) {
+                // Permettre l'accès à la page d'accueil, à la recherche, à voir profil et aux réglages
+                if (itemId == R.id.nav_profile) {
+                    fragment = new ProfileFragment(); // Profil générique pour utilisateur anonyme
+                } else if (itemId == R.id.nav_settings) {
+                    fragment = new SettingsFragment(); // Fragment des réglages
+                } else {
+                    fragment = new HomeFragment(); // ou un fragment de recherche si nécessaire
+                }
+                Log.d("Navigation", "Allowed navigation for anonymous user");
+            } else if (itemId == R.id.nav_logout) {
+                // Gérer l'option de déconnexion pour les utilisateurs anonymes (connexion ou inscription)
+                Intent intent = new Intent(this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+                return;
+            } else {
+                // Bloquer l'accès à d'autres pages
+                Toast.makeText(this, "Connectez-vous pour accéder à cette fonctionnalité", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        } else {
+            if (itemId == R.id.navigation_home) {
+                fragment = new HomeFragment();
+                Log.d("Navigation", "Home selected");
+            } else if (itemId == R.id.navigation_message) {
+                fragment = new MessagesFragment();
+                Log.d("Navigation", "Messages selected");
+            } else if (itemId == R.id.navigation_bookmark) {
+                fragment = new SavedOffersFragment();
+                Log.d("Navigation", "Saved selected");
+            } else if (itemId == R.id.navigation_notification) {
+                fragment = new NotificationsFragment();
+                Log.d("Navigation", "Notifications selected");
+            } else if (itemId == R.id.nav_cvs) {
+                fragment = new CVFragment();
+                Log.d("Navigation", "CVs selected");
+            } else if (itemId == R.id.nav_profile) {
+                loadUserProfileFragment(currentUser);
+                return;// Return here to avoid loading fragment twice
+            } else if (itemId == R.id.nav_applications) {
+                loadUserApplicationsFragment(currentUser);
+                return;
+            } else if (itemId == R.id.nav_cover_letters) {
+                fragment = new LDMFragment();
+                Log.d("Navigation", "LDM selected");
+            } else if (itemId == R.id.publish_offer_button) {
+                fragment = new OfferCreatedFragment();
+                Log.d("New Offer", "Offer created");
+            } else if (itemId == R.id.nav_logout) {
+                handleLogout();
+                return;
+            }
         }
 
         if (fragment != null) {
@@ -191,37 +232,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-private void loadFragment(Fragment fragment) {
-    getSupportFragmentManager().beginTransaction()
-            .replace(R.id.main_fragment, fragment)
-            .addToBackStack(null) // Ensure the fragment is added to the back stack
-            .commit();
-}
+    private void loadFragment(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.main_fragment, fragment)
+                .addToBackStack(null) // Ensure the fragment is added to the back stack
+                .commit();
+    }
 
+    private void handleLogout() {
+        auth.signOut();
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+        finish();
+    }
 
-private void handleLogout() {
-    auth.signOut();
-    Intent intent = new Intent(this, LoginActivity.class);
-    startActivity(intent);
-    finish();
-}
-
-private void setupOnBackPressedDispatcher() {
-    getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-        @Override
-        public void handleOnBackPressed() {
-            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                drawerLayout.closeDrawer(GravityCompat.START);
-            } else {
-                if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-                    getSupportFragmentManager().popBackStack();
+    private void setupOnBackPressedDispatcher() {
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    drawerLayout.closeDrawer(GravityCompat.START);
                 } else {
-                    finish();
+                    if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                        getSupportFragmentManager().popBackStack();
+                    } else {
+                        finish();
+                    }
                 }
             }
-        }
-    });
-}
+        });
+    }
+
     private void loadUserProfileFragment(FirebaseUser currentUser) {
         String email = currentUser.getEmail();
         if (email != null) {

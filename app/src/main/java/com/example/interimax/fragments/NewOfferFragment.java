@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.interimax.R;
 import com.example.interimax.models.Offer;
@@ -98,11 +99,12 @@ public class NewOfferFragment extends Fragment implements EditTextDialogFragment
 
         Offer offer = new Offer(employerId, jobTitle, companyName, description, null, 0, 0, new GeoPoint(0, 0), city);
 
-        db.collection("Jobs")
+        db.collection("Job")
                 .add(offer)
                 .addOnSuccessListener(documentReference -> {
                     Toast.makeText(getContext(), "Offre publiée avec succès", Toast.LENGTH_SHORT).show();
-                    requireActivity().getSupportFragmentManager().popBackStack();
+                    onOfferPublishedSuccessfully();
+                    //requireActivity().getSupportFragmentManager().popBackStack();
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(getContext(), "Erreur lors de la publication de l'offre", Toast.LENGTH_SHORT).show();
@@ -124,5 +126,12 @@ public class NewOfferFragment extends Fragment implements EditTextDialogFragment
         String city = villeText.getText().toString();
 
         publishOfferButton.setEnabled(!jobTitle.isEmpty() && !companyName.isEmpty() && !address.isEmpty() && !city.isEmpty());
+    }
+    private void onOfferPublishedSuccessfully() {
+        OfferCreatedFragment offerCreatedFragment = new OfferCreatedFragment();
+        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+        transaction.replace(R.id.main_fragment, offerCreatedFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 }

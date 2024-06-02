@@ -1,6 +1,7 @@
 package com.example.interimax.activities;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -31,8 +32,10 @@ public class RegisterActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private FirebaseFirestore db;
 
-    private EditText etFirstname, etLastname, etEmail, etPassword, etPhoneNumber, etAddress, etCountry;
+    private EditText etFirstname, etLastname, etEmail, etPassword, etPhoneNumber, etAddress, etCountry, etDob;
     private Button btnRegister;
+    private TextView tvEmployeur, tvCandidat;
+    private androidx.appcompat.widget.SwitchCompat switchAccountType;
     private List<Application> applicationsList;
 
     @Override
@@ -77,19 +80,31 @@ public class RegisterActivity extends AppCompatActivity {
             startActivity(intentLogin);
         });
 
+        // Initialiser les vues
+        etFirstname = findViewById(R.id.etFirstName);
+        etLastname = findViewById(R.id.etLastName);
+        etEmail = findViewById(R.id.etEmail);
+        etPassword = findViewById(R.id.etPassword);
+        etPhoneNumber = findViewById(R.id.etPhone);
+        etCountry = findViewById(R.id.etCountry);
+        etDob = findViewById(R.id.etDob);
+        tvEmployeur = findViewById(R.id.tvEmployeur);
+        tvCandidat = findViewById(R.id.tvCandidat);
+        switchAccountType = findViewById(R.id.switchAccountType);
+        btnRegister = findViewById(R.id.btnRegister);
+
         // Configuration du Switch pour le type de compte
-        androidx.appcompat.widget.SwitchCompat switchAccountType = findViewById(R.id.switchAccountType);
+        switchAccountType.setOnCheckedChangeListener((buttonView, isChecked) -> updateToggleTextColors(isChecked));
 
         // Configuration du bouton de validation du formulaire
-        Button buttonRegister = findViewById(R.id.btnRegister);
-        buttonRegister.setOnClickListener(view -> {
-            String firstName = ((EditText) findViewById(R.id.etFirstName)).getText().toString();
-            String lastName = ((EditText) findViewById(R.id.etLastName)).getText().toString();
-            String dob = ((EditText) findViewById(R.id.etDob)).getText().toString();
-            String country = ((EditText) findViewById(R.id.etCountry)).getText().toString();
-            String phone = ((EditText) findViewById(R.id.etPhone)).getText().toString();
-            String email = ((EditText) findViewById(R.id.etEmail)).getText().toString();
-            String password = ((EditText) findViewById(R.id.etPassword)).getText().toString();
+        btnRegister.setOnClickListener(view -> {
+            String firstName = etFirstname.getText().toString();
+            String lastName = etLastname.getText().toString();
+            String dob = etDob.getText().toString();
+            String country = etCountry.getText().toString();
+            String phone = etPhoneNumber.getText().toString();
+            String email = etEmail.getText().toString();
+            String password = etPassword.getText().toString();
             String confirmPassword = ((EditText) findViewById(R.id.etConfirmPassword)).getText().toString();
             String accountType = switchAccountType.isChecked() ? "Candidat" : "Employeur";
 
@@ -105,6 +120,7 @@ public class RegisterActivity extends AppCompatActivity {
             user.setPassword(password);
             user.setCountry(country);
             user.setPhoneNumber(phone);
+            user.setBirthDate(dob);
             user.setRole(accountType);
 
             db.collection("users").add(user)
@@ -120,6 +136,17 @@ public class RegisterActivity extends AppCompatActivity {
                     });
         });
     }
+
+    private void updateToggleTextColors(boolean isEmployeur) {
+        if (isEmployeur) {
+            tvEmployeur.setTextColor(Color.BLACK);
+            tvCandidat.setTextColor(Color.GRAY);
+        } else {
+            tvEmployeur.setTextColor(Color.GRAY);
+            tvCandidat.setTextColor(Color.BLACK);
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {

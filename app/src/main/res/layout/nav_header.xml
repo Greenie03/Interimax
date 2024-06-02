@@ -8,8 +8,8 @@
 
     <ImageView
         android:id="@+id/nav_header_image"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:src="@drawable/default_profile_image"
         android:layout_gravity="center_horizontal"/>
 
@@ -18,7 +18,8 @@
         android:id="@+id/nav_header_fullname"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Nom de l'utilisateur"
+        android:text="Anonyme"
+        android:textSize="24sp"
         android:layout_marginTop="8dp"
         android:textColor="@android:color/white"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
@@ -27,7 +28,8 @@
         android:id="@+id/nav_header_role"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Rôle de l'utilisateur"
+        android:text="Rôle inconnu"
+        android:textSize="16sp"
         android:textColor="@android:color/white"
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"/>
 </LinearLayout>

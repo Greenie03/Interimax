@@ -102,47 +102,47 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
             String email = currentUser.getEmail();
             if (email != null) {
                 db.collection("users")
-                    .whereEqualTo("email", email)
-                    .get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                            DocumentSnapshot document = task.getResult().getDocuments().get(0);
-                            String firstName = document.getString("firstname");
-                            String lastName = document.getString("lastname");
-                            String role = document.getString("role");
-                            String profileImageUrl = document.getString("profileImageUrl");
-                            Log.d(TAG, "First name: " + firstName + ", Last name: " + lastName + ", Role: " + role);
-                            if (firstName != null && lastName != null) {
-                                if (getActivity() != null) {
-                                    getActivity().runOnUiThread(() -> {
-                                        nomUserTextView.setText(firstName + " " + lastName);
-                                        Toast.makeText(getContext(), "Login successful", Toast.LENGTH_SHORT).show();
-                                        if ("Employeur".equals(role)) {
-                                            fabAddOffer.setVisibility(View.VISIBLE);
-                                        } else {
-                                            fabAddOffer.setVisibility(View.GONE);
-                                        }
+                        .whereEqualTo("email", email)
+                        .get()
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                                DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                                String firstName = document.getString("firstname");
+                                String lastName = document.getString("lastname");
+                                String role = document.getString("role");
+                                String profileImageUrl = document.getString("profileImageUrl");
+                                Log.d(TAG, "First name: " + firstName + ", Last name: " + lastName + ", Role: " + role);
+                                if (firstName != null && lastName != null) {
+                                    if (getActivity() != null) {
+                                        getActivity().runOnUiThread(() -> {
+                                            nomUserTextView.setText(firstName + " " + lastName);
+                                            Toast.makeText(getContext(), "Login successful", Toast.LENGTH_SHORT).show();
+                                            if ("Employeur".equals(role)) {
+                                                fabAddOffer.setVisibility(View.VISIBLE);
+                                            } else {
+                                                fabAddOffer.setVisibility(View.GONE);
+                                            }
 
-                                        if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
-                                            Glide.with(this).load(profileImageUrl).circleCrop().into(profileImageView);
-                                        } else {
-                                            profileImageView.setImageResource(R.drawable.default_profile_image);
-                                        }
-                                    });
+                                            if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
+                                                Glide.with(this).load(profileImageUrl).circleCrop().into(profileImageView);
+                                            } else {
+                                                profileImageView.setImageResource(R.drawable.default_profile_image);
+                                            }
+                                        });
+                                    }
+                                } else {
+                                    Log.d(TAG, "First name or Last name is null");
+                                    nomUserTextView.setText("Anonyme");
                                 }
                             } else {
-                                Log.d(TAG, "First name or Last name is null");
+                                Log.d(TAG, "User document not found");
                                 nomUserTextView.setText("Anonyme");
                             }
-                        } else {
-                            Log.d(TAG, "User document not found");
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.d(TAG, "Error fetching user document: ", e);
                             nomUserTextView.setText("Anonyme");
-                        }
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.d(TAG, "Error fetching user document: ", e);
-                        nomUserTextView.setText("Anonyme");
-                    });
+                        });
             }
         }
     }
