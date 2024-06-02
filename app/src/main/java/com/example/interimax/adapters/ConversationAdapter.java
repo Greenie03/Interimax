@@ -52,42 +52,42 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
     }
 
     public static class ConversationViewHolder extends RecyclerView.ViewHolder {
-        private CircleImageView profileImage;
-        private TextView tvNameUser, tvLastMessage, tvTimestamp, tvUnreadCount;
+    private CircleImageView profileImage;
+    private TextView tvNameUser, tvLastMessage, tvTimestamp, tvUnreadCount;
 
-        public ConversationViewHolder(@NonNull View itemView) {
-            super(itemView);
-            profileImage = itemView.findViewById(R.id.profile_image);
-            tvNameUser = itemView.findViewById(R.id.tvName);
-            tvLastMessage = itemView.findViewById(R.id.tvLastMessage);
-            tvTimestamp = itemView.findViewById(R.id.tvTimestamp);
-            tvUnreadCount = itemView.findViewById(R.id.tvUnreadCount);
+    public ConversationViewHolder(@NonNull View itemView) {
+        super(itemView);
+        profileImage = itemView.findViewById(R.id.profile_image);
+        tvNameUser = itemView.findViewById(R.id.tvName);
+        tvLastMessage = itemView.findViewById(R.id.tvLastMessage);
+        tvTimestamp = itemView.findViewById(R.id.tvTimestamp);
+        tvUnreadCount = itemView.findViewById(R.id.tvUnreadCount);
+    }
+
+    public void bind(Conversation conversation, OnConversationClickListener onConversationClickListener) {
+        tvNameUser.setText(conversation.getUserName());
+        tvLastMessage.setText(String.format("%s", conversation.getLastMessage()));
+
+        // Convert timestamp to readable date format
+        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+        String formattedDate = sdf.format(new Date(conversation.getTimestamp()));
+        tvTimestamp.setText(formattedDate);
+
+        tvUnreadCount.setText(String.valueOf(conversation.getUnreadCount()));
+
+        itemView.setOnClickListener(v -> onConversationClickListener.onConversationClick(conversation));
+
+        // Load profile image using Glide
+        if (conversation.getProfileImageUrl() != null && !conversation.getProfileImageUrl().isEmpty()) {
+            Glide.with(profileImage.getContext())
+                    .load(conversation.getProfileImageUrl())
+                    .circleCrop()
+                    .into(profileImage);
+        } else {
+            profileImage.setImageResource(R.drawable.default_profile_image);
         }
 
-        public void bind(Conversation conversation, OnConversationClickListener onConversationClickListener) {
-            tvNameUser.setText(conversation.getUserName());
-            tvLastMessage.setText(String.format("%s", conversation.getLastMessage()));
-
-            // Convert timestamp to readable date format
-            SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-            String formattedDate = sdf.format(new Date(conversation.getTimestamp()));
-            tvTimestamp.setText(formattedDate);
-
-            tvUnreadCount.setText(String.valueOf(conversation.getUnreadCount()));
-
-            itemView.setOnClickListener(v -> onConversationClickListener.onConversationClick(conversation));
-
-            // Load profile image using Glide
-            if (conversation.getProfileImageUrl() != null && !conversation.getProfileImageUrl().isEmpty()) {
-                Glide.with(profileImage.getContext())
-                        .load(conversation.getProfileImageUrl())
-                        .circleCrop()
-                        .into(profileImage);
-            } else {
-                profileImage.setImageResource(R.drawable.default_profile_image);
-            }
-
-            itemView.setOnClickListener(v -> onConversationClickListener.onConversationClick(conversation));
-        }
+        itemView.setOnClickListener(v -> onConversationClickListener.onConversationClick(conversation));
     }
 }
+    }
