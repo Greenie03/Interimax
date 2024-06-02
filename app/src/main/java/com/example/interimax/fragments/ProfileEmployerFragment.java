@@ -1,5 +1,8 @@
 package com.example.interimax.fragments;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,8 +21,9 @@ import com.bumptech.glide.Glide;
 import com.example.interimax.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
 
 public class ProfileEmployerFragment extends Fragment {
 
@@ -27,6 +31,7 @@ public class ProfileEmployerFragment extends Fragment {
 
     private FirebaseAuth auth;
     private FirebaseFirestore db;
+    private FirebaseStorage storage;
 
     private ImageView profileImage;
     private TextView profileName;
@@ -37,6 +42,8 @@ public class ProfileEmployerFragment extends Fragment {
     private TextView companyDescription;
     private ImageView companyLogo;
 
+    private Uri selectedImageUri;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -44,6 +51,7 @@ public class ProfileEmployerFragment extends Fragment {
 
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        storage = FirebaseStorage.getInstance();
 
         profileImage = view.findViewById(R.id.profile_image);
         profileName = view.findViewById(R.id.profile_name);
@@ -54,21 +62,22 @@ public class ProfileEmployerFragment extends Fragment {
         companyDescription = view.findViewById(R.id.company_description);
         companyLogo = view.findViewById(R.id.company_logo);
 
-        setupToolbar(view);
+        Toolbar toolbar = view.findViewById(R.id.toolbar);
+        toolbar.setNavigationOnClickListener(v -> requireActivity().getSupportFragmentManager().popBackStack());
+
         loadUserProfile();
 
-        return view;
-    }
+        profileImage.setOnClickListener(v -> pickImage());
 
-    private void setupToolbar(View view) {
-        Toolbar toolbar = view.findViewById(R.id.toolbar);
-        toolbar.setNavigationIcon(R.drawable.ic_back);
-        toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
-        TextView editTextView = view.findViewById(R.id.modify_text);
-        editTextView.setOnClickListener(v -> {
-            // Logic to handle edit profile action
-            Toast.makeText(getContext(), "Modifier profil", Toast.LENGTH_SHORT).show();
-        });
+        // Check if there's a new image URL from the arguments
+        if (getArguments() != null) {
+            String newProfileImageUrl = getArguments().getString("new_profile_image_url");
+            if (newProfileImageUrl != null) {
+                Glide.with(this).load(newProfileImageUrl).circleCrop().into(profileImage);
+            }
+        }
+
+        return view;
     }
 
     private void loadUserProfile() {
@@ -92,7 +101,7 @@ public class ProfileEmployerFragment extends Fragment {
                     profileRole.setText(role);
 
                     if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
-                        Glide.with(this).load(profileImageUrl).into(profileImage);
+                        Glide.with(this).load(profileImageUrl).circleCrop().into(profileImage);
                     } else {
                         profileImage.setImageResource(R.drawable.default_profile_image);
                     }
@@ -119,5 +128,31 @@ public class ProfileEmployerFragment extends Fragment {
                 }
             });
         }
+    }
+
+    private void pickImage() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        startActivityForResult(intent, 100);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
+            selectedImageUri = data.getData();
+            openImagePickerFragment(selectedImageUri);
+        }
+    }
+
+    private void openImagePickerFragment(Uri imageUri) {
+        ProfileImagePickerFragment fragment = new ProfileImagePickerFragment();
+        Bundle args = new Bundle();
+        args.putParcelable("image_uri", imageUri);
+        fragment.setArguments(args);
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.main_fragment, fragment)
+                .addToBackStack(null)
+                .commit();
     }
 }
