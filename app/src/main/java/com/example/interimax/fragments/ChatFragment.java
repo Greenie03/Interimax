@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class ChatFragment extends Fragment {
+
     private static final String ARG_EMAIL = "email";
     private static final String TAG = "ChatFragment";
 
@@ -38,6 +39,7 @@ public class ChatFragment extends Fragment {
     private MessageAdapter adapter;
     private List<Message> messageList;
     private String userEmail;
+    private String currentUserEmail;
 
     public ChatFragment() {
         // Required empty public constructor
@@ -64,13 +66,14 @@ public class ChatFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         if (getArguments() != null) {
-            recieverMail = getArguments().getString(ARG_EMAIL);
+            userEmail = getArguments().getString(ARG_EMAIL);
         }
 
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
         messageList = new ArrayList<>();
         adapter = new MessageAdapter(messageList);
+        currentUserEmail = auth.getCurrentUser().getEmail();
 
         binding.rvChat.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.rvChat.setAdapter(adapter);
@@ -82,14 +85,15 @@ public class ChatFragment extends Fragment {
     }
 
     private void setupToolbar() {
-        db.collection("users").whereEqualTo("email", recieverMail).get()
+        db.collection("users").whereEqualTo("email", userEmail).get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && !task.getResult().isEmpty()) {
                         DocumentSnapshot document = task.getResult().getDocuments().get(0);
-                        String name = document.getString("firstname") + " " + document.getString("lastname");
+                        String firstName = document.getString("firstname");
+                        String lastName = document.getString("lastname");
                         String role = document.getString("role");
                         String profileImageUrl = document.getString("profileImageUrl");
-
+                        String name = String.format("%s %s", firstName, lastName);
                         binding.toolbar.setTitle("");
                         binding.tvNameUser.setText(name);
                         binding.tvRole.setText(role);
@@ -107,19 +111,19 @@ public class ChatFragment extends Fragment {
     }
 
     private void loadMessages() {
-    db.collection("messages")
-        .orderBy("time", Query.Direction.ASCENDING)
-        .addSnapshotListener((value, error) -> {
-            if (error != null) {
-                Toast.makeText(getContext(), "Failed to load messages.", Toast.LENGTH_SHORT).show();
-                Log.e(TAG, "Failed to load messages: ", error);
-                return;
-            }
+        db.collection("messages")
+                .orderBy("time", Query.Direction.ASCENDING)
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        Toast.makeText(getContext(), "Failed to load messages.", Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "Failed to load messages: ", error);
+                        return;
+                    }
 
-            if (value == null) {
-                Log.e(TAG, "No messages found.");
-                return;
-            }
+                    if (value == null) {
+                        Log.e(TAG, "No messages found.");
+                        return;
+                    }
 
                 messageList.clear();
                 auth = FirebaseAuth.getInstance();
@@ -157,19 +161,17 @@ public class ChatFragment extends Fragment {
             .addOnSuccessListener(documentReference -> {
                 binding.etMessage.setText("");
                 Log.d(TAG, "Message sent successfully");
+                loadMessages(); // Reload messages after sending
             })
             .addOnFailureListener(e -> {
                 Toast.makeText(getContext(), "Failed to send message", Toast.LENGTH_SHORT).show();
                 Log.e(TAG, "Failed to send message: ", e);
             });
-}
-
-
+    }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
     }
-
 }
