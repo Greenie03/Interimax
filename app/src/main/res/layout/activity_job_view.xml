@@ -8,6 +8,7 @@
 
     <!-- Upper part with gradient background -->
     <LinearLayout
+        android:id="@+id/llOfferInfoHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -25,7 +26,6 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_gravity="start"
-
                 android:padding="8dp"
                 android:scaleX="2"
                 android:scaleY="2"
@@ -38,6 +38,7 @@
                 android:layout_weight="1" />
 
             <ImageView
+                android:id="@+id/icSave"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_gravity="end"
@@ -50,6 +51,7 @@
 
         <!-- Spotify Logo -->
         <ImageView
+            android:id="@+id/ivLogo"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:src="@drawable/spotify_logo"
@@ -57,6 +59,7 @@
             android:layout_marginTop="8dp" />
 
         <TextView
+            android:id="@+id/tvJobTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Product Designer"
@@ -70,7 +73,8 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="8dp"
+            android:visibility="gone">
 
             <!-- Tags as Chips -->
             <com.google.android.material.chip.Chip
@@ -103,25 +107,42 @@
                 android:layout_marginStart="4dp" />
         </LinearLayout>
 
-
-        <TextView
+        <LinearLayout
+            android:id="@+id/llSalaryCity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="25,000€/an · Lyon,France"
-            android:textSize="18sp"
-            android:textColor="@android:color/white"
-            android:gravity="center"
-            android:paddingTop="8dp" />
+            android:orientation="horizontal"
+            android:background="@drawable/background_purple_gradient"
+            android:paddingBottom="16dp">
+            <TextView
+                android:id="@+id/tvSalary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="25,000€/an"
+                android:textSize="18sp"
+                android:textColor="@android:color/white"
+                android:gravity="left"
+                android:paddingTop="8dp"
+                android:layout_marginStart="8dp" />
+
+            <TextView
+                android:id="@+id/tvLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:paddingTop="8dp"
+                android:text="Lyon,France"
+                android:textAlignment="textEnd"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                android:layout_marginEnd="8dp" />
+        </LinearLayout>
     </LinearLayout>
 
+
+
     <!-- Lower part with main content -->
-    <FrameLayout
-        android:id="@+id/contentFrame"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="8dp">
         <!-- Dynamically include fragments or views here based on tab selection -->
-    </FrameLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -176,4 +197,11 @@
         android:background="@color/purple_soft"
         android:textColor="@android:color/white"
         android:layout_marginTop="24dp" />
+    <FrameLayout
+        android:id="@+id/contentFrame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="8dp">
+
+    </FrameLayout>
 </LinearLayout>
