@@ -60,7 +60,7 @@ public class MessagesFragment extends Fragment {
         adapter = new ConversationAdapter(conversationList, conversation -> {
             // Handle conversation click
             // Open ChatFragment or ChatActivity
-            ChatFragment chatFragment = ChatFragment.newInstance(conversation.getParticipants().get(1));  // Assuming the second participant is the other user
+            ChatFragment chatFragment = ChatFragment.newInstance(conversation.getUserName());
             getParentFragmentManager().beginTransaction()
                     .replace(R.id.main_fragment, chatFragment)
                     .addToBackStack(null)
@@ -104,12 +104,7 @@ public class MessagesFragment extends Fragment {
                         String otherUserEmail = message.getSender().equals(currentUserEmail) ? message.getReceiver() : message.getSender();
 
                         // If the conversation with this user already exists, update the last message and timestamp
-                        if (conversationMap.containsKey(otherUserEmail)) {
-                            Conversation conversation = conversationMap.get(otherUserEmail);
-                            conversation.setLastMessage(message.getContent());
-                            conversation.setTimestamp(message.getTime());
-                        } else {
-                            // Create a new conversation for this user
+                        if (!conversationMap.containsKey(otherUserEmail)) {
                             Conversation conversation = new Conversation();
                             conversation.setUserName(otherUserEmail); // Temporary until we fetch user details
                             conversation.setLastMessage(message.getContent());
@@ -118,6 +113,10 @@ public class MessagesFragment extends Fragment {
                             conversation.setProfileImageUrl(""); // Temporary until we fetch user details
 
                             conversationMap.put(otherUserEmail, conversation);
+                        } else {
+                            Conversation conversation = conversationMap.get(otherUserEmail);
+                            conversation.setLastMessage(message.getContent());
+                            conversation.setTimestamp(message.getTime());
                         }
                     }
 

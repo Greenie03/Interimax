@@ -31,13 +31,14 @@ public class ChatFragment extends Fragment {
     private static final String ARG_EMAIL = "email";
     private static final String TAG = "ChatFragment";
 
+    private String recieverMail;
+
     private FragmentChatBinding binding;
     private FirebaseFirestore db;
     private FirebaseAuth auth;
     private MessageAdapter adapter;
     private List<Message> messageList;
     private String userEmail;
-    private String currentUserEmail;
 
     public ChatFragment() {
         // Required empty public constructor
@@ -64,14 +65,13 @@ public class ChatFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         if (getArguments() != null) {
-            userEmail = getArguments().getString(ARG_EMAIL);
+            recieverMail = getArguments().getString(ARG_EMAIL);
         }
 
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
         messageList = new ArrayList<>();
         adapter = new MessageAdapter(messageList);
-        currentUserEmail = auth.getCurrentUser().getEmail();
 
         binding.rvChat.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.rvChat.setAdapter(adapter);
@@ -83,7 +83,7 @@ public class ChatFragment extends Fragment {
     }
 
     private void setupToolbar() {
-        db.collection("users").whereEqualTo("email", userEmail).get()
+        db.collection("users").whereEqualTo("email", recieverMail).get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && !task.getResult().isEmpty()) {
                         DocumentSnapshot document = task.getResult().getDocuments().get(0);
@@ -96,7 +96,7 @@ public class ChatFragment extends Fragment {
                         binding.tvNameUser.setText(name);
                         binding.tvRole.setText(role);
 
-                        if (profileImageUrl != null && !profileImageUrl.isEmpty() && name.length() >=3) {
+                        if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
                             Glide.with(this).load(profileImageUrl).circleCrop().into(binding.profileImage);
                         } else {
                             Toast.makeText(getContext(), "Failed to load user info", Toast.LENGTH_SHORT).show();
@@ -109,21 +109,21 @@ public class ChatFragment extends Fragment {
     }
 
     private void loadMessages() {
-        db.collection("messages")
-            .orderBy("time", Query.Direction.ASCENDING)
-            .addSnapshotListener((value, error) -> {
-                if (error != null) {
-                    Toast.makeText(getContext(), "Failed to load messages.", Toast.LENGTH_SHORT).show();
-                    Log.e(TAG, "Failed to load messages: ", error);
-                    return;
-                }
+    db.collection("messages")
+        .orderBy("time", Query.Direction.ASCENDING)
+        .addSnapshotListener((value, error) -> {
+            if (error != null) {
+                Toast.makeText(getContext(), "Failed to load messages.", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Failed to load messages: ", error);
+                return;
+            }
 
             if (value == null) {
                 Log.e(TAG, "No messages found.");
                 return;
             }
 
-                //messageList.clear();
+                messageList.clear();
                 auth = FirebaseAuth.getInstance();
                 String currentUserEmail = auth.getCurrentUser().getEmail();
                 for (QueryDocumentSnapshot doc : value) {
@@ -135,9 +135,9 @@ public class ChatFragment extends Fragment {
 
                     // Ajout de vérifications nulles avant de comparer les adresses e-mail
                     if (message.getSender() != null && message.getReceiver() != null &&
-                            currentUserEmail != null && userEmail != null &&
-                            ((message.getSender().equals(currentUserEmail) && message.getReceiver().equals(userEmail)) ||
-                             (message.getSender().equals(currentUserEmail) && message.getReceiver().equals(currentUserEmail)))) {
+                            currentUserEmail != null && recieverMail != null &&
+                            ((message.getSender().equals(currentUserEmail) && message.getReceiver().equals(recieverMail)) ||
+                             (message.getSender().equals(recieverMail) && message.getReceiver().equals(currentUserEmail)))) {
                         messageList.add(message);
                         Log.d(TAG, "Message added to list: " + message.getContent());
                     }
@@ -154,18 +154,18 @@ public class ChatFragment extends Fragment {
     }
     auth = FirebaseAuth.getInstance();
     String senderEmail = Objects.requireNonNull(auth.getCurrentUser()).getEmail();
-    Message message = new Message(senderEmail, messageContent, System.currentTimeMillis(), "text", userEmail);  // Add receiver email to the message object
-        message.setReceiver(userEmail);
-        db.collection("messages").add(message)
-            .addOnSuccessListener(documentReference -> {
-                binding.etMessage.setText("");
-                Log.d(TAG, "Message sent successfully");
-                //loadMessages(); // Reload messages after sending
-            })
-            .addOnFailureListener(e -> {
-                Toast.makeText(getContext(), "Failed to send message", Toast.LENGTH_SHORT).show();
-                Log.e(TAG, "Failed to send message: ", e);
-            });
+    Message message = new Message(senderEmail, messageContent, System.currentTimeMillis(), "text", recieverMail);  // Add receiver email to the message object
+    message.setReceiver(recieverMail);
+    db.collection("messages").add(message)
+        .addOnSuccessListener(documentReference -> {
+            binding.etMessage.setText("");
+            Log.d(TAG, "Message sent successfully");
+            //loadMessages(); // Reload messages after sending
+        })
+        .addOnFailureListener(e -> {
+            Toast.makeText(getContext(), "Failed to send message", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Failed to send message: ", e);
+        });
     }
 
     @Override
