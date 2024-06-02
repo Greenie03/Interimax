@@ -17,6 +17,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.bumptech.glide.Glide;
 import com.example.interimax.models.Offer;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -45,6 +46,7 @@ public class OfferActivity extends AppCompatActivity {
 
             ImageButton backButton = findViewById(R.id.back_button);
             ImageButton saveButton = findViewById(R.id.save_button);
+            ImageView iconImageView = findViewById(R.id.icon);
             TextView name = findViewById(R.id.name);
             TextView employerName = findViewById(R.id.employer_name);
             TextView salaryTV  = findViewById(R.id.salary);
@@ -54,7 +56,11 @@ public class OfferActivity extends AppCompatActivity {
 
             String salary = offer.getSalary() + "/h";
 
-            name.setText(offer.getEmployerName());
+            if(offer.getLogoUrl() != null){
+                Glide.with(this).load(offer.getLogoUrl()).circleCrop().into(iconImageView);
+            }
+            name.setText(offer.getName());
+            employerName.setText(offer.getEmployerName());
             salaryTV.setText(salary);
             cityTV.setText(offer.getCity());
             descriptionTV.setText(offer.getDescription());

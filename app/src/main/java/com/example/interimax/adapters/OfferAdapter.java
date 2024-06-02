@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.interimax.R;
 import com.example.interimax.models.Offer;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -21,11 +22,13 @@ import java.util.List;
 
 public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.ViewHolder> {
 
+    private Context context;
     private List<Offer> itemList;
     private OnClickListener onClickListener;
     private FirebaseFirestore db;
 
     public OfferAdapter(Context context, List<Offer> itemList) {
+        this.context = context;
         this.itemList = itemList;
         Collections.reverse(this.itemList);
         db = FirebaseFirestore.getInstance();
@@ -41,6 +44,9 @@ public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         Offer item = itemList.get(position);
+        if(item.getLogoUrl() != null){
+            Glide.with(context).load(item.getLogoUrl()).circleCrop().into(holder.icon);
+        }
         holder.jobTitle.setText(item.getJobTitle());
         holder.salary.setText(String.format("%s/h", item.getSalary()));
         holder.employerName.setText(item.getEmployerName());

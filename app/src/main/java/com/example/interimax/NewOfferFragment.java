@@ -17,8 +17,11 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.example.interimax.R;
 import com.example.interimax.models.Offer;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 
@@ -96,20 +99,24 @@ public class NewOfferFragment extends Fragment implements EditTextDialogFragment
             Toast.makeText(getContext(), "Veuillez remplir les champs obligatoires", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        Offer offer = new Offer(employerId, jobTitle, companyName, description, null, 0, 0, new GeoPoint(0, 0), city, 0);
-
-        db.collection("Job")
-                .add(offer)
-                .addOnSuccessListener(documentReference -> {
-                    Toast.makeText(getContext(), "Offre publiée avec succès", Toast.LENGTH_SHORT).show();
-                    onOfferPublishedSuccessfully();
-                    //requireActivity().getSupportFragmentManager().popBackStack();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Erreur lors de la publication de l'offre", Toast.LENGTH_SHORT).show();
-                    Log.e("FirestoreError", "Erreur lors de la publication de l'offre", e);
-                });
+        db.collection("users").document(currentUser.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                String url = (String) task.getResult().get("profileImageUrl");
+                Offer offer = new Offer(employerId, jobTitle, companyName, description, null, 0, 0, new GeoPoint(0, 0), city, 0, url);
+                db.collection("Job")
+                        .add(offer)
+                        .addOnSuccessListener(documentReference -> {
+                            Toast.makeText(getContext(), "Offre publiée avec succès", Toast.LENGTH_SHORT).show();
+                            onOfferPublishedSuccessfully();
+                            //requireActivity().getSupportFragmentManager().popBackStack();
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(getContext(), "Erreur lors de la publication de l'offre", Toast.LENGTH_SHORT).show();
+                            Log.e("FirestoreError", "Erreur lors de la publication de l'offre", e);
+                        });
+            }
+        });
     }
 
     @Override

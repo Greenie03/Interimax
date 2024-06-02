@@ -1,6 +1,5 @@
 package com.example.interimax.models;
 
-import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
@@ -33,13 +32,14 @@ public class Offer implements Parcelable {
     private GeoPoint coordinate;
     private String city;
     private int popularity;
+    private String logoUrl;
 
     // Liste statique qui contient toutes les offres
     private static List<Offer> allOffers = new ArrayList<>();
     private static FirebaseFirestore database = FirebaseFirestore.getInstance();
 
     // Constructeur complet
-    public Offer(String id, String name, String employerName, String jobTitle, String description, Integer period, double salary, GeoPoint coordinate, String city, int popularity) {
+    public Offer(String id, String name, String employerName, String jobTitle, String description, Integer period, double salary, GeoPoint coordinate, String city, int popularity, String logoUrl) {
         this.id = id;
         this.name = name;
         this.employerName = employerName;
@@ -49,6 +49,8 @@ public class Offer implements Parcelable {
         this.salary = salary;
         this.coordinate = coordinate;
         this.city = city;
+        this.popularity = popularity;
+        this.logoUrl = logoUrl;
         addOffer(this); // Ajouter automatiquement l'offre à la liste
     }
 
@@ -212,6 +214,9 @@ public class Offer implements Parcelable {
     public int getPopularity(){
         return popularity;
     }
+    public String getLogoUrl(){
+        return logoUrl;
+    }
 
     @Override
     public int describeContents() {
@@ -231,6 +236,7 @@ public class Offer implements Parcelable {
         parcel.writeDouble(this.getCoordinate().getLatitude());
         parcel.writeDouble(this.getCoordinate().getLongitude());
         parcel.writeInt(this.popularity);
+        parcel.writeString(this.logoUrl);
     }
 
     public Offer(Parcel in){
@@ -246,5 +252,6 @@ public class Offer implements Parcelable {
         Double lng = in.readDouble();
         this.coordinate = new GeoPoint(lat,lng);
         this.popularity = in.readInt();
+        this.logoUrl = in.readString();
     }
 }

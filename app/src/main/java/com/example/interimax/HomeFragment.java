@@ -86,6 +86,12 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+        FirebaseStorage.getInstance().getReference("pfp/Otacos_logo.svg.png").getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                Log.d(TAG + " OTacos url", task.getResult().toString());
+            }
+        });
     }
 
     @Nullable

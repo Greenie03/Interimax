@@ -9,6 +9,7 @@
         android:id="@+id/icon"
         android:layout_width="48dp"
         android:layout_height="48dp"
+        android:layout_marginEnd="24dp"
         android:contentDescription="@string/offer_icon" />
 
     <RelativeLayout
