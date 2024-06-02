@@ -1,6 +1,7 @@
 package com.example.interimax.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,14 +19,17 @@ import com.example.interimax.models.Message;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ChatFragment extends Fragment {
 
     private static final String ARG_EMAIL = "email";
+    private static final String TAG = "ChatFragment";
 
     private FragmentChatBinding binding;
     private FirebaseFirestore db;
@@ -81,7 +85,7 @@ public class ChatFragment extends Fragment {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && !task.getResult().isEmpty()) {
                         DocumentSnapshot document = task.getResult().getDocuments().get(0);
-                        String name = document.getString("name");
+                        String name = document.getString("firstname") + " " + document.getString("lastname");
                         String role = document.getString("role");
                         String profileImageUrl = document.getString("profileImageUrl");
 
@@ -90,6 +94,7 @@ public class ChatFragment extends Fragment {
                         Glide.with(this).load(profileImageUrl).circleCrop().into(binding.profileImage);
                     } else {
                         Toast.makeText(getContext(), "Failed to load user info", Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "Failed to load user info: " + task.getException());
                     }
                 });
 
@@ -100,17 +105,22 @@ public class ChatFragment extends Fragment {
         db.collection("messages")
                 .whereEqualTo("sender", auth.getCurrentUser().getEmail())
                 .whereEqualTo("receiver", userEmail)
-                .orderBy("timestamp")
+                .orderBy("timestamp", Query.Direction.ASCENDING)
                 .addSnapshotListener((value, error) -> {
                     if (error != null) {
                         Toast.makeText(getContext(), "Failed to load messages.", Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "Failed to load messages: ", error);
                         return;
                     }
 
                     messageList.clear();
+                    String currentUserEmail = auth.getCurrentUser().getEmail();
                     for (QueryDocumentSnapshot doc : value) {
                         Message message = doc.toObject(Message.class);
-                        messageList.add(message);
+                        if ((message.getSender().equals(currentUserEmail) && message.getReceiver().equals(userEmail)) ||
+                                (message.getSender().equals(userEmail) && message.getReceiver().equals(currentUserEmail))) {
+                            messageList.add(message);
+                        }
                     }
                     adapter.notifyDataSetChanged();
                 });
@@ -121,11 +131,18 @@ public class ChatFragment extends Fragment {
         if (messageContent.isEmpty()) {
             return;
         }
-
-        Message message = new Message(auth.getCurrentUser().getEmail(), messageContent, System.currentTimeMillis(), "text");
+        auth = FirebaseAuth.getInstance();
+        Message message = new Message(Objects.requireNonNull(auth.getCurrentUser()).getEmail(), messageContent, System.currentTimeMillis(), "text");
+        message.setReceiver(userEmail);  // Add receiver email to the message object
         db.collection("messages").add(message)
-                .addOnSuccessListener(documentReference -> binding.etMessage.setText(""))
-                .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to send message", Toast.LENGTH_SHORT).show());
+                .addOnSuccessListener(documentReference -> {
+                    binding.etMessage.setText("");
+                    Log.d(TAG, "Message sent successfully");
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Failed to send message", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Failed to send message: ", e);
+                });
     }
 
     @Override

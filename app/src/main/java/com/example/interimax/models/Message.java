@@ -2,6 +2,7 @@ package com.example.interimax.models;
 
 public class Message {
     private String sender;
+    private String receiver;  // Ajout du champ receiver
     private String content;
     private long time;
     private String type;
@@ -23,6 +24,14 @@ public class Message {
 
     public void setSender(String sender) {
         this.sender = sender;
+    }
+
+    public String getReceiver() {
+        return receiver;
+    }
+
+    public void setReceiver(String receiver) {
+        this.receiver = receiver;
     }
 
     public String getContent() {

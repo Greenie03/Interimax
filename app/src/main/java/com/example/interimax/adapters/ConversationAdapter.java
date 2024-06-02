@@ -86,6 +86,8 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
             } else {
                 profileImage.setImageResource(R.drawable.default_profile_image);
             }
+
+            itemView.setOnClickListener(v -> onConversationClickListener.onConversationClick(conversation));
         }
     }
 }

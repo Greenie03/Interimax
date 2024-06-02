@@ -27,7 +27,7 @@ import java.util.List;
 public class UserListFragment extends DialogFragment {
 
     private RecyclerView rvUsers;
-    private UserAdapter adapter;
+    private UserAdapter userAdapter;
     private List<User> userList;
     private FirebaseFirestore db;
     private FirebaseAuth auth;
@@ -42,20 +42,24 @@ public class UserListFragment extends DialogFragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_user_list, container, false);
 
         rvUsers = view.findViewById(R.id.rvUsers);
-        userList = new ArrayList<>();
-        adapter = new UserAdapter(userList, this::openChatFragment);
-
         rvUsers.setLayoutManager(new LinearLayoutManager(getContext()));
-        rvUsers.setAdapter(adapter);
 
-        db = FirebaseFirestore.getInstance();
-        auth = FirebaseAuth.getInstance();
+        userList = new ArrayList<>();
+        userAdapter = new UserAdapter(userList, user -> {
+            String mail = user.getEmail();
+            ChatFragment chatFragment = ChatFragment.newInstance(mail);
+            FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+            transaction.replace(R.id.main_fragment, chatFragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
+            dismiss();
+        });
 
+        rvUsers.setAdapter(userAdapter);
         loadUsers();
 
         // Fermer le fragment lorsque l'on clique en dehors
@@ -72,27 +76,19 @@ public class UserListFragment extends DialogFragment {
     }
 
     private void loadUsers() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
         db.collection("users").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                userList.clear();
+            if (task.isSuccessful() && task.getResult() != null) {
                 for (QueryDocumentSnapshot document : task.getResult()) {
                     User user = document.toObject(User.class);
                     if (!user.getEmail().equals(auth.getCurrentUser().getEmail())) {
                         userList.add(user);
                     }
                 }
-                adapter.notifyDataSetChanged();
+                userAdapter.notifyDataSetChanged();
             }
         });
     }
 
-    private void openChatFragment(User user) {
-        String mail = user.getEmail();
-        ChatFragment chatFragment = ChatFragment.newInstance(mail);
-        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-        transaction.replace(R.id.main_fragment, chatFragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
-        dismiss(); // Fermer le UserListFragment après avoir ouvert le ChatFragment
-    }
 }
