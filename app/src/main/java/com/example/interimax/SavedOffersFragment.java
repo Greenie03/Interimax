@@ -21,6 +21,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -28,6 +29,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class SavedOffersFragment extends Fragment {
 
@@ -101,7 +103,11 @@ public class SavedOffersFragment extends Fragment {
                                     .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                         @Override
                                         public void onComplete(@NonNull Task<QuerySnapshot> offerTask) {
-                                            savedOffersList = offerTask.getResult().toObjects(Offer.class);
+                                            for (DocumentSnapshot doc : offerTask.getResult()){
+                                                Offer o = doc.toObject(Offer.class);
+                                                o.setId(doc.getId());
+                                                savedOffersList.add(o);
+                                            }
                                             adapter = new OfferAdapter(getContext(), savedOffersList);
 
                                             binding.recyclerViewSavedOffers.setLayoutManager(new LinearLayoutManager(getContext()));

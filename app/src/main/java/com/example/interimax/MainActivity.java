@@ -222,7 +222,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             } else if (itemId == R.id.navigation_notification) {
                 fragment = new NotificationsFragment();
                 Log.d("Navigation", "Notifications selected");
-            } else if (itemId == R.id.nav_cvs && role == "Candidat") {
+            } else if (itemId == R.id.nav_cvs && role.equals("Candidat")) {
                 fragment = new CVFragment();
                 Log.d("Navigation", "CVs selected");
             } else if (itemId == R.id.nav_profile) {
@@ -231,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             } else if (itemId == R.id.nav_applications) {
                 loadUserApplicationsFragment(currentUser);
                 return;
-            } else if (itemId == R.id.nav_cover_letters && role == "Candidat") {
+            } else if (itemId == R.id.nav_cover_letters && role.equals("Candidat")) {
                 fragment = new LDMFragment();
                 Log.d("Navigation", "LDM selected");
             } else if (itemId == R.id.publish_offer_button) {

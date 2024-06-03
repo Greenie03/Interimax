@@ -21,6 +21,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.bumptech.glide.Glide;
 import com.example.interimax.models.Offer;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
@@ -67,9 +68,21 @@ public class CandidateActivity extends AppCompatActivity {
                 salary.setText(salaryText);
                 city.setText(offer.getCity());
 
+                if(offer.getLogoUrl() != null){
+                    Glide.with(this).load(offer.getLogoUrl()).circleCrop().into(icon);
+                }
+
                 Button candidateButton = findViewById(R.id.candidate);
+                ImageButton backButton = findViewById(R.id.back_button);
                 ImageButton cvUploadButton = findViewById(R.id.cv_upload_button);
                 ImageButton mLUploadButton = findViewById(R.id.motivation_letter_upload);
+
+                backButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        finish();
+                    }
+                });
 
                 cvUploadButton.setOnClickListener(new View.OnClickListener() {
                     @Override

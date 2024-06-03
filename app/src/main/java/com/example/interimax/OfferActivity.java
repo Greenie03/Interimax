@@ -2,6 +2,7 @@ package com.example.interimax;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -87,7 +88,7 @@ public class OfferActivity extends AppCompatActivity {
                                 .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                     @Override
                                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                        if(task.isSuccessful()) {
+                                        if(task.isSuccessful() && offer.getId() != null) {
                                             if (Objects.equals((String) task.getResult().get("role"), "Candidat")) {
                                                 String savedOfferAction = "";
                                                 List<String> savedOffer = new ArrayList<>();
@@ -144,7 +145,7 @@ public class OfferActivity extends AppCompatActivity {
                                                             @Override
                                                             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                                                 if(task.isSuccessful()) {
-                                                                    if (task.getResult().get("role") == "Candidat") {
+                                                                    if (Objects.equals(task.getResult().getString("role"), "Candidat")) {
                                                                         Intent intent = new Intent(OfferActivity.this, CandidateActivity.class);
                                                                         intent.putExtra("offer", offer);
                                                                         startActivity(intent);
