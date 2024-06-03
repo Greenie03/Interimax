@@ -79,19 +79,8 @@
             android:id="@+id/map"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
-            android:layout_height="400dp"
+            android:layout_height="300dp"
             android:layout_marginTop="24dp" />
-
-        <TextView
-            android:id="@+id/view_list_link"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Voir liste"
-            android:textColor="@color/link_color"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackground" />
 
         <TextView
             android:layout_width="match_parent"
@@ -99,17 +88,6 @@
             android:layout_marginTop="24dp"
             android:text="Dernières offres de votre ville"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
-
-        <TextView
-            android:id="@+id/view_all_link"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Voir tout"
-            android:textColor="@color/link_color"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?attr/selectableItemBackground" />
 
     </LinearLayout>
     <com.google.android.material.floatingactionbutton.FloatingActionButton

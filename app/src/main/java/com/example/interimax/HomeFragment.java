@@ -169,8 +169,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
 
     private void initializeViews() {
         searchField = rootView.findViewById(R.id.search_field);
-        viewListLink = rootView.findViewById(R.id.view_list_link);
-        viewAllLink = rootView.findViewById(R.id.view_all_link);
+
         nomUserTextView = rootView.findViewById(R.id.nom_user);
         fabAddOffer = rootView.findViewById(R.id.fab_add_offer);
         profileImageView = rootView.findViewById(R.id.profile_image);
@@ -189,8 +188,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
             startActivity(intent);
         });
 
-        viewListLink.setOnClickListener(v -> viewList());
-        viewAllLink.setOnClickListener(v -> viewAll());
+
 
         fabAddOffer.setOnClickListener(view -> {
             NewOfferFragment newOfferFragment = new NewOfferFragment();
@@ -200,18 +198,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
             transaction.addToBackStack(null);
             transaction.commit();
         });
-    }
-
-    private void viewList() {
-        Intent intent = new Intent(getContext(), OffersListActivity.class);
-        intent.putExtra("view", "list");
-        startActivity(intent);
-    }
-
-    private void viewAll() {
-        Intent intent = new Intent(getContext(), OffersListActivity.class);
-        intent.putExtra("view", "all");
-        startActivity(intent);
     }
 
     @Override
