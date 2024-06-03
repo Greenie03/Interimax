@@ -1,6 +1,7 @@
 package com.example.interimax;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -12,6 +13,8 @@ import android.widget.TextView;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -265,5 +268,25 @@ public class ApplicationsActivity extends AppCompatActivity implements ActiveApp
                         updateList(list);
                     }
                 });
+    }
+
+    @Override
+    public void onDownloadClick(List<Map<String, Object>> list, Map<String, Object> item, int position) {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 100);
+        }
+        List<String> urls = new ArrayList<>();
+        urls.add((String) item.get("cv"));
+        if(item.containsKey("motivation_letter")){
+            urls.add((String) item.get("motivation_letter"));
+        }
+        for(String url : urls){
+            Intent downloadIntent = new Intent(this, DownloadService.class);
+            downloadIntent.putExtra(DownloadService.EXTRA_DOWNLOAD_URL, url);
+
+            // Démarrer le service
+            startService(downloadIntent);
+        }
     }
 }

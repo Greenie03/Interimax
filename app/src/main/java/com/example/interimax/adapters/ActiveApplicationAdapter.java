@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -67,6 +68,7 @@ public class ActiveApplicationAdapter extends RecyclerView.Adapter<ActiveApplica
             holder.city.setText((String) item.get("city"));
             String periodText = item.get("period") + " h";
             holder.period.setText(periodText);
+            holder.download.setVisibility(View.GONE);
         }else{
             if(item.get("profileImageUrl") != null){
                 Glide.with(context).load(item.get("profileImageUrl")).circleCrop().into(holder.icon);
@@ -76,6 +78,15 @@ public class ActiveApplicationAdapter extends RecyclerView.Adapter<ActiveApplica
             String name = item.get("firstname") + " " + item.get("lastname");
             holder.name.setText(name);
             holder.employerName.setText((String) item.get("name"));
+            holder.download.setVisibility(View.VISIBLE);
+            holder.download.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(onClickListener != null){
+                        onClickListener.onDownloadClick(itemList, item, position);
+                    }
+                }
+            });
         }
         Long status = (long) item.get("status");
         switch (toIntExact(status)){
@@ -177,6 +188,7 @@ public class ActiveApplicationAdapter extends RecyclerView.Adapter<ActiveApplica
     public interface OnClickListener{
         void onAcceptClick(List<Map<String, Object>> list, Map<String, Object> item, int position);
         void onDeclineClick(List<Map<String, Object>> list, Map<String, Object> item, int position);
+        void onDownloadClick(List<Map<String, Object>> list, Map<String, Object> item, int position);
     }
 
     @Override
@@ -190,6 +202,7 @@ public class ActiveApplicationAdapter extends RecyclerView.Adapter<ActiveApplica
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private ImageView icon;
+        private ImageButton download;
         private TextView name;
         private TextView salary;
         private TextView employerName;
@@ -203,6 +216,7 @@ public class ActiveApplicationAdapter extends RecyclerView.Adapter<ActiveApplica
         public ViewHolder(View itemView) {
             super(itemView);
             icon = itemView.findViewById(R.id.icon);
+            download = itemView.findViewById(R.id.download);
             name = itemView.findViewById(R.id.name);
             salary = itemView.findViewById(R.id.salary);
             employerName = itemView.findViewById(R.id.employer_name);

@@ -67,6 +67,14 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"/>
         </RelativeLayout>
+        <ImageButton
+            android:id="@+id/download"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/download_icon"
+            android:background="@color/transparent"
+            android:layout_alignParentEnd="true"
+            android:contentDescription="@string/offer_icon" />
     </RelativeLayout>
     <RelativeLayout
         android:id="@+id/status_layout"
