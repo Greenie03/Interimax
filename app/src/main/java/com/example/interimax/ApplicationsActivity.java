@@ -276,14 +276,15 @@ public class ApplicationsActivity extends AppCompatActivity implements ActiveApp
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 100);
         }
-        List<String> urls = new ArrayList<>();
-        urls.add((String) item.get("cv"));
+        Map<String, String> urls = new HashMap<>();
+        urls.put(item.get("firstName") + "_" + item.get("lastName") + "CV",(String) item.get("cv"));
         if(item.containsKey("motivation_letter")){
-            urls.add((String) item.get("motivation_letter"));
+            urls.put(item.get("firstName") + "_" + item.get("lastName") + "LDM",(String) item.get("motivation_letter"));
         }
-        for(String url : urls){
+        for(String key : urls.keySet()){
             Intent downloadIntent = new Intent(this, DownloadService.class);
-            downloadIntent.putExtra(DownloadService.EXTRA_DOWNLOAD_URL, url);
+            downloadIntent.putExtra(DownloadService.EXTRA_DOWNLOAD_URL, urls.get(key));
+            downloadIntent.putExtra(DownloadService.FILE_NAME, key);
 
             // Démarrer le service
             startService(downloadIntent);

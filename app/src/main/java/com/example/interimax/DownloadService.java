@@ -19,6 +19,8 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DownloadService extends Service {
 
@@ -31,6 +33,7 @@ public class DownloadService extends Service {
     private OnServiceFinishedListener listener;
     public static final String ACTION_SERVICE_FINISHED = "ACTION_SERVICE_FINISHED";
     public static final String EXTRA_DOWNLOAD_URL = "download_url";
+    public static final String FILE_NAME = "download_url";
 
     private final class ServiceHandler extends Handler {
         public ServiceHandler(Looper looper) {
@@ -39,7 +42,8 @@ public class DownloadService extends Service {
 
         @Override
         public void handleMessage(Message msg) {
-            String downloadUrl = (String) msg.obj;
+            String downloadUrl = ((Map<String, String>) msg.obj).get("downloadUrl");
+            String filename = ((Map<String, String>) msg.obj).get("file_name");
 
             if (downloadUrl == null || downloadUrl.isEmpty()) {
                 Log.e("DownloadService", "Invalid URL");
@@ -64,7 +68,7 @@ public class DownloadService extends Service {
                 if (!externalStorage.exists()) {
                     externalStorage.mkdirs();
                 }
-                File outputFile = new File(externalStorage, "downloaded_file" + fileExtension);
+                File outputFile = new File(externalStorage, filename + fileExtension);
                 FileOutputStream outputStream = new FileOutputStream(outputFile);
 
                 while ((n = inputStream.read(buffer)) != -1) {
@@ -118,9 +122,13 @@ public class DownloadService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         String downloadUrl = intent.getStringExtra(EXTRA_DOWNLOAD_URL);
+        String filename = intent.getStringExtra(FILE_NAME);
         Message msg = mServiceHandler.obtainMessage();
         msg.arg1 = startId;
-        msg.obj = downloadUrl;
+        Map<String, String> map = new HashMap<>();
+        map.put("downloadUrl", downloadUrl);
+        map.put("file_name", filename);
+        msg.obj = map;
         mServiceHandler.sendMessage(msg);
         return START_STICKY;
     }
