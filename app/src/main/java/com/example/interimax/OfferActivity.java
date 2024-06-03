@@ -22,6 +22,7 @@ import com.example.interimax.models.Offer;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -95,9 +96,22 @@ public class OfferActivity extends AppCompatActivity {
                                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                         if(task.isSuccessful()){
                                             if(task.getResult().isEmpty()){
-                                                Intent intent = new Intent(OfferActivity.this, CandidateActivity.class);
-                                                intent.putExtra("offer",offer);
-                                                startActivity(intent);
+                                                FirebaseFirestore.getInstance().collection("users")
+                                                        .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                                        .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                                if(task.isSuccessful()) {
+                                                                    if (task.getResult().get("role") == "Candidat") {
+                                                                        Intent intent = new Intent(OfferActivity.this, CandidateActivity.class);
+                                                                        intent.putExtra("offer", offer);
+                                                                        startActivity(intent);
+                                                                    } else {
+                                                                        Toast.makeText(OfferActivity.this, "Vous ne pouvez pas postuler en tant que employeur", Toast.LENGTH_LONG).show();
+                                                                    }
+                                                                }
+                                                            }
+                                                        });
                                             }else{
                                                 Toast.makeText(OfferActivity.this, "Vous avez déjà postulé pour cette offre !", Toast.LENGTH_LONG).show();
                                                 Intent intent = new Intent(OfferActivity.this, ApplicationsActivity.class);

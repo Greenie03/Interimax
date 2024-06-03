@@ -35,8 +35,8 @@
 
                 <ImageView
                     android:id="@+id/profile_image"
-                    android:layout_width="130dp"
-                    android:layout_height="130dp"
+                    android:layout_width="65dp"
+                    android:layout_height="65dp"
                     android:layout_gravity="center_horizontal"
                     android:src="@drawable/default_profile_image"
                     android:scaleType="centerCrop"

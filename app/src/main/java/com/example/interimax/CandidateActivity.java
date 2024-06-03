@@ -122,6 +122,7 @@ public class CandidateActivity extends AppCompatActivity {
                             Intent intent = new Intent(CandidateActivity.this, DoneActivity.class);
                             intent.putExtra("offer", offer);
                             startActivity(intent);
+                            finish();
                         }else{
                             Toast.makeText(CandidateActivity.this, "Veuillez entrer un CV !", Toast.LENGTH_LONG).show();
                         }

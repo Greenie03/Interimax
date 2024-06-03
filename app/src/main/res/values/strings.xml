@@ -161,4 +161,5 @@
     <string name="decline">Refuser</string>
     <string name="accepted">Accepté</string>
     <string name="declined_by_you">Refusé par vous</string>
+    <string name="my_offers">Mes Offres</string>
 </resources>

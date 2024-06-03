@@ -38,6 +38,7 @@ public class DoneActivity extends AppCompatActivity {
                 public void onClick(View view) {
                     Intent intent = new Intent(DoneActivity.this, ApplicationsActivity.class);
                     startActivity(intent);
+                    finish();
                 }
             });
 
@@ -47,6 +48,7 @@ public class DoneActivity extends AppCompatActivity {
                 public void onClick(View view) {
                     Intent intent = new Intent(DoneActivity.this, ResearchActivity.class);
                     startActivity(intent);
+                    finish();
                 }
             });
         }

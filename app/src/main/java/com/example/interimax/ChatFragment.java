@@ -71,9 +71,10 @@ public class ChatFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
         messageList = new ArrayList<>();
-        adapter = new MessageAdapter(messageList);
+        adapter = new MessageAdapter(getContext(), messageList, auth.getCurrentUser().getEmail());
 
         binding.rvChat.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.rvChat.scrollToPosition(adapter.getItemCount() - 1);
         binding.rvChat.setAdapter(adapter);
 
         loadMessages();
@@ -143,6 +144,7 @@ public class ChatFragment extends Fragment {
                     }
                 }
                 adapter.notifyDataSetChanged();
+                binding.rvChat.scrollToPosition(adapter.getItemCount() - 1);
                 Log.d(TAG, "Total messages: " + messageList.size());
             });
     }
@@ -160,6 +162,7 @@ public class ChatFragment extends Fragment {
         .addOnSuccessListener(documentReference -> {
             binding.etMessage.setText("");
             Log.d(TAG, "Message sent successfully");
+            binding.rvChat.scrollToPosition(adapter.getItemCount() - 1);
             //loadMessages(); // Reload messages after sending
         })
         .addOnFailureListener(e -> {

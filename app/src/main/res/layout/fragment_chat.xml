@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    tools:context=".fragments.ChatFragment">
+    tools:context=".ChatFragment">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -68,12 +68,12 @@
     </androidx.appcompat.widget.Toolbar>
 
 <androidx.recyclerview.widget.RecyclerView
-android:id="@+id/rvChat"
-android:layout_width="match_parent"
-android:layout_height="0dp"
-android:layout_below="@id/toolbar"
-android:layout_above="@+id/layout_send_message"
-android:padding="8dp" />
+    android:id="@+id/rvChat"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_below="@id/toolbar"
+    android:layout_above="@+id/layout_send_message"
+    android:padding="8dp" />
 
 <LinearLayout
 android:id="@+id/layout_send_message"

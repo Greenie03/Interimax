@@ -6,14 +6,14 @@
     android:layout_marginBottom="8dp"
     android:background="@drawable/rounded">
     <RelativeLayout
-        android:id="@+id/offer"
-        android:layout_width="wrap_content"
+        android:id="@+id/main_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <ImageView
             android:id="@+id/icon"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:paddingEnd="24dp"
+            android:layout_marginEnd="24dp"
             android:contentDescription="@string/offer_icon" />
 
         <RelativeLayout
@@ -69,66 +69,18 @@
         </RelativeLayout>
     </RelativeLayout>
     <RelativeLayout
-        android:id="@+id/status_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/offer"
-        android:layout_marginTop="12dp">
-        <TextView
-            android:id="@+id/status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:text="@string/waiting"
-            android:textColor="@color/colorPrimary"
-            android:textStyle="bold"
-            android:paddingVertical="8dp"
-            android:paddingHorizontal="12dp"
-            android:background="@drawable/waiting_status_background" />
-        <TextView
-            android:id="@+id/period"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="@color/black"/>
-    </RelativeLayout>
-    <LinearLayout
-        android:id="@+id/decision_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/status_layout"
-        android:layout_marginTop="12dp"
-        android:orientation="vertical"
-        android:visibility="gone">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/accept_question"
-            android:textSize="16sp"
-            android:textStyle="bold"/>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingHorizontal="18dp"
-            android:layout_marginTop="12dp">
+        android:layout_below="@id/main_layout">
             <Button
-                android:id="@+id/accept_button"
+                android:id="@+id/delete_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:text="@string/accept"
-                android:textColor="@color/green"
-                android:background="@color/transparent" />
-            <Button
-                android:id="@+id/refuse_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:text="@string/decline"
+                android:text="@string/delete"
                 android:textColor="@color/red"
-                android:background="@color/transparent" />
-        </RelativeLayout>
-    </LinearLayout>
+                android:textStyle="bold"
+                android:background="@drawable/reject_status_background"
+                android:layout_centerHorizontal="true"/>
+    </RelativeLayout>
+
 </RelativeLayout>

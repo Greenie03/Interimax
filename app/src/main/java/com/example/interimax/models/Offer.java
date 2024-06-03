@@ -33,13 +33,14 @@ public class Offer implements Parcelable {
     private String city;
     private int popularity;
     private String logoUrl;
+    private String employerId;
 
     // Liste statique qui contient toutes les offres
     private static List<Offer> allOffers = new ArrayList<>();
     private static FirebaseFirestore database = FirebaseFirestore.getInstance();
 
     // Constructeur complet
-    public Offer(String id, String name, String employerName, String jobTitle, String description, Integer period, double salary, GeoPoint coordinate, String city, int popularity, String logoUrl) {
+    public Offer(String id, String name, String employerName, String jobTitle, String description, Integer period, double salary, GeoPoint coordinate, String city, int popularity, String logoUrl, String employerId) {
         this.id = id;
         this.name = name;
         this.employerName = employerName;
@@ -51,6 +52,7 @@ public class Offer implements Parcelable {
         this.city = city;
         this.popularity = popularity;
         this.logoUrl = logoUrl;
+        this.employerId = employerId;
         addOffer(this); // Ajouter automatiquement l'offre à la liste
     }
 
@@ -217,6 +219,9 @@ public class Offer implements Parcelable {
     public String getLogoUrl(){
         return logoUrl;
     }
+    public String getEmployerId(){
+        return employerId;
+    }
 
     @Override
     public int describeContents() {
@@ -237,6 +242,7 @@ public class Offer implements Parcelable {
         parcel.writeDouble(this.getCoordinate().getLongitude());
         parcel.writeInt(this.popularity);
         parcel.writeString(this.logoUrl);
+        parcel.writeString(this.employerId);
     }
 
     public Offer(Parcel in){
@@ -253,5 +259,6 @@ public class Offer implements Parcelable {
         this.coordinate = new GeoPoint(lat,lng);
         this.popularity = in.readInt();
         this.logoUrl = in.readString();
+        this.employerId = in.readString();
     }
 }

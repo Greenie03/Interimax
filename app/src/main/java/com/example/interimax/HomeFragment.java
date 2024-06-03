@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -56,6 +57,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -86,12 +89,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
-        FirebaseStorage.getInstance().getReference("pfp/Otacos_logo.svg.png").getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
-            @Override
-            public void onComplete(@NonNull Task<Uri> task) {
-                Log.d(TAG + " OTacos url", task.getResult().toString());
-            }
-        });
     }
 
     @Nullable
@@ -267,7 +264,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                     if (location != null) {
                         Log.d(TAG, "User location: " + location.getLatitude() + ", " + location.getLongitude());
                         // Utiliser la localisation pour afficher les offres autour de l'utilisateur
-                        Bitmap icon = drawableToBitmap(getResources().getDrawable(R.drawable.home_icon));
+                        Bitmap icon = drawableToBitmap(getResources().getDrawable(R.drawable.default_profile_image));
                         LatLng currentPosition = new LatLng(location.getLatitude(), location.getLongitude());
                         builder.include(currentPosition);
                         CURRENT_POSITION_MARKER = gMap.addMarker(new MarkerOptions().position(currentPosition).title("Vous").icon(BitmapDescriptorFactory.fromBitmap(icon)));

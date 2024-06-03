@@ -1,11 +1,14 @@
 package com.example.interimax;
 
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,9 +28,13 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
 public class NewOfferFragment extends Fragment implements EditTextDialogFragment.EditTextDialogListener {
 
-    private TextView jobTitleText, workSpaceText, companyNameText, addressText, requiredExperienceText, workingHoursText, descriptionText, villeText;
+    private EditText jobTitleText, workSpaceText, companyNameText, addressText, requiredExperienceText, workingHoursText, descriptionText, villeText;
     private Button publishOfferButton;
     private FirebaseAuth auth;
     private FirebaseFirestore db;
@@ -48,7 +55,7 @@ public class NewOfferFragment extends Fragment implements EditTextDialogFragment
         workSpaceText = view.findViewById(R.id.workspace_label);
         companyNameText = view.findViewById(R.id.company_name_label);
         addressText = view.findViewById(R.id.address_label);
-        requiredExperienceText = view.findViewById(R.id.experience_label);
+        requiredExperienceText = view.findViewById(R.id.salary_label);
         workingHoursText = view.findViewById(R.id.hours_label);
         descriptionText = view.findViewById(R.id.description_label);
         villeText = view.findViewById(R.id.city_label);
@@ -57,15 +64,15 @@ public class NewOfferFragment extends Fragment implements EditTextDialogFragment
 
         view.findViewById(R.id.close_icon).setOnClickListener(v -> requireActivity().getSupportFragmentManager().popBackStack());
 
-        view.findViewById(R.id.job_title_edit).setOnClickListener(v -> showEditDialog("Intitulé du poste*", R.id.job_title_label));
+        /*view.findViewById(R.id.job_title_edit).setOnClickListener(v -> showEditDialog("Intitulé du poste*", R.id.job_title_label));
         view.findViewById(R.id.workspace_edit).setOnClickListener(v -> showEditDialog("Espace de travail*", R.id.workspace_label));
         view.findViewById(R.id.company_name_edit).setOnClickListener(v -> showEditDialog("Nom de l'entreprise*", R.id.company_name_label));
         view.findViewById(R.id.address_edit).setOnClickListener(v -> showEditDialog("Adresse*", R.id.address_label));
-        view.findViewById(R.id.experience_edit).setOnClickListener(v -> showEditDialog("Expérience requise*", R.id.experience_label));
+        view.findViewById(R.id.experience_edit).setOnClickListener(v -> showEditDialog("Expérience requise*", R.id.salary_label));
         view.findViewById(R.id.hours_edit).setOnClickListener(v -> showEditDialog("Horaires*", R.id.hours_label));
         view.findViewById(R.id.description_edit).setOnClickListener(v -> showEditDialog("Description", R.id.description_label));
         view.findViewById(R.id.city_edit).setOnClickListener(v -> showEditDialog("Ville*", R.id.city_label));
-
+*/
         publishOfferButton.setOnClickListener(v -> publishOffer());
 
         return view;
@@ -90,8 +97,8 @@ public class NewOfferFragment extends Fragment implements EditTextDialogFragment
         String companyName = companyNameText.getText().toString();
         String address = addressText.getText().toString();
         String workSpace = workSpaceText.getText().toString();
-        String requiredExperience = requiredExperienceText.getText().toString();
-        String workingHours = workingHoursText.getText().toString();
+        int salary = Integer.valueOf(requiredExperienceText.getText().toString());
+        int workingHours = Integer.valueOf(workingHoursText.getText().toString());
         String description = descriptionText.getText().toString();
         String city = villeText.getText().toString();
 
@@ -103,18 +110,20 @@ public class NewOfferFragment extends Fragment implements EditTextDialogFragment
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 String url = (String) task.getResult().get("profileImageUrl");
-                Offer offer = new Offer(employerId, jobTitle, companyName, description, null, 0, 0, new GeoPoint(0, 0), city, 0, url);
-                db.collection("Job")
+
+                Offer offer = new Offer(null, jobTitle, companyName, jobTitle, description, workingHours, salary,getLocationFromAddress(address, city), city, 0, url, employerId);
+                onOfferPublishedSuccessfully();
+                /*db.collection("Job")
                         .add(offer)
                         .addOnSuccessListener(documentReference -> {
                             Toast.makeText(getContext(), "Offre publiée avec succès", Toast.LENGTH_SHORT).show();
-                            onOfferPublishedSuccessfully();
+
                             //requireActivity().getSupportFragmentManager().popBackStack();
                         })
                         .addOnFailureListener(e -> {
                             Toast.makeText(getContext(), "Erreur lors de la publication de l'offre", Toast.LENGTH_SHORT).show();
                             Log.e("FirestoreError", "Erreur lors de la publication de l'offre", e);
-                        });
+                        });*/
             }
         });
     }
@@ -140,5 +149,21 @@ public class NewOfferFragment extends Fragment implements EditTextDialogFragment
         transaction.replace(R.id.main_fragment, offerCreatedFragment);
         transaction.addToBackStack(null);
         transaction.commit();
+    }
+
+    private GeoPoint getLocationFromAddress(String address, String city){
+        Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
+        try{
+            List<Address> addresses = geocoder.getFromLocationName(address + ", " + city,1);
+            if(addresses != null && !addresses.isEmpty()){
+                Address a = addresses.get(0);
+                return new GeoPoint(a.getLatitude(), a.getLongitude());
+            }else{
+                return new GeoPoint(0, 0);
+            }
+        }catch (IOException e){
+            Log.e("NEW OFFER FRAGMENT", e.getMessage(), e);
+            return new GeoPoint(0, 0);
+        }
     }
 }

@@ -26,15 +26,18 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class ActiveApplicationAdapter extends RecyclerView.Adapter<ActiveApplicationAdapter.ViewHolder> {
 
     private List<Map<String, Object>> itemList;
     private OnClickListener onClickListener;
     private Context context;
-    public ActiveApplicationAdapter(Context context, List<Map<String, Object>> itemList) {
+    private String role;
+    public ActiveApplicationAdapter(Context context, List<Map<String, Object>> itemList, String role) {
         this.context = context;
         this.itemList = itemList;
+        this.role = role;
         Collections.reverse(this.itemList);
     }
 
@@ -53,57 +56,104 @@ public class ActiveApplicationAdapter extends RecyclerView.Adapter<ActiveApplica
 
     private void updateUI(ViewHolder holder, int position){
         Map<String, Object> item = itemList.get(position);
-        if(item.get("logoUrl") != null){
-            Glide.with(context).load(item.get("logoUrl")).circleCrop().into(holder.icon);
+        if(Objects.equals(role, "Candidat")){
+            if(item.get("logoUrl") != null){
+                Glide.with(context).load(item.get("logoUrl")).circleCrop().into(holder.icon);
+            }
+            holder.name.setText((String) item.get("name"));
+            holder.employerName.setText((String) item.get("employerName"));
+            String salary = item.get("salary") + "/h";
+            holder.salary.setText(salary);
+            holder.city.setText((String) item.get("city"));
+            String periodText = item.get("period") + " h";
+            holder.period.setText(periodText);
+        }else{
+            if(item.get("profileImageUrl") != null){
+                Glide.with(context).load(item.get("profileImageUrl")).circleCrop().into(holder.icon);
+            }else{
+                holder.icon.setImageResource(R.drawable.default_profile_image);
+            }
+            String name = item.get("firstname") + " " + item.get("lastname");
+            holder.name.setText(name);
+            holder.employerName.setText((String) item.get("name"));
         }
-        holder.name.setText((String) item.get("name"));
-        holder.employerName.setText((String) item.get("employerName"));
-        String salary = item.get("salary") + "/h";
-        holder.salary.setText(salary);
-        holder.city.setText((String) item.get("city"));
-        String periodText = item.get("period") + " h";
-        holder.period.setText(periodText);
         Long status = (long) item.get("status");
         switch (toIntExact(status)){
             case 0:
                 holder.status.setText(context.getResources().getString(R.string.waiting));
                 holder.status.setTextColor(context.getResources().getColor(R.color.colorPrimary));
                 holder.status.setBackground(context.getResources().getDrawable(R.drawable.waiting_status_background));
+
+                if(Objects.equals(role, "Employeur")){
+                    holder.itemView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            if(holder.decisionLayout.getVisibility() == View.GONE){
+                                holder.decisionLayout.setVisibility(View.VISIBLE);
+                                holder.acceptButton.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        if(onClickListener != null){
+                                            onClickListener.onAcceptClick(itemList, item, position);
+                                        }
+                                    }
+                                });
+
+                                holder.refuseButton.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        if(onClickListener != null){
+                                            onClickListener.onDeclineClick(itemList, item, position);
+                                        }
+                                    }
+                                });
+                            }else{
+                                holder.decisionLayout.setVisibility(View.GONE);
+                            }
+                        }
+                    });
+                }
                 break;
             case 1:
                 holder.status.setText(context.getResources().getString(R.string.selection));
                 holder.status.setTextColor(context.getResources().getColor(R.color.green));
                 holder.status.setBackground(context.getResources().getDrawable(R.drawable.selection_status_background));
-                holder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        if(holder.decisionLayout.getVisibility() == View.GONE){
-                            holder.decisionLayout.setVisibility(View.VISIBLE);
-                            holder.acceptButton.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    if(onClickListener != null){
-                                        onClickListener.onAcceptClick(itemList, item, position);
+                if(Objects.equals(role, "Candidat")) {
+                    holder.itemView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            if (holder.decisionLayout.getVisibility() == View.GONE) {
+                                holder.decisionLayout.setVisibility(View.VISIBLE);
+                                holder.acceptButton.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        if (onClickListener != null) {
+                                            onClickListener.onAcceptClick(itemList, item, position);
+                                        }
                                     }
-                                }
-                            });
+                                });
 
-                            holder.refuseButton.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    if(onClickListener != null){
-                                        onClickListener.onDeclineClick(itemList, item, position);
+                                holder.refuseButton.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        if (onClickListener != null) {
+                                            onClickListener.onDeclineClick(itemList, item, position);
+                                        }
                                     }
-                                }
-                            });
-                        }else{
-                            holder.decisionLayout.setVisibility(View.GONE);
+                                });
+                            } else {
+                                holder.decisionLayout.setVisibility(View.GONE);
+                            }
                         }
-                    }
-                });
+                    });
+                }
                 break;
             case 2:
-                holder.status.setText(context.getResources().getString(R.string.refuse));
+                if(Objects.equals(role, "Candidat")) {
+                    holder.status.setText(context.getResources().getString(R.string.refuse));
+                }else{
+                    holder.status.setText(context.getResources().getString(R.string.declined_by_you));
+                }
                 holder.status.setTextColor(context.getResources().getColor(R.color.red));
                 holder.status.setBackground(context.getResources().getDrawable(R.drawable.reject_status_background));
                 break;
@@ -113,7 +163,11 @@ public class ActiveApplicationAdapter extends RecyclerView.Adapter<ActiveApplica
                 holder.status.setBackground(context.getResources().getDrawable(R.drawable.selection_status_background));
                 break;
             case 4:
-                holder.status.setText(context.getResources().getString(R.string.declined_by_you));
+                if(Objects.equals(role, "Candidat")) {
+                    holder.status.setText(context.getResources().getString(R.string.declined_by_you));
+                }else{
+                    holder.status.setText(context.getResources().getString(R.string.refuse));
+                }
                 holder.status.setTextColor(context.getResources().getColor(R.color.red));
                 holder.status.setBackground(context.getResources().getDrawable(R.drawable.reject_status_background));
                 break;

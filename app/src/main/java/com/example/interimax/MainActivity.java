@@ -1,6 +1,7 @@
 package com.example.interimax;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -34,6 +35,8 @@ import com.example.interimax.ProfileEmployerFragment;
 import com.example.interimax.ProfileFragment;
 import com.example.interimax.SavedOffersFragment;
 import com.example.interimax.SettingsFragment;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -42,6 +45,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, NavigationBarView.OnItemSelectedListener {
 
@@ -67,6 +71,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+
+        FirebaseStorage.getInstance().getReference("pfp/bigshaq.jpg").getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                Log.d("bigshaq", task.getResult().toString());
+            }
+        });
 
         initializeViews();
         setupDrawer();
@@ -304,7 +315,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         Intent intent = new Intent(MainActivity.this, ApplicationsActivity.class);
                         startActivity(intent);
                     } else if ("Employeur".equals(role)) {
-                        loadFragment(new ApplicationsEmployerFragment());
+                        Intent intent = new Intent(MainActivity.this, AllMyOffersActivity.class);
+                        startActivity(intent);
                     } else {
                         Toast.makeText(this, "Rôle inconnu", Toast.LENGTH_SHORT).show();
                     }

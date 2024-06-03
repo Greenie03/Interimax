@@ -41,11 +41,12 @@
             android:backgroundTint="#35390A6E"
             >
 
-            <TextView
+            <EditText
                 android:id="@+id/job_title_label"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:background="@color/transparent"
                 android:hint="Poste*"
                 android:textSize="16sp"
                 android:textColorHint="@color/purple_hard"/>
@@ -75,11 +76,12 @@
             android:layout_marginBottom="16dp"
             android:backgroundTint="#35390A6E">
 
-            <TextView
+            <EditText
                 android:id="@+id/workspace_label"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:background="@color/transparent"
                 android:hint="Espace de travail"
                 android:textSize="16sp"
                 android:textColorHint="@color/purple_hard"/>
@@ -109,11 +111,12 @@
             android:layout_marginBottom="16dp"
             android:backgroundTint="#35390A6E">
 
-            <TextView
+            <EditText
                 android:id="@+id/company_name_label"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:background="@color/transparent"
                 android:hint="Nom de l'entreprise*"
                 android:textSize="16sp"
                 android:textColorHint="@color/purple_hard"/>
@@ -143,12 +146,13 @@
             android:layout_marginBottom="16dp"
             android:backgroundTint="#35390A6E">
 
-            <TextView
+            <EditText
                 android:id="@+id/city_label"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="Ville*"
+                android:background="@color/transparent"
                 android:textSize="16sp"
                 android:textColorHint="@color/purple_hard"/>
 
@@ -177,11 +181,12 @@
             android:layout_marginBottom="16dp"
             android:backgroundTint="#35390A6E">
 
-            <TextView
+            <EditText
                 android:id="@+id/address_label"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:background="@color/transparent"
                 android:hint="Adresse"
                 android:textSize="16sp"
                 android:textColorHint="@color/purple_hard"/>
@@ -211,12 +216,14 @@
             android:layout_marginBottom="16dp"
             android:backgroundTint="#35390A6E">
 
-            <TextView
-                android:id="@+id/experience_label"
+            <EditText
+                android:id="@+id/salary_label"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="Expérience requise"
+                android:background="@color/transparent"
+                android:hint="Salaire horaire"
+                android:inputType="number"
                 android:textSize="16sp"
                 android:textColorHint="@color/purple_hard"/>
 
@@ -245,12 +252,14 @@
             android:layout_marginBottom="16dp"
             android:backgroundTint="#35390A6E">
 
-            <TextView
+            <EditText
                 android:id="@+id/hours_label"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:background="@color/transparent"
                 android:hint="Horaires"
+                android:inputType="number"
                 android:textSize="16sp"
                 android:textColorHint="@color/purple_hard"/>
 
@@ -279,12 +288,13 @@
             android:layout_marginBottom="16dp"
             android:backgroundTint="#35390A6E">
 
-            <TextView
+            <EditText
                 android:id="@+id/description_label"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="Description"
+                android:background="@color/transparent"
                 android:textSize="16sp"
                 android:textColorHint="@color/purple_hard"/>
 
@@ -303,14 +313,15 @@
         </LinearLayout>
 
         <!-- Button to publish the job offer -->
-        <Button
-            android:id="@+id/publish_offer_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/rounded_background"
-            android:layout_marginTop="32dp"
-            android:hint="Publier l'offre"
-            android:textSize="16sp"
-            android:enabled="false" />
+
     </LinearLayout>
+    <Button
+        android:id="@+id/publish_offer_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_background"
+        android:hint="Publier l'offre"
+        android:textSize="16sp"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="12dp"/>
 </RelativeLayout>

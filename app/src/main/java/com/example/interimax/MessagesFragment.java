@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class MessagesFragment extends Fragment {
 
@@ -100,28 +102,41 @@ public class MessagesFragment extends Fragment {
                     for (QueryDocumentSnapshot doc : value) {
                         Message message = doc.toObject(Message.class);
                         Log.d(TAG, "Message retrieved: " + message.getContent());
+                        if(Objects.equals(message.getSender(), currentUserEmail) || Objects.equals(message.getReceiver(), currentUserEmail)) {
+                            String otherUserEmail = message.getSender().equals(currentUserEmail) ? message.getReceiver() : message.getSender();
 
-                        String otherUserEmail = message.getSender().equals(currentUserEmail) ? message.getReceiver() : message.getSender();
+                            // If the conversation with this user already exists, update the last message and timestamp
+                            if (!conversationMap.containsKey(otherUserEmail)) {
+                                Conversation conversation = new Conversation();
+                                conversation.setUserName(otherUserEmail); // Temporary until we fetch user details
+                                conversation.setLastMessage(message.getContent());
+                                conversation.setTimestamp(message.getTime());
+                                conversation.setUnreadCount(0); // You can implement unread count logic
+                                conversation.setProfileImageUrl(""); // Temporary until we fetch user details
 
-                        // If the conversation with this user already exists, update the last message and timestamp
-                        if (!conversationMap.containsKey(otherUserEmail)) {
-                            Conversation conversation = new Conversation();
-                            conversation.setUserName(otherUserEmail); // Temporary until we fetch user details
-                            conversation.setLastMessage(message.getContent());
-                            conversation.setTimestamp(message.getTime());
-                            conversation.setUnreadCount(0); // You can implement unread count logic
-                            conversation.setProfileImageUrl(""); // Temporary until we fetch user details
-
-                            conversationMap.put(otherUserEmail, conversation);
-                        } else {
-                            Conversation conversation = conversationMap.get(otherUserEmail);
-                            conversation.setLastMessage(message.getContent());
-                            conversation.setTimestamp(message.getTime());
+                                conversationMap.put(otherUserEmail, conversation);
+                            } else {
+                                Conversation conversation = conversationMap.get(otherUserEmail);
+                                conversation.setLastMessage(message.getContent());
+                                conversation.setTimestamp(message.getTime());
+                           }
                         }
                     }
 
                     conversationList.clear();
                     conversationList.addAll(conversationMap.values());
+                    Log.d("MAP DEBUG", conversationMap.toString());
+                    adapter.setOnConversationClickListener(new ConversationAdapter.OnConversationClickListener() {
+                        @Override
+                        public void onConversationClick(Conversation conversation) {
+                            String email = conversationMap.entrySet().stream().filter(s -> conversation.equals(s.getValue())).map(Map.Entry::getKey).collect(Collectors.toList()).get(0);
+                            ChatFragment chatFragment = ChatFragment.newInstance(email);
+                            getParentFragmentManager().beginTransaction()
+                                    .replace(R.id.main_fragment, chatFragment)
+                                    .addToBackStack(null)
+                                    .commit();
+                        }
+                    });
                     adapter.notifyDataSetChanged();
 
                     // Fetch user details for each conversation

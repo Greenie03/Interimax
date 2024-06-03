@@ -33,6 +33,10 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
         this.onConversationClickListener = onConversationClickListener;
     }
 
+    public void setOnConversationClickListener(OnConversationClickListener onConversationClickListener) {
+        this.onConversationClickListener = onConversationClickListener;
+    }
+
     @NonNull
     @Override
     public ConversationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

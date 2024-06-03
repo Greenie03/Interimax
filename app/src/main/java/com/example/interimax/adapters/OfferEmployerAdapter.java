@@ -1,0 +1,123 @@
+package com.example.interimax.adapters;
+
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+import com.example.interimax.R;
+import com.example.interimax.models.Offer;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.Collections;
+import java.util.List;
+
+public class OfferEmployerAdapter extends RecyclerView.Adapter<OfferEmployerAdapter.ViewHolder> {
+
+    private Context context;
+    private List<Offer> itemList;
+    private OnClickListener onClickListener;
+    private FirebaseFirestore db;
+
+    public OfferEmployerAdapter(Context context, List<Offer> itemList) {
+        this.context = context;
+        this.itemList = itemList;
+        Collections.reverse(this.itemList);
+        db = FirebaseFirestore.getInstance();
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.offer_employer_list_element, parent, false);
+        return new ViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
+        Offer item = itemList.get(position);
+        if(item.getLogoUrl() != null){
+            Glide.with(context).load(item.getLogoUrl()).circleCrop().into(holder.icon);
+        }
+        holder.jobTitle.setText(item.getJobTitle());
+        holder.salary.setText(String.format("%s/h", item.getSalary()));
+        holder.employerName.setText(item.getEmployerName());
+        holder.city.setText(item.getCity());
+        holder.delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(onClickListener != null){
+                    onClickListener.onDeleteClick(position, item);
+                }
+            }
+        });
+
+        holder.itemView.setOnClickListener(view -> {
+            if (onClickListener != null) {
+                onClickListener.onClick(position, item);
+            }
+        });
+
+
+        //fetchEmployerName(item.getId(), holder.employerName, holder);
+    }
+
+    private void fetchEmployerName(String employerId, TextView employerNameView, OfferEmployerAdapter.ViewHolder holder) {
+        db.collection("users").document(employerId).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                DocumentSnapshot document = task.getResult();
+                String firstName = document.getString("firstname");
+                String lastName = document.getString("lastname");
+                if (firstName != null && lastName != null) {
+                    holder.employerName.setText(String.format("%s %s", firstName, lastName));
+                } else {
+                    employerNameView.setText("Nom inconnu");
+                }
+            } else {
+                employerNameView.setText("Nom inconnu");
+            }
+        });
+    }
+
+    @Override
+    public int getItemCount() {
+        return itemList.size();
+    }
+
+    public void setOnClickListener(OnClickListener onClickListener) {
+        this.onClickListener = onClickListener;
+    }
+
+    public interface OnClickListener {
+        void onClick(int position, Offer model);
+        void onDeleteClick(int position, Offer model);
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private ImageView icon;
+        private TextView jobTitle;
+        private TextView salary;
+        private TextView employerName;
+        private TextView city;
+        private Button delete;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+            icon = itemView.findViewById(R.id.icon);
+            jobTitle = itemView.findViewById(R.id.name);
+            salary = itemView.findViewById(R.id.salary);
+            employerName = itemView.findViewById(R.id.employer_name);
+            city = itemView.findViewById(R.id.city);
+            delete = itemView.findViewById(R.id.delete_button);
+        }
+    }
+}
