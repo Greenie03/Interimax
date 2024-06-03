@@ -167,7 +167,9 @@ public class ChatFragment extends Fragment {
                     }
                 }
                 adapter.notifyDataSetChanged();
-                binding.rvChat.scrollToPosition(adapter.getItemCount() - 1);
+                if(!messageList.isEmpty()){
+                    binding.rvChat.scrollToPosition(adapter.getItemCount() - 1);
+                }
                 Log.d(TAG, "Total messages: " + messageList.size());
             });
     }
