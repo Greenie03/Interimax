@@ -250,7 +250,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         builder = new LatLngBounds.Builder();
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(location -> {
-                    if (location == null) {
+                    if (location != null) {
                         Log.d(TAG, "User location: " + location.getLatitude() + ", " + location.getLongitude());
                         // Utiliser la localisation pour afficher les offres autour de l'utilisateur
                         Bitmap icon = drawableToBitmap(getResources().getDrawable(R.drawable.default_profile_image));
