@@ -3,11 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.LDMFragment">
+    tools:context=".LDMFragment">
+    <LinearLayout
+        android:id="@+id/margin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="?attr/colorPrimary"/>
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbarLDM"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/margin"
         android:background="?attr/colorPrimary"
         android:title="Lettres de Motivation"
         android:titleTextColor="@android:color/black" />

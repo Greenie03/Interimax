@@ -5,10 +5,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -64,6 +70,19 @@ public class ChatFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        final LinearLayout margin = binding.margin;
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), new OnApplyWindowInsetsListener() {
+            @Override
+            public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
+                int topInset = insets.getSystemWindowInsetTop();
+                RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) margin.getLayoutParams();
+                lp.height = topInset/3;
+                margin.setLayoutParams(lp);
+                return insets;
+            }
+        });
+
         if (getArguments() != null) {
             recieverMail = getArguments().getString(ARG_EMAIL);
         }
@@ -73,8 +92,12 @@ public class ChatFragment extends Fragment {
         messageList = new ArrayList<>();
         adapter = new MessageAdapter(getContext(), messageList, auth.getCurrentUser().getEmail());
 
-        binding.rvChat.setLayoutManager(new LinearLayoutManager(getContext()));
-        binding.rvChat.scrollToPosition(adapter.getItemCount() - 1);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        layoutManager.setStackFromEnd(true);
+        binding.rvChat.setLayoutManager(layoutManager);
+        if(!messageList.isEmpty()) {
+            binding.rvChat.scrollToPosition(adapter.getItemCount() - 1);
+        }
         binding.rvChat.setAdapter(adapter);
 
         loadMessages();
@@ -162,7 +185,9 @@ public class ChatFragment extends Fragment {
         .addOnSuccessListener(documentReference -> {
             binding.etMessage.setText("");
             Log.d(TAG, "Message sent successfully");
-            binding.rvChat.scrollToPosition(adapter.getItemCount() - 1);
+            if(!messageList.isEmpty()) {
+                binding.rvChat.scrollToPosition(adapter.getItemCount() - 1);
+            }
             //loadMessages(); // Reload messages after sending
         })
         .addOnFailureListener(e -> {

@@ -5,11 +5,17 @@
     android:layout_height="match_parent"
     android:background="#FFFFFF"
     tools:context=".ChatFragment">
-
+    <LinearLayout
+        android:id="@+id/margin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#99390A6E"/>
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        android:layout_below="@id/margin"
         android:background="#99390A6E"
         app:titleTextColor="#FFFFFF"
         app:subtitleTextColor="#E0E0E0"

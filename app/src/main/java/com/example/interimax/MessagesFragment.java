@@ -7,9 +7,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -49,6 +55,19 @@ public class MessagesFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentMessagesBinding.inflate(inflater, container, false);
+        final LinearLayout margin = binding.margin;
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), new OnApplyWindowInsetsListener() {
+            @Override
+            public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
+                int topInset = insets.getSystemWindowInsetTop();
+                RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) margin.getLayoutParams();
+                lp.height = topInset/3;
+                margin.setLayoutParams(lp);
+                return insets;
+            }
+        });
+
         return binding.getRoot();
     }
 
@@ -115,7 +134,7 @@ public class MessagesFragment extends Fragment {
                                 conversation.setProfileImageUrl(""); // Temporary until we fetch user details
 
                                 conversationMap.put(otherUserEmail, conversation);
-                            } else {
+                            } else if(conversationMap.get(otherUserEmail).getTimestamp() < message.getTime()){
                                 Conversation conversation = conversationMap.get(otherUserEmail);
                                 conversation.setLastMessage(message.getContent());
                                 conversation.setTimestamp(message.getTime());
