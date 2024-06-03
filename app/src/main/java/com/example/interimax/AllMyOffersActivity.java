@@ -25,6 +25,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.interimax.adapters.OfferEmployerAdapter;
 import com.example.interimax.models.Offer;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -205,6 +206,13 @@ public class AllMyOffersActivity extends AppCompatActivity implements OnMapReady
                     TextView salary = findViewById(R.id.salary);
                     TextView employerName = findViewById(R.id.employer_name);
                     TextView city = findViewById(R.id.city);
+
+                    if(offer.getLogoUrl() != null){
+                        icon.setVisibility(View.VISIBLE);
+                        Glide.with(AllMyOffersActivity.this).load(offer.getLogoUrl()).circleCrop().into(icon);
+                    }else{
+                        icon.setVisibility(View.INVISIBLE);
+                    }
                     name.setText(offer.getName());
                     employerName.setText(offer.getEmployerName());
                     String salaryText = offer.getSalary() + "/h";

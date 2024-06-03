@@ -65,7 +65,10 @@ public class OfferActivity extends AppCompatActivity {
             String salary = offer.getSalary() + "/h";
 
             if(offer.getLogoUrl() != null){
+                iconImageView.setVisibility(View.VISIBLE);
                 Glide.with(this).load(offer.getLogoUrl()).circleCrop().into(iconImageView);
+            }else{
+                iconImageView.setVisibility(View.INVISIBLE);
             }
             name.setText(offer.getName());
             employerName.setText(offer.getEmployerName());

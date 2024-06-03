@@ -27,6 +27,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.interimax.adapters.OfferAdapter;
 import com.example.interimax.models.Offer;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -56,7 +57,6 @@ import java.util.stream.Collectors;
 public class SearchResultActivity extends AppCompatActivity  implements OnMapReadyCallback {
 
     private GoogleMap gMap;
-    private Marker CURRENT_POSITION_MARKER;
     private Marker focusedMarker;
     private List<Offer> offers;
 
@@ -224,6 +224,12 @@ public class SearchResultActivity extends AppCompatActivity  implements OnMapRea
                     TextView salary = findViewById(R.id.salary);
                     TextView employerName = findViewById(R.id.employer_name);
                     TextView city = findViewById(R.id.city);
+                    if(offer.getLogoUrl() != null){
+                        icon.setVisibility(View.VISIBLE);
+                        Glide.with(SearchResultActivity.this).load(offer.getLogoUrl()).circleCrop().into(icon);
+                    }else{
+                        icon.setVisibility(View.INVISIBLE);
+                    }
                     name.setText(offer.getName());
                     employerName.setText(offer.getEmployerName());
                     String salaryText = offer.getSalary() + "/h";

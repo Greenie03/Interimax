@@ -226,6 +226,23 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                     }
                 }
                 focusedMarker = marker;
+                ImageView icon = rootView.findViewById(R.id.icon);
+                TextView name = rootView.findViewById(R.id.name);
+                TextView salary = rootView.findViewById(R.id.salary);
+                TextView employerName = rootView.findViewById(R.id.employer_name);
+                TextView city = rootView.findViewById(R.id.city);
+                Offer offer = (Offer) marker.getTag();
+                if(offer.getLogoUrl() != null){
+                    icon.setVisibility(View.VISIBLE);
+                    Glide.with(getContext()).load(offer.getLogoUrl()).circleCrop().into(icon);
+                }else{
+                    icon.setVisibility(View.INVISIBLE);
+                }
+                name.setText(offer.getName());
+                employerName.setText(offer.getEmployerName());
+                String salaryText = offer.getSalary() + "/h";
+                salary.setText(salaryText);
+                city.setText(offer.getCity());
                 Log.d("Marker", focusedMarker.toString());
                 return false;
             }
@@ -233,7 +250,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         builder = new LatLngBounds.Builder();
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(location -> {
-                    if (location != null) {
+                    if (location == null) {
                         Log.d(TAG, "User location: " + location.getLatitude() + ", " + location.getLongitude());
                         // Utiliser la localisation pour afficher les offres autour de l'utilisateur
                         Bitmap icon = drawableToBitmap(getResources().getDrawable(R.drawable.default_profile_image));

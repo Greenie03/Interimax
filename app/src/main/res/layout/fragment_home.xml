@@ -83,11 +83,19 @@
             android:layout_marginTop="24dp" />
 
         <TextView
+            android:id="@+id/latest_offer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="Dernières offres de votre ville"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+
+        <include
+            layout="@layout/offer_list_element"
+            android:id="@+id/offer_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" />
 
     </LinearLayout>
     <com.google.android.material.floatingactionbutton.FloatingActionButton
