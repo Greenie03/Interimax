@@ -216,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             } else if (itemId == R.id.navigation_message) {
                 fragment = new MessagesFragment();
                 Log.d("Navigation", "Messages selected");
-            } else if (itemId == R.id.navigation_bookmark) {
+            } else if (itemId == R.id.navigation_bookmark && role.equals("Candidat")) {
                 fragment = new SavedOffersFragment();
                 Log.d("Navigation", "Saved selected");
             } else if (itemId == R.id.navigation_notification) {
