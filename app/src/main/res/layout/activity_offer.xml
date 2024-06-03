@@ -48,7 +48,8 @@
                     android:singleLine="false"
                     android:textColor="@color/white"
                     android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:textAlignment="center"/>
 
                 <TextView
                     android:id="@+id/employer_name"

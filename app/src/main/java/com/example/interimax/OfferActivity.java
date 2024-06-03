@@ -26,6 +26,12 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 public class OfferActivity extends AppCompatActivity {
 
     @Override
@@ -76,7 +82,43 @@ public class OfferActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     if(FirebaseAuth.getInstance().getCurrentUser() != null){
-
+                        FirebaseFirestore.getInstance().collection("users")
+                                .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if(task.isSuccessful()) {
+                                            if (Objects.equals((String) task.getResult().get("role"), "Candidat")) {
+                                                String savedOfferAction = "";
+                                                List<String> savedOffer = new ArrayList<>();
+                                                if(task.getResult().get("savedOffers") != null){
+                                                    savedOffer = (List<String>) task.getResult().get("savedOffers");
+                                                    if(savedOffer.contains(offer.getId())){
+                                                        savedOffer.remove(offer.getId());
+                                                        savedOfferAction = offer.getName() + " a été retiré de vos offres enregistrées";
+                                                    }else{
+                                                        savedOffer.add(offer.getId());
+                                                        savedOfferAction = offer.getName() + " a été ajouté à vos offres enregistrées";
+                                                    }
+                                                }else{
+                                                    savedOffer.add(offer.getId());
+                                                    savedOfferAction = offer.getName() + " a été ajouté à vos offres enregistrées";
+                                                }
+                                                String finalSavedOfferAction = savedOfferAction;
+                                                FirebaseFirestore.getInstance().collection("users")
+                                                        .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                                        .update("savedOffers", savedOffer).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                Toast.makeText(OfferActivity.this, finalSavedOfferAction, Toast.LENGTH_LONG).show();
+                                                            }
+                                                        });
+                                            } else {
+                                                Toast.makeText(OfferActivity.this, "Vous ne pouvez pas enregistrer cette offre en tant que employeur", Toast.LENGTH_LONG).show();
+                                            }
+                                        }
+                                    }
+                                });
                     }else{
                         Intent intent = new Intent(OfferActivity.this, LoginActivity.class);
                         startActivity(intent);

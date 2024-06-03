@@ -58,7 +58,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void handleOnBackPressed() {
                 // Gérer l'action de retour ici pour revenir à l'activité précédente
-                navigateUpOrBack();
+                finish();
             }
         });
 

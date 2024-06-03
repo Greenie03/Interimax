@@ -1,5 +1,6 @@
 package com.example.interimax;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,13 +13,18 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.interimax.adapters.OfferAdapter;
 import com.example.interimax.adapters.SavedOffersAdapter;
 import com.example.interimax.databinding.FragmentSavedOffersBinding;
 import com.example.interimax.models.Offer;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +34,7 @@ public class SavedOffersFragment extends Fragment {
     private FragmentSavedOffersBinding binding;
     private FirebaseAuth auth;
     private FirebaseFirestore db;
-    private SavedOffersAdapter adapter;
+    private OfferAdapter adapter;
     private List<Offer> savedOffersList;
 
     public SavedOffersFragment() {
@@ -51,10 +57,18 @@ public class SavedOffersFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
 
         savedOffersList = new ArrayList<>();
-        adapter = new SavedOffersAdapter(savedOffersList);
+        adapter = new OfferAdapter(getContext(), savedOffersList);
 
         binding.recyclerViewSavedOffers.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.recyclerViewSavedOffers.setAdapter(adapter);
+        adapter.setOnClickListener(new OfferAdapter.OnClickListener() {
+            @Override
+            public void onClick(int position, Offer model) {
+                Intent offerIntent = new Intent(getContext(), OfferActivity.class);
+                offerIntent.putExtra("offer", model);
+                startActivity(offerIntent);
+            }
+        });
 
         Log.d("auth.getCurrentUser()", String.valueOf(auth.getCurrentUser()));
         if (auth.getCurrentUser() == null) {
@@ -74,17 +88,37 @@ public class SavedOffersFragment extends Fragment {
 
     private void loadSavedOffers() {
         String userId = auth.getCurrentUser().getUid();
-        db.collection("saved_offers")
-                .whereEqualTo("userId", userId)
+        db.collection("users")
+                .document(userId)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         savedOffersList.clear();
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            Offer offer = document.toObject(Offer.class);
-                            savedOffersList.add(offer);
+                        List<String> offersId = (List<String>) task.getResult().get("savedOffers");
+                        if(!offersId.isEmpty()) {
+                            db.collection("Job")
+                                    .whereIn(FieldPath.documentId(), offersId)
+                                    .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<QuerySnapshot> offerTask) {
+                                            savedOffersList = offerTask.getResult().toObjects(Offer.class);
+                                            adapter = new OfferAdapter(getContext(), savedOffersList);
+
+                                            binding.recyclerViewSavedOffers.setLayoutManager(new LinearLayoutManager(getContext()));
+                                            binding.recyclerViewSavedOffers.setAdapter(adapter);
+                                            adapter.setOnClickListener(new OfferAdapter.OnClickListener() {
+                                                @Override
+                                                public void onClick(int position, Offer model) {
+                                                    Intent offerIntent = new Intent(getContext(), OfferActivity.class);
+                                                    offerIntent.putExtra("offer", model);
+                                                    startActivity(offerIntent);
+                                                }
+                                            });
+                                            adapter.notifyDataSetChanged();
+                                            Log.d("DEBUG", savedOffersList.toString());
+                                        }
+                                    });
                         }
-                        adapter.notifyDataSetChanged();
                     } else {
                         Snackbar.make(binding.getRoot(), "Failed to load offers", Snackbar.LENGTH_LONG).show();
                     }

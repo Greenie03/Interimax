@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FirebaseAuth auth;
     private FirebaseFirestore db;
     private static final String TAG = "MainActivity";
+    private String role;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,13 +72,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-
-        FirebaseStorage.getInstance().getReference("pfp/bigshaq.jpg").getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
-            @Override
-            public void onComplete(@NonNull Task<Uri> task) {
-                Log.d("bigshaq", task.getResult().toString());
-            }
-        });
 
         initializeViews();
         setupDrawer();
@@ -109,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     DocumentSnapshot document = task.getResult().getDocuments().get(0);
                     String firstName = document.getString("firstname");
                     String lastName = document.getString("lastname");
-                    String role = document.getString("role");
+                    role = document.getString("role");
                     String profileImageUrl = document.getString("profileImageUrl");
                     View headerView = navigationView.getHeaderView(0);
                     TextView navUsername = headerView.findViewById(R.id.nav_header_fullname);
@@ -208,14 +202,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 // Gérer l'option de déconnexion pour les utilisateurs anonymes (connexion ou inscription)
                 Intent intent = new Intent(this, LoginActivity.class);
                 startActivity(intent);
-                finish();
                 return;
             } else {
                 // Bloquer l'accès à d'autres pages
                 Toast.makeText(this, "Connectez-vous pour accéder à cette fonctionnalité", Toast.LENGTH_SHORT).show();
                 return;
             }
-        } else {
+        }
+        else if(role != null) {
             if (itemId == R.id.navigation_home) {
                 fragment = new HomeFragment();
                 Log.d("Navigation", "Home selected");
@@ -228,7 +222,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             } else if (itemId == R.id.navigation_notification) {
                 fragment = new NotificationsFragment();
                 Log.d("Navigation", "Notifications selected");
-            } else if (itemId == R.id.nav_cvs) {
+            } else if (itemId == R.id.nav_cvs && role == "Candidat") {
                 fragment = new CVFragment();
                 Log.d("Navigation", "CVs selected");
             } else if (itemId == R.id.nav_profile) {
@@ -237,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             } else if (itemId == R.id.nav_applications) {
                 loadUserApplicationsFragment(currentUser);
                 return;
-            } else if (itemId == R.id.nav_cover_letters) {
+            } else if (itemId == R.id.nav_cover_letters && role == "Candidat") {
                 fragment = new LDMFragment();
                 Log.d("Navigation", "LDM selected");
             } else if (itemId == R.id.publish_offer_button) {
@@ -290,13 +284,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             db.collection("users").whereEqualTo("email", email).get().addOnCompleteListener(task -> {
                 if (task.isSuccessful() && !task.getResult().isEmpty()) {
                     DocumentSnapshot document = task.getResult().getDocuments().get(0);
-                    String role = document.getString("role");
-                    if ("Employeur".equals(role)) {
-                        loadFragment(new ProfileEmployerFragment());
-                    } else {
-                        // loadFragment(ProfileFragment()); // Assuming you have a ProfileFragment for other roles
-                        Toast.makeText(this, "Rôle inconnu ou non supporté", Toast.LENGTH_SHORT).show();
-                    }
+                    loadFragment(new ProfileEmployerFragment());
                 } else {
                     Toast.makeText(this, "Erreur lors de la récupération du rôle", Toast.LENGTH_SHORT).show();
                 }
