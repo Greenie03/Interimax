@@ -33,7 +33,7 @@ public class DownloadService extends Service {
     private OnServiceFinishedListener listener;
     public static final String ACTION_SERVICE_FINISHED = "ACTION_SERVICE_FINISHED";
     public static final String EXTRA_DOWNLOAD_URL = "download_url";
-    public static final String FILE_NAME = "download_url";
+    public static final String FILE_NAME = "file_name";
 
     private final class ServiceHandler extends Handler {
         public ServiceHandler(Looper looper) {
@@ -42,6 +42,7 @@ public class DownloadService extends Service {
 
         @Override
         public void handleMessage(Message msg) {
+            Log.d("handleMessage DEBUG", msg.obj.toString());
             String downloadUrl = ((Map<String, String>) msg.obj).get("downloadUrl");
             String filename = ((Map<String, String>) msg.obj).get("file_name");
 
@@ -54,6 +55,7 @@ public class DownloadService extends Service {
             Toast.makeText(getBaseContext(), "Starting download", Toast.LENGTH_SHORT).show();
 
             try {
+                Log.d("URL", downloadUrl);
                 URL url = new URL(downloadUrl);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.connect();
@@ -128,6 +130,7 @@ public class DownloadService extends Service {
         Map<String, String> map = new HashMap<>();
         map.put("downloadUrl", downloadUrl);
         map.put("file_name", filename);
+        Log.d("map for service", map.toString());
         msg.obj = map;
         mServiceHandler.sendMessage(msg);
         return START_STICKY;

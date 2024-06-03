@@ -24,7 +24,6 @@ import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.example.interimax.R;
-import com.example.interimax.fragments.ApplicationsEmployerFragment;
 import com.example.interimax.CVFragment;
 import com.example.interimax.HomeFragment;
 import com.example.interimax.LDMFragment;

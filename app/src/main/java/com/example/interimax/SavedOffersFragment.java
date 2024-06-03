@@ -72,7 +72,6 @@ public class SavedOffersFragment extends Fragment {
             }
         });
 
-        Log.d("auth.getCurrentUser()", String.valueOf(auth.getCurrentUser()));
         if (auth.getCurrentUser() == null) {
             redirectToLogin();
         } else {

@@ -42,7 +42,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     public void onBindViewHolder(@NonNull MessageViewHolder holder, int position) {
         Message message = messageList.get(position);
         holder.bind(message);
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        RelativeLayout.LayoutParams params = new RelativeLayout
+                .LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         if(Objects.equals(message.getSender(), currentUserEmail)) {
             params.addRule(RelativeLayout.ALIGN_PARENT_END, RelativeLayout.TRUE);
             holder.messageText.setBackground(context.getResources().getDrawable(R.drawable.waiting_status_background));

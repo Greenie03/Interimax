@@ -144,7 +144,6 @@ public class MessagesFragment extends Fragment {
 
                     conversationList.clear();
                     conversationList.addAll(conversationMap.values());
-                    Log.d("MAP DEBUG", conversationMap.toString());
                     adapter.setOnConversationClickListener(new ConversationAdapter.OnConversationClickListener() {
                         @Override
                         public void onConversationClick(Conversation conversation) {

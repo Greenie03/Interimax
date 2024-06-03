@@ -63,17 +63,6 @@ public class ResearchActivity extends AppCompatActivity implements FilterFragmen
         });
         search_input = findViewById(R.id.search_input);
         LinearLayout button_layout = findViewById(R.id.popular_buttons);
-        /*Offer.getAllOffers().thenAccept(offers -> {
-            runOnUiThread(() -> {
-                offers.sort(Comparator.comparingInt(Offer::getPopularity));
-                Set<String> jobTitle = offers.stream().map(Offer::getJobTitle).collect(Collectors.toSet());
-                jobTitle.forEach(jt -> {
-                    Button b = createNewPopularButton(jt);
-                    button_layout.addView(b);
-                    Log.d("Job", jt);
-                });
-            });
-        });*/
         FirebaseFirestore.getInstance().collection("job_popularity").orderBy("popularity", Query.Direction.DESCENDING).limit(5).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {

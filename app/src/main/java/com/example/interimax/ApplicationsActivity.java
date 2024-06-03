@@ -9,6 +9,7 @@ import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -48,6 +49,7 @@ public class ApplicationsActivity extends AppCompatActivity implements ActiveApp
     List<Map<String, Object>> obj;
     RecyclerView listResult;
     String role;
+    Map<String, Object> item;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,10 +75,10 @@ public class ApplicationsActivity extends AppCompatActivity implements ActiveApp
             }
         });
 
-
-        Log.d("USER ID", auth.getCurrentUser().getUid());
-
-        db.collection("users").document(auth.getCurrentUser().getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        db.collection("users")
+                .document(auth.getCurrentUser().getUid())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if(task.isSuccessful()){
@@ -275,19 +277,48 @@ public class ApplicationsActivity extends AppCompatActivity implements ActiveApp
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 100);
-        }
-        Map<String, String> urls = new HashMap<>();
-        urls.put(item.get("firstName") + "_" + item.get("lastName") + "CV",(String) item.get("cv"));
-        if(item.containsKey("motivation_letter")){
-            urls.put(item.get("firstName") + "_" + item.get("lastName") + "LDM",(String) item.get("motivation_letter"));
-        }
-        for(String key : urls.keySet()){
-            Intent downloadIntent = new Intent(this, DownloadService.class);
-            downloadIntent.putExtra(DownloadService.EXTRA_DOWNLOAD_URL, urls.get(key));
-            downloadIntent.putExtra(DownloadService.FILE_NAME, key);
+        }else{
+            Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
+            Map<String, String> urls = new HashMap<>();
+            urls.put("CV" + "_" + ((String) item.get("firstname")).replace(" ","_").replace("\"", "") + "_" + ((String )item.get("lastname")).replace(" ","_").replace("\"", ""),(String) item.get("cv"));
+            if(item.containsKey("motivation_letter")){
+                urls.put("LDM" + "_" + ((String) item.get("firstname")).replace(" ","_").replace("\"", "") + "_" + ((String )item.get("lastname")).replace(" ","_").replace("\"", ""),(String) item.get("motivation_letter"));
+            }
+            for(String key : urls.keySet()){
+                Log.d(key, urls.get(key));
+                Intent downloadIntent = new Intent(this, DownloadService.class);
+                downloadIntent.putExtra(DownloadService.EXTRA_DOWNLOAD_URL, urls.get(key));
+                downloadIntent.putExtra(DownloadService.FILE_NAME, key);
 
-            // Démarrer le service
-            startService(downloadIntent);
+                // Démarrer le service
+                startService(downloadIntent);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 100) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
+                Map<String, String> urls = new HashMap<>();
+                urls.put("CV" + "_" + item.get("firstname") + "_" + item.get("lastname"),(String) item.get("cv"));
+                if(item.containsKey("motivation_letter")){
+                    urls.put("LDM" + "_" + item.get("firstname") + "_" + item.get("lastname"),(String) item.get("motivation_letter"));
+                }
+                for(String key : urls.keySet()){
+                    Log.d(key, urls.get(key));
+                    Intent downloadIntent = new Intent(this, DownloadService.class);
+                    downloadIntent.putExtra(DownloadService.EXTRA_DOWNLOAD_URL, urls.get(key));
+                    downloadIntent.putExtra(DownloadService.FILE_NAME, key);
+
+                    // Démarrer le service
+                    startService(downloadIntent);
+                }
+            } else {
+                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }
