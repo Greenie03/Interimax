@@ -95,9 +95,6 @@ public class ChatFragment extends Fragment {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         layoutManager.setStackFromEnd(true);
         binding.rvChat.setLayoutManager(layoutManager);
-        if(!messageList.isEmpty()) {
-            binding.rvChat.scrollToPosition(adapter.getItemCount() - 1);
-        }
         binding.rvChat.setAdapter(adapter);
 
         loadMessages();
@@ -167,9 +164,6 @@ public class ChatFragment extends Fragment {
                     }
                 }
                 adapter.notifyDataSetChanged();
-                if(!messageList.isEmpty()){
-                    binding.rvChat.scrollToPosition(adapter.getItemCount() - 1);
-                }
                 Log.d(TAG, "Total messages: " + messageList.size());
             });
     }
@@ -187,7 +181,7 @@ public class ChatFragment extends Fragment {
         .addOnSuccessListener(documentReference -> {
             binding.etMessage.setText("");
             Log.d(TAG, "Message sent successfully");
-            if(!messageList.isEmpty()) {
+            if(messageList.size() > 1) {
                 binding.rvChat.scrollToPosition(adapter.getItemCount() - 1);
             }
             //loadMessages(); // Reload messages after sending
