@@ -33,7 +33,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.interimax.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -53,7 +52,6 @@ import java.util.Map;
 public class CVFragment extends Fragment {
 
     private static final String TAG = "CVFragment";
-    private static final int PICK_FILE_REQUEST = 1;
     private Uri fileUri;
     private FirebaseAuth auth;
     private FirebaseFirestore db;
@@ -98,10 +96,15 @@ public class CVFragment extends Fragment {
 
         // Setting up the back button functionality
         toolbar.setNavigationOnClickListener(v -> {
-            DrawerLayout drawerLayout = getActivity().findViewById(R.id.drawer_layout);
+            /*DrawerLayout drawerLayout = getActivity().findViewById(R.id.drawer_layout);
             if (drawerLayout != null) {
                 drawerLayout.openDrawer(GravityCompat.START);
-            }
+            }*/
+            HomeFragment homeFragment = new HomeFragment();
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.main_fragment, homeFragment)
+                    .addToBackStack(null)
+                    .commit();
         });
 
         auth = FirebaseAuth.getInstance();
